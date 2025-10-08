@@ -1,0 +1,196 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo que representa a un usuario de la aplicación
+model AppUser {
+  // Identificador único del usuario
+  id         String    @id @default(cuid())
+  // ID de Clerk (autenticación externa)
+  clerkId    String?   @unique
+  // Correo electrónico del usuario
+  email      String?   @unique
+  // Nombre del usuario
+  name       String?
+  // Teléfono del usuario
+  phone      String?
+  // Rol del usuario (ADMINISTRADOR, PROPIETARIO, CLIENTE)
+  role       Role      @default(CLIENTE)
+  // Negocios que posee el usuario
+  businesses Business[]
+  // Órdenes realizadas por el usuario
+  orders     Order[]
+  // Fecha de creación del usuario
+  createdAt  DateTime  @default(now())
+  // Fecha de última actualización del usuario
+  updatedAt  DateTime  @updatedAt
+}
+
+// Modelo que representa un negocio dentro de la aplicación
+model Business {
+  // Identificador único del negocio
+  id            String    @id @default(cuid())
+  // ID del propietario del negocio
+  ownerId       String
+  // Relación con el usuario propietario
+  owner         AppUser   @relation(fields: [ownerId], references: [id])
+  // Nombre del negocio
+  name          String
+  // Slug único para el negocio
+  slug          String    @unique
+  // Descripción del negocio
+  description   String?
+  // Rubro o categoría del negocio
+  rubro         String
+  // Teléfono de WhatsApp del negocio
+  whatsappPhone String?
+  // Alias para pagos del negocio
+  aliasPago     String?
+  // Dirección textual del negocio
+  addressText   String?
+  // Latitud de la ubicación del negocio
+  lat           Float?
+  // Longitud de la ubicación del negocio
+  lng           Float?
+  // Productos ofrecidos por el negocio
+  products      Product[]
+  // Órdenes asociadas al negocio
+  orders        Order[]
+  // Fecha de creación del negocio
+  createdAt     DateTime @default(now())
+  // Fecha de última actualización del negocio
+  updatedAt     DateTime @updatedAt
+}
+
+// Modelo que representa un producto ofrecido por un negocio
+model Product {
+  // Identificador único del producto
+  id         String   @id @default(cuid())
+  // ID del negocio al que pertenece el producto
+  businessId String
+  // Relación con el negocio
+  business   Business @relation(fields: [businessId], references: [id])
+  // Nombre del producto
+  name       String
+  // Descripción del producto
+  description String?
+  // Precio del producto
+  price      Float
+  // Stock disponible del producto
+  stock      Int      @default(0)
+  // Código SKU del producto
+  sku        String?
+  // Indica si el producto está disponible
+  available  Boolean  @default(true)
+  // Imágenes del producto
+  images     Json?
+  // Ítems de orden que incluyen este producto
+  orderItems OrderItem[]
+  // Fecha de creación del producto
+  createdAt  DateTime @default(now())
+  // Fecha de última actualización del producto
+  updatedAt  DateTime @updatedAt
+}
+
+// Modelo que representa una orden de compra realizada por un usuario
+model Order {
+  // Identificador único de la orden
+  id           String       @id @default(cuid())
+  // ID del negocio asociado a la orden
+  businessId   String
+  // Relación con el negocio
+  business     Business     @relation(fields: [businessId], references: [id])
+  // ID del cliente que realiza la orden
+  customerId   String
+  // Relación con el usuario cliente
+  customer     AppUser      @relation(fields: [customerId], references: [id])
+  // Ítems incluidos en la orden
+  items        OrderItem[]
+  // Total de la orden
+  total        Float
+  // Indica si la orden requiere envío
+  shipping     Boolean      @default(false)
+  // Latitud de la dirección de envío
+  lat          Float?
+  // Longitud de la dirección de envío
+  lng          Float?
+  // Dirección textual de envío
+  addressText  String?
+  // Estado actual de la orden
+  state        OrderState   @default(REGISTRADA)
+  // Comprobante de pago
+  paymentProof String?
+  // Nota adicional de la orden
+  note         String?
+  // Eventos asociados a la orden
+  events       OrderEvent[]
+  // Fecha de creación de la orden
+  createdAt    DateTime     @default(now())
+  // Fecha de última actualización de la orden
+  updatedAt    DateTime     @updatedAt
+}
+
+// Modelo que representa un ítem dentro de una orden de compra
+model OrderItem {
+  // Identificador único del ítem
+  id        String  @id @default(cuid())
+  // ID de la orden a la que pertenece el ítem
+  orderId   String
+  // Relación con la orden
+  order     Order   @relation(fields: [orderId], references: [id])
+  // ID del producto incluido en el ítem
+  productId String
+  // Relación con el producto
+  product   Product @relation(fields: [productId], references: [id])
+  // Cantidad de productos en el ítem
+  quantity  Int
+  // Precio unitario del producto en el ítem
+  unitPrice Float
+}
+
+// Modelo que representa un evento dentro del ciclo de vida de una orden
+model OrderEvent {
+  // Identificador único del evento
+  id        String   @id @default(cuid())
+  // ID de la orden asociada al evento
+  orderId   String
+  // Relación con la orden
+  order     Order    @relation(fields: [orderId], references: [id])
+  // ID del usuario que realizó el evento
+  actorId   String?
+  // Tipo de evento
+  type      String
+  // Nota adicional del evento
+  note      String?
+  // Fecha de creación del evento
+  createdAt DateTime @default(now())
+}
+
+// Enum que representa los roles posibles de un usuario
+enum Role {
+  ADMINISTRADOR      // Administrador
+  PROPIETARIO        // Propietario de negocio
+  CLIENTE            // Cliente
+}
+
+// Enum que representa los estados posibles de una orden
+enum OrderState {
+  REGISTRADA         // Orden registrada
+  PENDIENTE_PAGO     // Pendiente de pago
+  PAGADA             // Pagada
+  PREPARANDO         // Preparando
+  ENVIADA            // Enviada
+  ENTREGADA          // Entregada
+  CANCELADA          // Cancelada
+}
