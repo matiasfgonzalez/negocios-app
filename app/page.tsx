@@ -4,14 +4,7 @@
 import { useEffect, useState } from "react";
 import BusinessCard from "@/components/BusinessCard";
 import MapView from "@/components/MapView";
-
-type Business = {
-  id: string;
-  name: string;
-  category: string;
-  description?: string;
-  location?: string;
-};
+import { Business } from "./types/types";
 
 export default function HomePage() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
