@@ -45,7 +45,7 @@ export default function MapView({ businesses }: { businesses: Business[] }) {
   }, []);
 
   return (
-    <div className="w-full h-[400px] rounded-xl overflow-hidden">
+    <div className="w-full h-[400px] rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-700 shadow-soft dark:shadow-soft-dark">
       <MapContainer
         center={center}
         zoom={13}
@@ -71,7 +71,11 @@ export default function MapView({ businesses }: { businesses: Business[] }) {
           return (
             position && (
               <Marker key={b.id} position={position} icon={icon}>
-                <Popup>{b.name}</Popup>
+                <Popup>
+                  <div className="text-neutral-900 dark:text-neutral-100">
+                    {b.name}
+                  </div>
+                </Popup>
               </Marker>
             )
           );

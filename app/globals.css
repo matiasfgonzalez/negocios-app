@@ -120,4 +120,21 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Leaflet popup styling for dark mode */
+  .leaflet-popup-content-wrapper {
+    @apply bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100;
+  }
+
+  .leaflet-popup-tip {
+    @apply bg-white dark:bg-neutral-800;
+  }
+
+  /* Smooth transitions for theme changes */
+  .transition-colors {
+    transition-property: color, background-color, border-color,
+      text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
+  }
 }
