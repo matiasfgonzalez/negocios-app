@@ -49,97 +49,97 @@ export default async function EstadisticasPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
+    // UI improved: Clean background
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* UI improved: Enhanced back button */}
         <Link href="/dashboard">
           <Button
             variant="ghost"
-            className="mb-6 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="mb-6 hover:bg-accent transition-colors duration-200"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver al Dashboard
           </Button>
         </Link>
 
+        {/* UI improved: Enhanced header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
             Estadísticas del Sistema
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Visualiza métricas y análisis de rendimiento de la plataforma
           </p>
         </div>
 
-        {/* Grid de Estadísticas Principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Usuarios */}
-          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+        {/* UI improved: Enhanced statistics grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+          {/* UI improved: Enhanced Users card */}
+          <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-xl hover:border-primary/50 transition-all duration-300">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Usuarios Totales
               </CardTitle>
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                <Users className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-md">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
                 {stats.usuarios.total}
               </div>
-              <div className="flex items-center gap-1 text-sm">
-                <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <div className="flex items-center gap-1 text-xs sm:text-sm">
+                <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600 dark:text-green-400" />
                 <span className="text-green-600 dark:text-green-400 font-medium">
                   +{stats.usuarios.crecimiento}%
                 </span>
-                <span className="text-gray-600 dark:text-gray-400">
-                  este mes
-                </span>
+                <span className="text-muted-foreground">este mes</span>
               </div>
             </CardContent>
           </Card>
 
-          {/* Negocios */}
-          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+          {/* UI improved: Enhanced Business card */}
+          <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-xl hover:border-primary/50 transition-all duration-300">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Negocios Activos
               </CardTitle>
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
-                <Store className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center shadow-md">
+                <Store className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
                 {stats.negocios.activos}
               </div>
-              <div className="flex items-center gap-1 text-sm">
-                <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <div className="flex items-center gap-1 text-xs sm:text-sm">
+                <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600 dark:text-green-400" />
                 <span className="text-green-600 dark:text-green-400 font-medium">
                   +{stats.negocios.crecimiento}%
                 </span>
-                <span className="text-gray-600 dark:text-gray-400">
+                <span className="text-muted-foreground">
                   de {stats.negocios.total}
                 </span>
               </div>
             </CardContent>
           </Card>
 
-          {/* Pedidos */}
-          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+          {/* UI improved: Enhanced Orders card */}
+          <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-xl hover:border-primary/50 transition-all duration-300">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Pedidos Totales
               </CardTitle>
-              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-rose-500 rounded-lg flex items-center justify-center">
-                <ShoppingBag className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-red-500 to-rose-500 rounded-xl flex items-center justify-center shadow-md">
+                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
                 {stats.pedidos.total}
               </div>
-              <div className="flex items-center gap-1 text-sm">
+              <div className="flex items-center gap-1 text-xs sm:text-sm">
                 <span className="text-green-600 dark:text-green-400 font-medium">
                   {stats.pedidos.completados} completados
                 </span>
@@ -147,51 +147,51 @@ export default async function EstadisticasPage() {
             </CardContent>
           </Card>
 
-          {/* Ingresos */}
-          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
+          {/* UI improved: Enhanced Revenue card */}
+          <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-xl hover:border-primary/50 transition-all duration-300">
+            <CardHeader className="flex flex-row items-center justify-between pb-3">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                 Ingresos Totales
               </CardTitle>
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-white" />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center shadow-md">
+                <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+              <div className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
                 ${stats.ingresos.total.toLocaleString()}
               </div>
-              <div className="flex items-center gap-1 text-sm">
-                <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <div className="flex items-center gap-1 text-xs sm:text-sm">
+                <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600 dark:text-green-400" />
                 <span className="text-green-600 dark:text-green-400 font-medium">
                   +{stats.ingresos.crecimiento}%
                 </span>
-                <span className="text-gray-600 dark:text-gray-400">
-                  este mes
-                </span>
+                <span className="text-muted-foreground">este mes</span>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Gráfico Placeholder */}
-        <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-xl">
+        {/* UI improved: Enhanced Chart Placeholder */}
+        <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-300">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-primary-500" />
+            <CardTitle className="text-lg sm:text-xl font-bold text-foreground flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               Análisis de Rendimiento
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-64 flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-700 dark:to-blue-900/20 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
-              <div className="text-center">
-                <BarChart3 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 dark:text-gray-400 font-medium">
-                  Gráficos de estadísticas aquí
-                </p>
-                <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-                  Se pueden integrar librerías como Chart.js o Recharts
-                </p>
+            <div className="h-64 flex items-center justify-center bg-muted/30 rounded-xl border-2 border-dashed border-border">
+              <div className="text-center space-y-3">
+                <BarChart3 className="w-14 h-14 sm:w-16 sm:h-16 text-muted-foreground/40 mx-auto" />
+                <div>
+                  <p className="text-sm sm:text-base text-muted-foreground font-medium">
+                    Gráficos de estadísticas aquí
+                  </p>
+                  <p className="text-xs sm:text-sm text-muted-foreground/70 mt-1.5">
+                    Se pueden integrar librerías como Chart.js o Recharts
+                  </p>
+                </div>
               </div>
             </div>
           </CardContent>

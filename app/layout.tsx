@@ -19,18 +19,33 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="es">
+      <html lang="es" suppressHydrationWarning>
         <body
-          className={`${inter.className} bg-neutral-50 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-50 transition-colors`}
+          className={`${inter.className} bg-background text-foreground antialiased transition-colors duration-200`}
         >
           <ThemeProvider>
+            {/* UI improved: Added gradient background overlay */}
+            <div className="fixed inset-0 -z-10 bg-gradient-to-br from-background via-background to-muted/20 dark:from-background dark:via-background dark:to-muted/10" />
+
             <Navbar />
 
-            <main className="max-w-6xl mx-auto p-4">{children}</main>
+            {/* UI improved: Enhanced main container with better spacing and max-width */}
+            <main className="relative min-h-[calc(100vh-16rem)] max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              {children}
+            </main>
 
-            <footer className="text-center py-6 text-sm text-neutral-500 dark:text-neutral-400 border-t border-neutral-200 dark:border-neutral-700 mt-10">
-              © {new Date().getFullYear()} NegociosApp – Todos los derechos
-              reservados.
+            {/* UI improved: Enhanced footer with better styling and dark mode support */}
+            <footer className="relative border-t border-border bg-card/50 backdrop-blur-sm mt-16">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="text-center space-y-2">
+                  <p className="text-sm font-medium text-foreground">
+                    NegociosApp
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    © {new Date().getFullYear()} Todos los derechos reservados
+                  </p>
+                </div>
+              </div>
             </footer>
           </ThemeProvider>
         </body>

@@ -119,31 +119,34 @@ export default function NuevoNegocioDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all duration-200">
+        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all">
           <Plus className="w-4 h-4 mr-2" />
           Nuevo Negocio
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+          <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground">
             Crear Nuevo Negocio
           </DialogTitle>
-          <DialogDescription className="text-gray-600 dark:text-gray-300">
+          <DialogDescription className="text-sm sm:text-base text-muted-foreground">
             Completa la información de tu negocio. Los campos marcados con * son
             obligatorios.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6 mt-4">
-          {/* Información Básica */}
+        <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6 mt-4">
+          {/* UI improved: Enhanced Basic Info Section */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">
               Información Básica
             </h3>
 
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-gray-900 dark:text-white">
+              <Label
+                htmlFor="name"
+                className="text-sm font-medium text-foreground"
+              >
                 Nombre del Negocio *
               </Label>
               <Input
@@ -153,12 +156,15 @@ export default function NuevoNegocioDialog({
                 onChange={handleChange}
                 required
                 placeholder="Ej: Panadería El Hornero"
-                className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="rubro" className="text-gray-900 dark:text-white">
+              <Label
+                htmlFor="rubro"
+                className="text-sm font-medium text-foreground"
+              >
                 Rubro *
               </Label>
               <Input
@@ -168,14 +174,14 @@ export default function NuevoNegocioDialog({
                 onChange={handleChange}
                 required
                 placeholder="Ej: Panadería, Restaurante, Cafetería..."
-                className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
 
             <div className="space-y-2">
               <Label
                 htmlFor="description"
-                className="text-gray-900 dark:text-white"
+                className="text-sm font-medium text-foreground"
               >
                 Descripción
               </Label>
@@ -186,12 +192,15 @@ export default function NuevoNegocioDialog({
                 onChange={handleChange}
                 placeholder="Describe tu negocio..."
                 rows={3}
-                className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground resize-none"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="img" className="text-gray-900 dark:text-white">
+              <Label
+                htmlFor="img"
+                className="text-sm font-medium text-foreground"
+              >
                 Imagen del Negocio (URL)
               </Label>
               <Input

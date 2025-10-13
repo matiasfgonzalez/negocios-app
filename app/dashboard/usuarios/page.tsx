@@ -59,83 +59,85 @@ export default async function UsuariosPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
+    // UI improved: Clean background
+    <div className="min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* UI improved: Enhanced back button */}
         <Link href="/dashboard">
           <Button
             variant="ghost"
-            className="mb-6 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="mb-6 hover:bg-accent transition-colors duration-200"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver al Dashboard
           </Button>
         </Link>
 
+        {/* UI improved: Enhanced header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
             Gestión de Usuarios
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-sm sm:text-base text-muted-foreground">
             Administra usuarios y sus permisos en el sistema
           </p>
         </div>
 
-        {/* Lista de Usuarios */}
+        {/* UI improved: Enhanced users list */}
         <div className="space-y-4">
           {usuariosEjemplo.map((usuario) => (
             <Card
               key={usuario.id}
-              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300"
+              className="bg-card/50 backdrop-blur-sm border-border hover:shadow-xl hover:border-primary/50 transition-all duration-300"
             >
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  {/* Info del usuario */}
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
-                      <Users className="w-7 h-7 text-white" />
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                  {/* UI improved: User info section */}
+                  <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                      <Users className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate">
+                      <h3 className="text-base sm:text-lg font-bold text-foreground truncate">
                         {usuario.nombre}
                       </h3>
-                      <div className="flex flex-wrap items-center gap-3 mt-1">
-                        <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                          <Mail className="w-3 h-3" />
-                          {usuario.email}
+                      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-1 sm:gap-3 mt-1">
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
+                          <Mail className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate">{usuario.email}</span>
                         </div>
-                        <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                          <Calendar className="w-3 h-3" />
-                          {usuario.fechaRegistro}
+                        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
+                          <Calendar className="w-3 h-3 flex-shrink-0" />
+                          <span>{usuario.fechaRegistro}</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Rol y estado */}
-                  <div className="flex items-center gap-3">
+                  {/* UI improved: Role and status badges */}
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <Badge className={getRoleBadgeColor(usuario.rol)}>
                       <Shield className="w-3 h-3 mr-1" />
                       {usuario.rol}
                     </Badge>
-                    <Badge className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+                    <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
                       {usuario.estado}
                     </Badge>
                   </div>
 
-                  {/* Acciones */}
+                  {/* UI improved: Enhanced actions */}
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="hover:bg-accent transition-colors duration-200"
                     >
                       Editar
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
-                      className="hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                      className="hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 hover:border-red-500/20 transition-colors duration-200"
                     >
                       Desactivar
                     </Button>
@@ -146,42 +148,42 @@ export default async function UsuariosPage() {
           ))}
         </div>
 
-        {/* Estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-sm text-gray-600 dark:text-gray-400">
+        {/* UI improved: Enhanced statistics cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-8">
+          <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-200">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium">
                 Total Usuarios
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+              <p className="text-2xl sm:text-3xl font-bold text-primary">
                 {usuariosEjemplo.length}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-sm text-gray-600 dark:text-gray-400">
+          <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-200">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium">
                 Propietarios
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+              <p className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400">
                 {usuariosEjemplo.filter((u) => u.rol === "PROPIETARIO").length}
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-sm text-gray-600 dark:text-gray-400">
+          <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-200">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium">
                 Clientes
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+              <p className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
                 {usuariosEjemplo.filter((u) => u.rol === "CLIENTE").length}
               </p>
             </CardContent>

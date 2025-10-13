@@ -156,15 +156,15 @@ export default function BusinessDetailClient({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/20">
-      {/* Header del Negocio */}
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen">
+      {/* UI improved: Enhanced Business Header */}
+      <div className="bg-card/80 backdrop-blur-xl border-b border-border shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center gap-3 sm:gap-4 mb-3">
                 {business.img ? (
-                  <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg flex-shrink-0 bg-gray-100 dark:bg-gray-700">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-muted">
                     <img
                       src={business.img}
                       alt={`Logo de ${business.name}`}
@@ -172,65 +172,65 @@ export default function BusinessDetailClient({
                     />
                   </div>
                 ) : (
-                  <div className="w-16 h-16 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center shadow-lg">
-                    <StoreIcon className="w-8 h-8 text-white" />
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-md">
+                    <StoreIcon className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
                   </div>
                 )}
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
                     {business.name}
                   </h1>
-                  <Badge className="mt-1 bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300">
+                  <Badge className="mt-1.5 bg-primary/10 text-primary border-primary/20">
                     {business.rubro}
                   </Badge>
                 </div>
               </div>
 
               {business.description && (
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                <p className="text-sm sm:text-base text-muted-foreground mb-4">
                   {business.description}
                 </p>
               )}
 
-              <div className="flex flex-wrap gap-4 text-sm">
+              <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm">
                 {business.addressText && (
-                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                    <MapPin className="w-4 h-4 text-primary-500" />
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
                     <span>{business.addressText}</span>
                   </div>
                 )}
                 {business.whatsappPhone && (
-                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                    <Phone className="w-4 h-4 text-secondary-500" />
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600 dark:text-green-400" />
                     <a
                       href={`https://wa.me/${business.whatsappPhone}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-secondary-600 dark:hover:text-secondary-400 transition-colors"
+                      className="hover:text-green-600 dark:hover:text-green-400 transition-colors"
                     >
                       {business.whatsappPhone}
                     </a>
                   </div>
                 )}
                 {business.aliasPago && (
-                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                    <DollarSign className="w-4 h-4 text-secondary-500" />
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400" />
                     <span>Alias: {business.aliasPago}</span>
                   </div>
                 )}
               </div>
             </div>
 
-            {/* Botón del carrito */}
+            {/* UI improved: Enhanced Cart Button */}
             <Button
               onClick={() => setShowCart(!showCart)}
-              className="relative bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="relative bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all"
               size="lg"
             >
-              <ShoppingCart className="w-5 h-5 mr-2" />
+              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Carrito {cart.length > 0 && `(${cart.length})`}
               {cart.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-bounce shadow-lg">
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center font-bold animate-bounce shadow-md">
                   {cart.reduce((sum, item) => sum + item.quantity, 0)}
                 </span>
               )}
@@ -239,35 +239,35 @@ export default function BusinessDetailClient({
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Lista de Productos */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+          {/* UI improved: Enhanced Products List */}
           <div className="lg:col-span-2">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">
               Productos Disponibles
             </h2>
 
             {business.products.length === 0 ? (
-              <Card>
+              <Card className="bg-card/50 border-border">
                 <CardContent className="py-12 text-center">
-                  <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <Package className="w-14 h-14 sm:w-16 sm:h-16 text-muted-foreground/50 mx-auto mb-4" />
+                  <p className="text-sm sm:text-base text-muted-foreground">
                     No hay productos disponibles en este momento
                   </p>
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {business.products.map((product) => {
                   const cartQty = getCartQuantity(product.id);
                   return (
                     <Card
                       key={product.id}
-                      className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700"
+                      className="bg-card/50 backdrop-blur-sm hover:shadow-xl hover:-translate-y-1 hover:border-primary/50 transition-all duration-300 border-border group"
                     >
                       <CardHeader>
-                        <div className="flex justify-between items-start">
-                          <CardTitle className="text-lg text-gray-900 dark:text-white">
+                        <div className="flex justify-between items-start gap-3">
+                          <CardTitle className="text-base sm:text-lg text-foreground group-hover:text-primary transition-colors">
                             {product.name}
                           </CardTitle>
                           <Badge
@@ -276,8 +276,8 @@ export default function BusinessDetailClient({
                             }
                             className={
                               product.stock > 0
-                                ? "bg-secondary-100 text-secondary-700 dark:bg-secondary-900 dark:text-secondary-300"
-                                : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                                ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20"
+                                : "bg-muted text-muted-foreground border-border"
                             }
                           >
                             Stock: {product.stock}
@@ -286,13 +286,13 @@ export default function BusinessDetailClient({
                       </CardHeader>
                       <CardContent>
                         {product.description && (
-                          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                          <p className="text-xs sm:text-sm text-muted-foreground mb-4">
                             {product.description}
                           </p>
                         )}
 
                         <div className="flex items-center justify-between">
-                          <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                          <span className="text-xl sm:text-2xl font-bold text-primary">
                             ${product.price.toFixed(2)}
                           </span>
 
@@ -302,11 +302,11 @@ export default function BusinessDetailClient({
                                 size="sm"
                                 variant="outline"
                                 onClick={() => updateQuantity(product.id, -1)}
-                                className="h-8 w-8 p-0 hover:bg-red-50 hover:border-red-300 dark:hover:bg-red-900/20 dark:hover:border-red-700 transition-colors"
+                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-600 dark:hover:text-red-400 transition-colors border-border"
                               >
-                                <Minus className="w-4 h-4" />
+                                <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               </Button>
-                              <span className="text-lg font-semibold min-w-[2rem] text-center text-gray-900 dark:text-white">
+                              <span className="text-base sm:text-lg font-semibold min-w-[2rem] text-center text-foreground">
                                 {cartQty}
                               </span>
                               <Button
@@ -314,18 +314,19 @@ export default function BusinessDetailClient({
                                 variant="outline"
                                 onClick={() => updateQuantity(product.id, 1)}
                                 disabled={cartQty >= product.stock}
-                                className="h-8 w-8 p-0 hover:bg-green-50 hover:border-green-300 dark:hover:bg-green-900/20 dark:hover:border-green-700 transition-colors disabled:opacity-50"
+                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-green-500/10 hover:border-green-500/50 hover:text-green-600 dark:hover:text-green-400 transition-colors disabled:opacity-50 border-border"
                               >
-                                <Plus className="w-4 h-4" />
+                                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               </Button>
                             </div>
                           ) : (
                             <Button
                               onClick={() => addToCart(product)}
                               disabled={product.stock === 0}
-                              className="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50"
+                              size="sm"
+                              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all disabled:opacity-50"
                             >
-                              <Plus className="w-4 h-4 mr-1" />
+                              <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
                               Agregar
                             </Button>
                           )}
@@ -338,67 +339,67 @@ export default function BusinessDetailClient({
             )}
           </div>
 
-          {/* Panel del Carrito */}
+          {/* UI improved: Enhanced Cart Panel */}
           <div className="lg:col-span-1">
             <div className="sticky top-20">
               <Card
-                className={`bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm transition-all duration-300 ${
+                className={`bg-card/50 backdrop-blur-sm transition-all duration-300 ${
                   showCart
-                    ? "border-2 border-primary-500 shadow-2xl ring-4 ring-primary-100 dark:ring-primary-900/30"
-                    : "border border-gray-200 dark:border-gray-700 shadow-lg"
+                    ? "border-2 border-primary shadow-xl ring-4 ring-primary/10"
+                    : "border-border shadow-md"
                 }`}
               >
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
-                    <ShoppingCart className="w-5 h-5" />
+                  <CardTitle className="flex items-center gap-2 text-foreground text-lg sm:text-xl">
+                    <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
                     Tu Pedido
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-4 sm:space-y-6">
                   {cart.length === 0 ? (
                     <div className="text-center py-8">
-                      <ShoppingCart className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-600 dark:text-gray-400">
+                      <ShoppingCart className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground/50 mx-auto mb-3" />
+                      <p className="text-sm sm:text-base text-muted-foreground">
                         Tu carrito está vacío
                       </p>
                     </div>
                   ) : (
                     <>
-                      {/* Items del carrito */}
-                      <div className="space-y-3 max-h-64 overflow-y-auto">
+                      {/* UI improved: Enhanced Cart Items */}
+                      <div className="space-y-2 sm:space-y-3 max-h-64 overflow-y-auto pr-1">
                         {cart.map((item) => (
                           <div
                             key={item.productId}
-                            className="flex items-center justify-between gap-3 p-3 bg-gradient-to-r from-gray-50 to-blue-50/50 dark:from-gray-700 dark:to-blue-900/20 rounded-lg border border-gray-200 dark:border-gray-600 hover:shadow-md transition-all duration-200"
+                            className="flex items-center justify-between gap-3 p-2.5 sm:p-3 bg-accent/30 rounded-lg border border-border hover:bg-accent/50 hover:shadow-sm transition-all"
                           >
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-sm text-gray-900 dark:text-white truncate">
+                              <p className="font-medium text-xs sm:text-sm text-foreground truncate">
                                 {item.name}
                               </p>
-                              <p className="text-xs text-gray-600 dark:text-gray-400">
+                              <p className="text-xs text-muted-foreground">
                                 ${item.price.toFixed(2)} x {item.quantity}
                               </p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="font-semibold text-primary-600 dark:text-primary-400">
+                              <span className="font-semibold text-sm sm:text-base text-primary">
                                 ${(item.price * item.quantity).toFixed(2)}
                               </span>
                               <Button
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => removeFromCart(item.productId)}
-                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200 hover:scale-110"
+                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-500/10 transition-all hover:scale-110"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               </Button>
                             </div>
                           </div>
                         ))}
                       </div>
 
-                      {/* Tipo de entrega */}
-                      <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <Label className="text-base font-semibold mb-3 block text-gray-900 dark:text-white">
+                      {/* UI improved: Enhanced Delivery Type */}
+                      <div className="pt-4 border-t border-border">
+                        <Label className="text-sm sm:text-base font-semibold mb-3 block text-foreground">
                           Tipo de Entrega
                         </Label>
                         <RadioGroup
@@ -406,13 +407,13 @@ export default function BusinessDetailClient({
                           onValueChange={(value) =>
                             setDeliveryType(value as "pickup" | "delivery")
                           }
-                          className="space-y-3"
+                          className="space-y-2.5 sm:space-y-3"
                         >
                           <div
-                            className={`flex items-center space-x-3 p-3 border-2 rounded-lg transition-all duration-200 cursor-pointer ${
+                            className={`flex items-center space-x-3 p-2.5 sm:p-3 border-2 rounded-lg transition-all cursor-pointer ${
                               deliveryType === "pickup"
-                                ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20 shadow-md"
-                                : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                ? "border-primary bg-primary/10 shadow-sm"
+                                : "border-border hover:bg-accent/50"
                             }`}
                           >
                             <RadioGroupItem value="pickup" id="pickup" />
@@ -420,17 +421,17 @@ export default function BusinessDetailClient({
                               htmlFor="pickup"
                               className="flex items-center gap-2 cursor-pointer flex-1"
                             >
-                              <Package className="w-5 h-5 text-primary-500" />
-                              <span className="text-gray-900 dark:text-white font-medium">
+                              <Package className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                              <span className="text-xs sm:text-sm text-foreground font-medium">
                                 Retiro en el local
                               </span>
                             </Label>
                           </div>
                           <div
-                            className={`flex items-center space-x-3 p-3 border-2 rounded-lg transition-all duration-200 cursor-pointer ${
+                            className={`flex items-center space-x-3 p-2.5 sm:p-3 border-2 rounded-lg transition-all cursor-pointer ${
                               deliveryType === "delivery"
-                                ? "border-secondary-500 bg-secondary-50 dark:bg-secondary-900/20 shadow-md"
-                                : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                ? "border-primary bg-primary/10 shadow-sm"
+                                : "border-border hover:bg-accent/50"
                             }`}
                           >
                             <RadioGroupItem value="delivery" id="delivery" />
@@ -438,8 +439,8 @@ export default function BusinessDetailClient({
                               htmlFor="delivery"
                               className="flex items-center gap-2 cursor-pointer flex-1"
                             >
-                              <Truck className="w-5 h-5 text-secondary-500" />
-                              <span className="text-gray-900 dark:text-white font-medium">
+                              <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                              <span className="text-xs sm:text-sm text-foreground font-medium">
                                 Envío a domicilio
                               </span>
                             </Label>
@@ -447,10 +448,10 @@ export default function BusinessDetailClient({
                         </RadioGroup>
                       </div>
 
-                      {/* Mapa de ubicación si es envío */}
+                      {/* UI improved: Enhanced Map Selector */}
                       {deliveryType === "delivery" && (
-                        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                          <Label className="text-sm font-semibold mb-2 block text-gray-900 dark:text-white">
+                        <div className="pt-4 border-t border-border">
+                          <Label className="text-xs sm:text-sm font-semibold mb-2 block text-foreground">
                             Selecciona tu ubicación
                           </Label>
                           <OrderMapSelector
@@ -462,20 +463,20 @@ export default function BusinessDetailClient({
                             }
                           />
                           {deliveryLocation && (
-                            <p className="text-xs text-secondary-600 dark:text-secondary-400 mt-2">
+                            <p className="text-xs text-green-600 dark:text-green-400 mt-2">
                               ✓ Ubicación seleccionada
                             </p>
                           )}
                         </div>
                       )}
 
-                      {/* Total y botón de compra */}
-                      <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
+                      {/* UI improved: Enhanced Total and Checkout */}
+                      <div className="pt-4 border-t border-border space-y-3 sm:space-y-4">
                         <div className="flex justify-between items-center">
-                          <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                          <span className="text-base sm:text-lg font-semibold text-foreground">
                             Total:
                           </span>
-                          <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                          <span className="text-xl sm:text-2xl font-bold text-primary">
                             ${total.toFixed(2)}
                           </span>
                         </div>
@@ -486,7 +487,7 @@ export default function BusinessDetailClient({
                             cart.length === 0 ||
                             (deliveryType === "delivery" && !deliveryLocation)
                           }
-                          className="w-full bg-gradient-to-r from-secondary-500 to-primary-500 hover:from-secondary-600 hover:to-primary-600 text-white font-bold py-3 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2.5 sm:py-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
                           size="lg"
                         >
                           Realizar Pedido

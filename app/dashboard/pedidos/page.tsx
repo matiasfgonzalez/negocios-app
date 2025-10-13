@@ -47,48 +47,50 @@ export default async function PedidosPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
+    // UI improved: Clean background
+    <div className="min-h-screen">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* UI improved: Enhanced back button */}
         <Link href="/dashboard">
           <Button
             variant="ghost"
-            className="mb-6 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="mb-6 hover:bg-accent transition-colors duration-200"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Volver al Dashboard
           </Button>
         </Link>
 
+        {/* UI improved: Enhanced header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
             {role === "CLIENTE" ? "Mis Pedidos" : "Gestión de Pedidos"}
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-sm sm:text-base text-muted-foreground">
             {role === "CLIENTE"
               ? "Revisa el estado de tus pedidos realizados"
               : "Administra y procesa los pedidos recibidos"}
           </p>
         </div>
 
-        {/* Lista de Pedidos */}
-        <div className="space-y-6">
+        {/* UI improved: Enhanced orders list */}
+        <div className="space-y-4 sm:space-y-6">
           {pedidosEjemplo.map((pedido) => (
             <Card
               key={pedido.id}
-              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:shadow-2xl transition-all duration-300"
+              className="bg-card/50 backdrop-blur-sm border-border hover:shadow-xl hover:border-primary/50 transition-all duration-300"
             >
               <CardHeader>
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-red-500 to-rose-500 rounded-xl flex items-center justify-center shadow-lg">
-                      <ShoppingBag className="w-7 h-7 text-white" />
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-red-500 to-rose-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+                      <ShoppingBag className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                     </div>
-                    <div>
-                      <CardTitle className="text-xl text-gray-900 dark:text-white">
+                    <div className="min-w-0">
+                      <CardTitle className="text-lg sm:text-xl text-foreground truncate">
                         {pedido.negocio}
                       </CardTitle>
-                      <CardDescription className="text-gray-600 dark:text-gray-400">
+                      <CardDescription className="text-sm text-muted-foreground">
                         Pedido #{pedido.id}
                       </CardDescription>
                     </div>
@@ -96,74 +98,82 @@ export default async function PedidosPage() {
                   <Badge
                     className={
                       pedido.estado === "Completado"
-                        ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                        : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300"
+                        ? "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20"
+                        : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20"
                     }
                   >
                     {pedido.estado === "Completado" ? (
-                      <CheckCircle className="w-4 h-4 mr-1" />
+                      <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
                     ) : (
-                      <Clock className="w-4 h-4 mr-1" />
+                      <Clock className="w-3.5 h-3.5 mr-1.5" />
                     )}
                     {pedido.estado}
                   </Badge>
                 </div>
               </CardHeader>
+              {/* UI improved: Enhanced content layout */}
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Productos */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 font-semibold">
-                      <Package className="w-4 h-4 text-orange-500" />
+                  {/* Products section */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground font-semibold">
+                      <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-orange-500/10">
+                        <Package className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
+                      </div>
                       Productos
                     </div>
-                    <ul className="space-y-1">
+                    <ul className="space-y-1.5">
                       {pedido.productos.map((producto) => (
                         <li
                           key={producto}
-                          className="text-sm text-gray-900 dark:text-white"
+                          className="text-sm text-foreground pl-2 border-l-2 border-border"
                         >
-                          • {producto}
+                          {producto}
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  {/* Detalles */}
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      <span className="font-semibold">Fecha:</span>{" "}
+                  {/* Details section */}
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-semibold text-foreground">
+                        Fecha:
+                      </span>{" "}
                       {pedido.fecha}
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      <span className="font-semibold">Tipo:</span> {pedido.tipo}
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-semibold text-foreground">
+                        Tipo:
+                      </span>{" "}
+                      {pedido.tipo}
                     </p>
                   </div>
 
-                  {/* Total */}
-                  <div className="flex flex-col justify-center items-end">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  {/* Total section */}
+                  <div className="flex flex-col justify-center items-end p-4 bg-accent/50 rounded-xl">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-1">
                       Total
                     </p>
-                    <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+                    <p className="text-2xl sm:text-3xl font-bold text-primary">
                       ${pedido.total}
                     </p>
                   </div>
                 </div>
 
-                {/* Acciones */}
-                <div className="mt-6 flex gap-3">
+                {/* UI improved: Enhanced actions */}
+                <div className="mt-6 flex flex-wrap gap-2 sm:gap-3">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="hover:bg-accent transition-colors duration-200"
                   >
                     Ver detalles
                   </Button>
                   {role !== "CLIENTE" && pedido.estado !== "Completado" && (
                     <Button
                       size="sm"
-                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                      className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-sm"
                     >
                       Marcar como completado
                     </Button>
@@ -174,15 +184,17 @@ export default async function PedidosPage() {
           ))}
         </div>
 
-        {/* Empty State si no hay pedidos */}
+        {/* UI improved: Enhanced empty state */}
         {pedidosEjemplo.length === 0 && (
-          <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700">
+          <Card className="bg-card/50 backdrop-blur-sm border-border">
             <CardContent className="py-16 text-center">
-              <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <div className="w-20 h-20 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <ShoppingBag className="w-10 h-10 text-muted-foreground" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 No hay pedidos
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">
                 {role === "CLIENTE"
                   ? "Aún no has realizado ningún pedido"
                   : "No hay pedidos registrados en el sistema"}

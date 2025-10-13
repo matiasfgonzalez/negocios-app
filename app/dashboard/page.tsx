@@ -129,51 +129,57 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
+    // UI improved: Clean background without gradient overlay
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        {/* UI improved: Enhanced header with better responsive design */}
         <div className="mb-12">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center shadow-lg">
-              <User className="w-8 h-8 text-white" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-md">
+              <User className="w-7 h-7 sm:w-8 sm:h-8 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">
                 {roleTitle}
               </h1>
-              <p className="text-lg text-gray-600 dark:text-gray-300 mt-1">
+              <p className="text-base sm:text-lg text-muted-foreground mt-1">
                 Bienvenido,{" "}
-                <span className="font-semibold">{user.firstName}</span>
+                <span className="font-semibold text-foreground">
+                  {user.firstName}
+                </span>
               </p>
             </div>
           </div>
-          <p className="text-gray-600 dark:text-gray-400 max-w-2xl">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
             {roleDescription}
           </p>
         </div>
 
-        {/* Grid de Tarjetas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* UI improved: Enhanced cards grid with better hover effects */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {visibleCards.map((card) => {
             const Icon = card.icon;
             return (
               <Link key={card.href} href={card.href}>
-                <Card className="group h-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                  <CardHeader>
+                <Card className="group relative h-full bg-card/50 backdrop-blur-sm border-border hover:border-primary/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden">
+                  {/* UI improved: Gradient overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-secondary/0 group-hover:from-primary/5 group-hover:via-primary/0 group-hover:to-secondary/5 dark:group-hover:from-primary/10 dark:group-hover:to-secondary/10 transition-all duration-300 pointer-events-none" />
+
+                  <CardHeader className="relative">
                     <div className="flex items-center justify-between mb-4">
                       <div
-                        className={`w-14 h-14 bg-gradient-to-br ${card.gradient} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                        className={`w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br ${card.gradient} rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}
                       >
-                        <Icon className="w-7 h-7 text-white" />
+                        <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                       </div>
-                      <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-500 group-hover:translate-x-1 transition-all duration-300" />
+                      <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-300" />
                     </div>
-                    <CardTitle className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                    <CardTitle className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors">
                       {card.title}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-gray-600 dark:text-gray-300">
+                  <CardContent className="relative">
+                    <CardDescription className="text-sm text-muted-foreground leading-relaxed">
                       {card.description}
                     </CardDescription>
                   </CardContent>
@@ -183,17 +189,17 @@ export default async function DashboardPage() {
           })}
         </div>
 
-        {/* Footer Info */}
-        <div className="mt-12 p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-              <BarChart3 className="w-6 h-6 text-white" />
+        {/* UI improved: Enhanced footer info card */}
+        <div className="mt-8 sm:mt-12 p-4 sm:p-6 bg-card/50 backdrop-blur-sm rounded-2xl border border-border shadow-md">
+          <div className="flex flex-col sm:flex-row items-start gap-4">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
+              <BarChart3 className="w-6 h-6 text-primary-foreground" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
                 Acceso Rápido
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 Selecciona cualquier tarjeta para acceder a la funcionalidad
                 correspondiente. Cada sección está diseñada para facilitar la
                 gestión de tu{" "}

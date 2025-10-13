@@ -37,14 +37,14 @@ export default function CustomUserMenu() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="cursor-pointer relative h-8 w-8 rounded-full"
+          className="cursor-pointer relative h-8 w-8 rounded-full hover:ring-2 hover:ring-primary/20 transition-all"
         >
           <Avatar className="h-8 w-8">
             <AvatarImage
               src={user?.imageUrl}
               alt={user?.firstName || "Usuario"}
             />
-            <AvatarFallback className="bg-primary-500 text-white text-xs font-medium">
+            <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
               {getUserInitials()}
             </AvatarFallback>
           </Avatar>
@@ -52,27 +52,27 @@ export default function CustomUserMenu() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-xl"
+        className="w-56 bg-card border-border shadow-xl"
         align="end"
       >
         <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none text-gray-900 dark:text-white">
+          <div className="flex flex-col space-y-1.5">
+            <p className="text-sm font-medium leading-none text-foreground">
               {user?.firstName} {user?.lastName}
             </p>
-            <p className="text-xs leading-none text-gray-500 dark:text-gray-400">
+            <p className="text-xs leading-none text-muted-foreground">
               {user?.emailAddresses[0]?.emailAddress}
             </p>
-            <p className="text-xs leading-none text-primary-600 dark:text-primary-400 capitalize">
+            <p className="text-xs leading-none text-primary capitalize font-medium">
               {getUserRole()}
             </p>
           </div>
         </DropdownMenuLabel>
 
-        <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+        <DropdownMenuSeparator className="bg-border" />
 
         <DropdownMenuItem
-          className="cursor-pointer text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-400"
+          className="cursor-pointer text-foreground hover:bg-accent hover:text-primary transition-colors"
           onClick={() => router.push("/dashboard")}
         >
           <Shield className="mr-2 h-4 w-4" />
@@ -80,7 +80,7 @@ export default function CustomUserMenu() {
         </DropdownMenuItem>
 
         <DropdownMenuItem
-          className="cursor-pointer text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-400"
+          className="cursor-pointer text-foreground hover:bg-accent hover:text-primary transition-colors"
           onClick={() => router.push("/profile")}
         >
           <User className="mr-2 h-4 w-4" />
@@ -88,17 +88,17 @@ export default function CustomUserMenu() {
         </DropdownMenuItem>
 
         <DropdownMenuItem
-          className="cursor-pointer text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-400"
+          className="cursor-pointer text-foreground hover:bg-accent hover:text-primary transition-colors"
           onClick={() => router.push("/settings")}
         >
           <Settings className="mr-2 h-4 w-4" />
           <span>Configuración</span>
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-700" />
+        <DropdownMenuSeparator className="bg-border" />
 
         <DropdownMenuItem
-          className="cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300"
+          className="cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300 transition-colors"
           onClick={handleSignOut}
         >
           <LogOut className="mr-2 h-4 w-4" />

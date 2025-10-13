@@ -72,17 +72,17 @@ export default function BusinessPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-6">
           <div className="relative">
-            <div className="absolute inset-0 bg-primary-500/20 blur-3xl rounded-full animate-pulse"></div>
-            <Loader2 className="relative w-16 h-16 animate-spin text-primary-500 mx-auto" />
+            <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full animate-pulse"></div>
+            <Loader2 className="relative w-14 h-14 sm:w-16 sm:h-16 animate-spin text-primary mx-auto" />
           </div>
           <div className="space-y-2">
-            <p className="text-xl font-semibold text-gray-900 dark:text-white">
+            <p className="text-lg sm:text-xl font-semibold text-foreground">
               Cargando negocio...
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Por favor espera un momento
             </p>
           </div>
@@ -93,20 +93,20 @@ export default function BusinessPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-red-50 dark:from-gray-900 dark:via-gray-800 dark:to-red-900/20 flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-md w-full">
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-8 text-center space-y-6">
+          <div className="bg-card/50 backdrop-blur-xl rounded-2xl shadow-xl border-border p-6 sm:p-8 text-center space-y-6">
             <div className="relative inline-flex">
               <div className="absolute inset-0 bg-red-500/20 blur-2xl rounded-full"></div>
-              <div className="relative w-20 h-20 bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/40 dark:to-red-800/40 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
-                <AlertCircle className="w-10 h-10 text-red-600 dark:text-red-400" />
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-red-500/10 to-red-600/10 rounded-2xl flex items-center justify-center mx-auto shadow-md border border-red-500/20">
+                <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-red-600 dark:text-red-400" />
               </div>
             </div>
             <div className="space-y-3">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">
                 {error}
               </h2>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                 {error.includes("conexión")
                   ? "Verifica tu conexión a internet y que la base de datos esté activa."
                   : "El negocio que buscas no está disponible."}
@@ -115,14 +115,14 @@ export default function BusinessPage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
               <Button
                 onClick={() => window.location.reload()}
-                className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all"
               >
                 Reintentar
               </Button>
               <Link href="/">
                 <Button
                   variant="outline"
-                  className="w-full border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="w-full border-border hover:bg-accent"
                 >
                   Volver al inicio
                 </Button>
@@ -136,25 +136,25 @@ export default function BusinessPage() {
 
   if (!business) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-md w-full">
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-8 text-center space-y-6">
+          <div className="bg-card/50 backdrop-blur-xl rounded-2xl shadow-xl border-border p-6 sm:p-8 text-center space-y-6">
             <div className="relative inline-flex">
-              <div className="absolute inset-0 bg-gray-400/20 blur-2xl rounded-full"></div>
-              <div className="relative w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg">
-                <AlertCircle className="w-10 h-10 text-gray-600 dark:text-gray-300" />
+              <div className="absolute inset-0 bg-muted-foreground/20 blur-2xl rounded-full"></div>
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-muted/50 rounded-2xl flex items-center justify-center mx-auto shadow-md border border-border">
+                <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground" />
               </div>
             </div>
             <div className="space-y-3">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">
                 Negocio no encontrado
               </h2>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                 El negocio que buscas no existe o no está disponible.
               </p>
             </div>
             <Link href="/">
-              <Button className="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-lg hover:shadow-xl transition-all duration-200">
+              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all">
                 Volver al inicio
               </Button>
             </Link>

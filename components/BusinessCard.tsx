@@ -9,7 +9,6 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import { Business } from "@/app/types/types";
 import {
   MapPin,
@@ -25,8 +24,6 @@ import Link from "next/link";
 export default function BusinessCard({
   business,
 }: Readonly<{ business: Business }>) {
-  const router = useRouter();
-
   // Función para formatear la fecha de creación
   const getTimeSinceCreation = (createdAt: Date) => {
     const now = new Date();
@@ -43,20 +40,25 @@ export default function BusinessCard({
   };
 
   return (
-    <Card className="group hover:shadow-xl dark:hover:shadow-soft-dark transition-all duration-500 bg-gradient-to-br from-white to-neutral-50 dark:from-neutral-800 dark:to-neutral-900 border-neutral-200 dark:border-neutral-700 hover:border-primary-300 dark:hover:border-primary-600 overflow-hidden relative">
-      {/* Badge de tiempo en el negocio */}
-      <div className="absolute top-3 right-3 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/50 dark:to-purple-900/50 text-indigo-700 dark:text-indigo-300 px-2 py-1 rounded-full text-xs font-medium shadow-sm border border-indigo-200/50 dark:border-indigo-700/50">
+    // UI improved: Enhanced card with better hover effects and dark mode support
+    <Card className="group relative overflow-hidden bg-card hover:bg-card/80 border-border hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+      {/* UI improved: Gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-secondary/0 group-hover:from-primary/5 group-hover:via-primary/0 group-hover:to-secondary/5 dark:group-hover:from-primary/10 dark:group-hover:to-secondary/10 transition-all duration-300 pointer-events-none" />
+
+      {/* UI improved: Better badge styling with dark mode support */}
+      <div className="absolute top-3 right-3 z-10 px-3 py-1 bg-primary/10 dark:bg-primary/20 backdrop-blur-sm text-primary rounded-full text-xs font-medium border border-primary/20 shadow-sm">
         {getTimeSinceCreation(business.createdAt)}
       </div>
 
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-xl font-bold text-neutral-900 dark:text-neutral-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-1">
+      {/* UI improved: Enhanced header with relative positioning */}
+      <CardHeader className="relative pb-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-200 line-clamp-1">
               {business.name}
             </CardTitle>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r from-primary-100 to-blue-100 dark:from-primary-900/50 dark:to-blue-900/50 text-primary-800 dark:text-primary-200 border border-primary-200/50 dark:border-primary-700/50">
+            <div className="flex items-center gap-2 mt-2">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
                 {business.rubro}
               </span>
             </div>
@@ -64,80 +66,97 @@ export default function BusinessCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        {/* Descripción */}
-        <p className="text-neutral-600 dark:text-neutral-300 text-sm line-clamp-3 leading-relaxed">
+      {/* UI improved: Enhanced content with better spacing */}
+      <CardContent className="relative space-y-4">
+        {/* Description */}
+        <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
           {business.description ||
             "Descubre lo que este negocio tiene para ofrecerte."}
         </p>
 
-        {/* Información de contacto y ubicación */}
-        <div className="space-y-2">
+        {/* Contact and location info with improved icons */}
+        <div className="space-y-2.5">
           {business.addressText && (
-            <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
-              <MapPin className="w-4 h-4 text-blue-500 dark:text-blue-400" />
-              <span className="line-clamp-1">{business.addressText}</span>
+            <div className="flex items-center gap-2.5 text-sm text-muted-foreground group/item">
+              <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-primary/10 text-primary flex-shrink-0">
+                <MapPin className="w-4 h-4" />
+              </div>
+              <span className="line-clamp-1 group-hover/item:text-foreground transition-colors">
+                {business.addressText}
+              </span>
             </div>
           )}
 
           {business.whatsappPhone && (
-            <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
-              <MessageCircle className="w-4 h-4 text-green-500 dark:text-green-400" />
+            <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+              <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-green-500/10 text-green-600 dark:text-green-500 flex-shrink-0">
+                <MessageCircle className="w-4 h-4" />
+              </div>
               <span>WhatsApp disponible</span>
             </div>
           )}
 
           {business.aliasPago && (
-            <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400">
-              <CreditCard className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+            <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+              <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 flex-shrink-0">
+                <CreditCard className="w-4 h-4" />
+              </div>
               <span>Pagos digitales</span>
             </div>
           )}
         </div>
 
-        {/* Estadísticas del negocio */}
-        <div className="flex items-center justify-between pt-2 border-t border-neutral-200 dark:border-neutral-700">
-          <div className="flex items-center gap-4 text-xs text-neutral-500 dark:text-neutral-400">
-            <div className="flex items-center gap-1">
+        {/* UI improved: Enhanced statistics section */}
+        <div className="flex items-center justify-between pt-3 border-t border-border">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1.5">
               <Package className="w-3.5 h-3.5 text-orange-500 dark:text-orange-400" />
-              <span>{business.products?.length || 0} productos</span>
+              <span className="font-medium">
+                {business.products?.length || 0}
+              </span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400" />
-              <span>{business.orders?.length || 0} pedidos</span>
+              <span className="font-medium">
+                {business.orders?.length || 0}
+              </span>
             </div>
           </div>
 
-          {/* Rating simulado */}
-          <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 dark:fill-yellow-300 dark:text-yellow-300" />
-            <span className="text-sm font-medium text-neutral-600 dark:text-neutral-300">
+          {/* Rating with improved styling */}
+          <div className="flex items-center gap-1 px-2 py-1 bg-amber-500/10 rounded-lg">
+            <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+            <span className="text-xs font-semibold text-foreground">
               {(4.2 + Math.random() * 0.7).toFixed(1)}
             </span>
           </div>
         </div>
       </CardContent>
 
-      <CardFooter className="pt-4 bg-neutral-50 dark:bg-neutral-800/50">
-        <div className="flex gap-2 w-full">
+      {/* UI improved: Enhanced footer with better button styling */}
+      <CardFooter className="relative pt-4 pb-0 px-0">
+        <div className="flex gap-2 w-full px-6 pb-6">
           {business.whatsappPhone && (
             <Button
               variant="outline"
               size="sm"
-              className="cursor-pointer flex-1 border-green-300 dark:border-green-600 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-400 dark:hover:border-green-500 transition-all duration-300 shadow-sm hover:shadow-md focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-800"
+              className="flex-1 border-green-600/20 bg-green-500/5 text-green-700 dark:text-green-400 hover:bg-green-500/10 hover:border-green-600/40 transition-all duration-200"
               onClick={() =>
                 window.open(`https://wa.me/${business.whatsappPhone}`, "_blank")
               }
             >
-              <MessageCircle className="w-4 h-4 mr-1" />
-              WhatsApp
+              <MessageCircle className="w-4 h-4 mr-1.5" />
+              <span className="font-medium">Chat</span>
             </Button>
           )}
 
-          <Link href={`/businesses/${business.id}`}>
-            <Button className="cursor-pointer flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 border-0 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-neutral-800">
-              <Eye className="w-4 h-4 mr-1" />
-              Ver tienda
+          <Link href={`/businesses/${business.id}`} className="flex-1">
+            <Button
+              size="sm"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+            >
+              <Eye className="w-4 h-4 mr-1.5" />
+              <span>Ver tienda</span>
             </Button>
           </Link>
         </div>
