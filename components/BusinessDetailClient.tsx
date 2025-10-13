@@ -45,6 +45,7 @@ interface BusinessDetailClientProps {
     slug: string;
     description: string | null;
     rubro: string;
+    img: string | null;
     whatsappPhone: string | null;
     aliasPago: string | null;
     addressText: string | null;
@@ -162,9 +163,19 @@ export default function BusinessDetailClient({
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-16 h-16 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <StoreIcon className="w-8 h-8 text-white" />
-                </div>
+                {business.img ? (
+                  <div className="w-16 h-16 rounded-xl overflow-hidden shadow-lg flex-shrink-0 bg-gray-100 dark:bg-gray-700">
+                    <img
+                      src={business.img}
+                      alt={`Logo de ${business.name}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <StoreIcon className="w-8 h-8 text-white" />
+                  </div>
+                )}
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
                     {business.name}

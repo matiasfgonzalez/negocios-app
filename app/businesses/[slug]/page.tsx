@@ -13,6 +13,7 @@ interface BusinessData {
   slug: string;
   description: string | null;
   rubro: string;
+  img: string | null;
   whatsappPhone: string | null;
   aliasPago: string | null;
   addressText: string | null;
