@@ -50,6 +50,19 @@ export default function BusinessCard({
         {getTimeSinceCreation(business.createdAt)}
       </div>
 
+      {/* UI improved: Business image section */}
+      <div className="relative w-full h-48 overflow-hidden">
+        <img
+          src={
+            business.img ||
+            "https://www.sillasmesas.es/blog/wp-content/uploads/2021/05/montar-un-negocio-de-comida-para-llevar-1.jpg"
+          }
+          alt={`Imagen de ${business.name}`}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0" />
+      </div>
+
       {/* UI improved: Enhanced header with relative positioning */}
       <CardHeader className="relative pb-3">
         <div className="flex items-start justify-between gap-3">

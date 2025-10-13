@@ -36,7 +36,7 @@ interface NuevoNegocioDialogProps {
 
 export default function NuevoNegocioDialog({
   userId,
-}: NuevoNegocioDialogProps) {
+}: Readonly<NuevoNegocioDialogProps>) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

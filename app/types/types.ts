@@ -200,6 +200,9 @@ export type Business = {
   // Rubro o categoría del negocio (Corresponde a 'rubro' en el modelo)
   rubro: string;
 
+  // Imagen del negocio (opcional: String?)
+  img?: string;
+
   // Teléfono de WhatsApp del negocio (opcional: String?)
   whatsappPhone?: string;
 
