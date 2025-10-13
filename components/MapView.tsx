@@ -106,7 +106,7 @@ export default function MapView({
                     )}
                     <button
                       onClick={() =>
-                        window.open(`/negocio/${b.slug || b.id}`, "_blank")
+                        window.open(`/businesses/${b.slug || b.id}`, "_blank")
                       }
                       className="text-xs bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded transition-colors"
                     >
