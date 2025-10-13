@@ -63,6 +63,8 @@ model Business {
   lat           Float?
   // Longitud de la ubicación del negocio
   lng           Float?
+  // URL de la imagen o logo del negocio
+  img           String?
   // Productos ofrecidos por el negocio
   products      Product[]
   // Órdenes asociadas al negocio
