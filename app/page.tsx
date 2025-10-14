@@ -279,7 +279,7 @@ export default function HomePage() {
       <section className="scroll-mt-20">
         <div className="flex items-center gap-3 mb-8">
           <div className="p-2 bg-secondary/10 rounded-xl">
-            <MapPin className="w-6 h-6 text-secondary" />
+            <MapPin className="w-6 h-6 text-black dark:text-white" />
           </div>
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground">

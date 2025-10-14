@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
+import { useUser, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "./theme-toggle";
@@ -87,17 +87,7 @@ export default function Navbar() {
             {!isLoaded ? (
               <div className="w-9 h-9 bg-muted rounded-full animate-pulse" />
             ) : isSignedIn ? (
-              <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <p className="text-sm font-medium text-foreground leading-tight">
-                    {user?.firstName} {user?.lastName}
-                  </p>
-                  <p className="text-xs text-muted-foreground capitalize">
-                    {(user?.publicMetadata?.role as string) || "usuario"}
-                  </p>
-                </div>
-                <CustomUserMenu />
-              </div>
+              <CustomUserMenu />
             ) : (
               <SignInButton mode="modal">
                 <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-foreground bg-primary/10 hover:bg-primary/20 rounded-lg transition-all duration-200 border border-primary/20">
@@ -153,44 +143,8 @@ export default function Navbar() {
                   <div className="w-32 h-4 bg-muted rounded animate-pulse" />
                 </div>
               ) : isSignedIn ? (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 px-3 py-2">
-                    <UserButton
-                      appearance={{
-                        elements: {
-                          avatarBox: "w-10 h-10",
-                          userButtonPopoverCard:
-                            "shadow-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 backdrop-blur-md",
-                          userButtonPopoverHeader:
-                            "border-b border-gray-200 dark:border-gray-700 pb-3 mb-3",
-                          userButtonPopoverActions: "space-y-1",
-                          userButtonPopoverActionButton:
-                            "w-full justify-start text-left text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-primary-600 dark:hover:text-primary-400 rounded-lg px-3 py-2 transition-colors duration-200 font-medium",
-                          userButtonPopoverActionButtonIcon:
-                            "text-primary-500 mr-3",
-                          userButtonPopoverFooter: "hidden",
-                          userPreviewMainIdentifier:
-                            "text-gray-900 dark:text-white font-semibold",
-                          userPreviewSecondaryIdentifier:
-                            "text-gray-500 dark:text-gray-400 text-sm",
-                        },
-                        variables: {
-                          colorPrimary: "#3b82f6",
-                          colorBackground: "transparent",
-                          borderRadius: "0.75rem",
-                          spacingUnit: "0.5rem",
-                        },
-                      }}
-                    />
-                    <div>
-                      <p className="text-base font-medium text-foreground leading-tight">
-                        {user?.firstName} {user?.lastName}
-                      </p>
-                      <p className="text-sm text-muted-foreground capitalize">
-                        {(user?.publicMetadata?.role as string) || "usuario"}
-                      </p>
-                    </div>
-                  </div>
+                <div className="px-3 py-2">
+                  <CustomUserMenu />
                 </div>
               ) : (
                 <SignInButton mode="modal">
