@@ -30,6 +30,132 @@ const OrderMapSelector = dynamic(
   }
 );
 
+// Componente de Carrusel de Imágenes (Estilo Flowbite)
+type ImageCarouselProps = {
+  images: string[];
+  productName: string;
+};
+
+function ImageCarousel({ images, productName }: Readonly<ImageCarouselProps>) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const goToImage = (index: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex(index);
+  };
+
+  return (
+    <div className="relative w-full h-48 md:h-56 rounded-t-lg overflow-hidden group">
+      {/* Carousel wrapper */}
+      <div className="relative h-full overflow-hidden">
+        {images.map((url, index) => (
+          <div
+            key={`${productName}-${index}-${url.substring(url.length - 20)}`}
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+              index === currentIndex ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <img
+              src={url}
+              alt={`${productName} - Imagen ${index + 1}`}
+              className="absolute block w-full h-full object-cover -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Overlay Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+
+      {/* Slider indicators */}
+      {images.length > 1 && (
+        <div className="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3">
+          {images.map((url, idx) => (
+            <button
+              key={`${productName}-indicator-${idx}-${url.substring(
+                url.length - 10
+              )}`}
+              type="button"
+              className={`w-3 h-3 rounded-full transition-all ${
+                idx === currentIndex
+                  ? "bg-white"
+                  : "bg-white/50 hover:bg-white/75"
+              }`}
+              aria-current={idx === currentIndex}
+              aria-label={`Slide ${idx + 1}`}
+              onClick={(e) => goToImage(idx, e)}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Slider controls */}
+      {images.length > 1 && (
+        <>
+          <button
+            type="button"
+            className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group/prev focus:outline-none"
+            onClick={prevImage}
+          >
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover/prev:bg-white/50 dark:group-hover/prev:bg-gray-800/60 group-focus/prev:ring-4 group-focus/prev:ring-white dark:group-focus/prev:ring-gray-800/70 group-focus/prev:outline-none">
+              <svg
+                className="w-4 h-4 text-white dark:text-gray-200"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 6 10"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 1 1 5l4 4"
+                />
+              </svg>
+              <span className="sr-only">Previous</span>
+            </span>
+          </button>
+          <button
+            type="button"
+            className="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group/next focus:outline-none"
+            onClick={nextImage}
+          >
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover/next:bg-white/50 dark:group-hover/next:bg-gray-800/60 group-focus/next:ring-4 group-focus/next:ring-white dark:group-focus/next:ring-gray-800/70 group-focus/next:outline-none">
+              <svg
+                className="w-4 h-4 text-white dark:text-gray-200"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 6 10"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m1 9 4-4-4-4"
+                />
+              </svg>
+              <span className="sr-only">Next</span>
+            </span>
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 interface CartItem {
   productId: string;
   name: string;
@@ -65,7 +191,7 @@ interface BusinessDetailClientProps {
 
 export default function BusinessDetailClient({
   business,
-}: BusinessDetailClientProps) {
+}: Readonly<BusinessDetailClientProps>) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [deliveryType, setDeliveryType] = useState<"pickup" | "delivery">(
     "pickup"
@@ -260,11 +386,25 @@ export default function BusinessDetailClient({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {business.products.map((product) => {
                   const cartQty = getCartQuantity(product.id);
+                  const productImages = product.images
+                    ? Array.isArray(product.images)
+                      ? product.images
+                      : []
+                    : [];
+
                   return (
                     <Card
                       key={product.id}
-                      className="bg-card/50 backdrop-blur-sm hover:shadow-xl hover:-translate-y-1 hover:border-primary/50 transition-all duration-300 border-border group"
+                      className="bg-card/50 backdrop-blur-sm hover:shadow-xl hover:-translate-y-1 hover:border-primary/50 transition-all duration-300 border-border group overflow-hidden"
                     >
+                      {/* Carrusel de Imágenes del Producto */}
+                      {productImages.length > 0 && (
+                        <ImageCarousel
+                          images={productImages}
+                          productName={product.name}
+                        />
+                      )}
+
                       <CardHeader>
                         <div className="flex justify-between items-start gap-3">
                           <CardTitle className="text-base sm:text-lg text-foreground group-hover:text-primary transition-colors">
