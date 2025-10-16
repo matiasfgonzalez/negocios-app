@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Loader2 } from "lucide-react";
+import { Pencil, Loader2 } from "lucide-react";
 import dynamic from "next/dynamic";
 import {
   Dialog,
@@ -30,27 +30,57 @@ const MapSelector = dynamic<{
   ),
 });
 
-interface NuevoNegocioDialogProps {
-  userId: string;
+interface Business {
+  id: string;
+  name: string;
+  rubro: string;
+  description: string | null;
+  img: string | null;
+  whatsappPhone: string | null;
+  aliasPago: string | null;
+  addressText: string | null;
+  lat: number | null;
+  lng: number | null;
 }
 
-export default function NuevoNegocioDialog({
-  userId,
-}: Readonly<NuevoNegocioDialogProps>) {
+interface EditarNegocioDialogProps {
+  business: Business;
+  triggerButton?: React.ReactNode;
+}
+
+export default function EditarNegocioDialog({
+  business,
+  triggerButton,
+}: Readonly<EditarNegocioDialogProps>) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    rubro: "",
-    description: "",
-    img: "",
-    whatsappPhone: "",
-    aliasPago: "",
-    addressText: "",
-    lat: "",
-    lng: "",
+    name: business.name,
+    rubro: business.rubro,
+    description: business.description || "",
+    img: business.img || "",
+    whatsappPhone: business.whatsappPhone || "",
+    aliasPago: business.aliasPago || "",
+    addressText: business.addressText || "",
+    lat: business.lat?.toString() || "",
+    lng: business.lng?.toString() || "",
   });
+
+  // Actualizar formData cuando cambie el negocio
+  useEffect(() => {
+    setFormData({
+      name: business.name,
+      rubro: business.rubro,
+      description: business.description || "",
+      img: business.img || "",
+      whatsappPhone: business.whatsappPhone || "",
+      aliasPago: business.aliasPago || "",
+      addressText: business.addressText || "",
+      lat: business.lat?.toString() || "",
+      lng: business.lng?.toString() || "",
+    });
+  }, [business]);
 
   const handleLocationSelect = (location: { lat: number; lng: number }) => {
     setFormData({
@@ -65,14 +95,13 @@ export default function NuevoNegocioDialog({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/businesses", {
-        method: "POST",
+      const response = await fetch(`/api/businesses/${business.id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...formData,
-          ownerId: userId,
           lat: formData.lat ? Number.parseFloat(formData.lat) : null,
           lng: formData.lng ? Number.parseFloat(formData.lng) : null,
         }),
@@ -80,27 +109,18 @@ export default function NuevoNegocioDialog({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Error al crear el negocio");
+        throw new Error(error.error || "Error al actualizar el negocio");
       }
 
       // Cerrar dialog y refrescar la página
       setOpen(false);
-      setFormData({
-        name: "",
-        rubro: "",
-        description: "",
-        img: "",
-        whatsappPhone: "",
-        aliasPago: "",
-        addressText: "",
-        lat: "",
-        lng: "",
-      });
       router.refresh();
     } catch (error) {
       console.error("Error:", error);
       alert(
-        error instanceof Error ? error.message : "Error al crear el negocio"
+        error instanceof Error
+          ? error.message
+          : "Error al actualizar el negocio"
       );
     } finally {
       setIsSubmitting(false);
@@ -119,24 +139,30 @@ export default function NuevoNegocioDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all">
-          <Plus className="w-4 h-4 mr-2" />
-          Nuevo Negocio
-        </Button>
+        {triggerButton || (
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full hover:bg-accent border-border"
+          >
+            <Pencil className="w-4 h-4 mr-2" />
+            Editar
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="md:min-w-3xl max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto bg-card border-border">
         <DialogHeader>
           <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground">
-            Crear Nuevo Negocio
+            Editar Negocio
           </DialogTitle>
           <DialogDescription className="text-sm sm:text-base text-muted-foreground">
-            Completa la información de tu negocio. Los campos marcados con * son
-            obligatorios.
+            Actualiza la información de tu negocio. Los campos marcados con *
+            son obligatorios.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6 mt-4">
-          {/* UI improved: Enhanced Basic Info Section */}
+          {/* Información Básica */}
           <div className="space-y-4">
             <h3 className="text-base sm:text-lg font-semibold text-foreground">
               Información Básica
@@ -288,11 +314,20 @@ export default function NuevoNegocioDialog({
                 Selecciona la ubicación en el mapa
               </Label>
               <div className="border-2 border-dashed border-border rounded-lg overflow-hidden">
-                <MapSelector onLocationSelect={handleLocationSelect} />
+                <MapSelector
+                  onLocationSelect={handleLocationSelect}
+                  initialLocation={
+                    formData.lat && formData.lng
+                      ? {
+                          lat: Number.parseFloat(formData.lat),
+                          lng: Number.parseFloat(formData.lng),
+                        }
+                      : undefined
+                  }
+                />
               </div>
               <p className="text-xs text-muted-foreground">
-                Haz clic en el mapa para seleccionar la ubicación exacta de tu
-                negocio
+                Haz clic en el mapa para actualizar la ubicación de tu negocio
               </p>
             </div>
 
@@ -361,12 +396,12 @@ export default function NuevoNegocioDialog({
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Creando...
+                  Actualizando...
                 </>
               ) : (
                 <>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Crear Negocio
+                  <Pencil className="w-4 h-4 mr-2" />
+                  Actualizar Negocio
                 </>
               )}
             </Button>

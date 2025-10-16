@@ -1,6 +1,13 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { ArrowLeft, Store, MapPin, Phone, DollarSign } from "lucide-react";
+import {
+  ArrowLeft,
+  Store,
+  MapPin,
+  Phone,
+  DollarSign,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +20,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import NuevoNegocioDialog from "@/components/NuevoNegocioDialog";
+import EditarNegocioDialog from "@/components/EditarNegocioDialog";
+import EliminarNegocioDialog from "@/components/EliminarNegocioDialog";
 
 export default async function NegociosPage() {
   const user = await currentUser();
@@ -158,7 +167,7 @@ export default async function NegociosPage() {
                       <div className="flex items-center gap-3 text-xs sm:text-sm p-2 rounded-lg hover:bg-accent/50 transition-colors">
                         <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
                         <a
-                          href={`https://wa.me/${negocio.whatsappPhone.replace(
+                          href={`https://wa.me/${negocio.whatsappPhone.replaceAll(
                             /\D/g,
                             ""
                           )}`}
@@ -202,31 +211,59 @@ export default async function NegociosPage() {
                   </div>
 
                   {/* UI improved: Enhanced Actions */}
-                  <div className="flex gap-2 sm:gap-3 pt-2">
-                    <Link
-                      href={`/dashboard/negocios/${negocio.id}/editar`}
-                      className="flex-1"
-                    >
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full hover:bg-accent border-border text-xs sm:text-sm"
+                  <div className="flex flex-col gap-2 sm:gap-3 pt-2">
+                    <div className="flex gap-2 sm:gap-3">
+                      <EditarNegocioDialog
+                        business={{
+                          id: negocio.id,
+                          name: negocio.name,
+                          rubro: negocio.rubro,
+                          description: negocio.description,
+                          img: negocio.img,
+                          whatsappPhone: negocio.whatsappPhone,
+                          aliasPago: negocio.aliasPago,
+                          addressText: negocio.addressText,
+                          lat: negocio.lat,
+                          lng: negocio.lng,
+                        }}
+                        triggerButton={
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 hover:bg-accent border-border text-xs sm:text-sm"
+                          >
+                            Editar
+                          </Button>
+                        }
+                      />
+                      <Link
+                        href={`/dashboard/productos?negocioId=${negocio.id}`}
+                        className="flex-1"
                       >
-                        Editar
-                      </Button>
-                    </Link>
-                    <Link
-                      href={`/dashboard/productos?negocioId=${negocio.id}`}
-                      className="flex-1"
-                    >
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full hover:bg-accent border-border text-xs sm:text-sm"
-                      >
-                        Productos
-                      </Button>
-                    </Link>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full hover:bg-accent border-border text-xs sm:text-sm"
+                        >
+                          Productos
+                        </Button>
+                      </Link>
+                    </div>
+                    <EliminarNegocioDialog
+                      businessId={negocio.id}
+                      businessName={negocio.name}
+                      productCount={negocio._count.products}
+                      triggerButton={
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors text-xs sm:text-sm"
+                        >
+                          <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2" />
+                          Eliminar
+                        </Button>
+                      }
+                    />
                   </div>
                 </CardContent>
               </Card>
