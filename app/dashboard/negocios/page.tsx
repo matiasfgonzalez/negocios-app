@@ -222,6 +222,8 @@ export default async function NegociosPage() {
                           img: negocio.img,
                           whatsappPhone: negocio.whatsappPhone,
                           aliasPago: negocio.aliasPago,
+                          hasShipping: negocio.hasShipping,
+                          shippingCost: negocio.shippingCost,
                           addressText: negocio.addressText,
                           lat: negocio.lat,
                           lng: negocio.lng,

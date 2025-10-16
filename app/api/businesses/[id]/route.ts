@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 
-// GET - Obtener un negocio por ID
+// GET - Obtener un negocio por ID o slug
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -10,10 +10,14 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const business = await prisma.business.findUnique({
-      where: { id },
+    // Intentar buscar por ID primero, luego por slug
+    const business = await prisma.business.findFirst({
+      where: {
+        OR: [{ id }, { slug: id }],
+      },
       include: {
         owner: true,
+        products: true,
         _count: {
           select: { products: true },
         },
@@ -57,6 +61,8 @@ export async function PUT(
       img,
       whatsappPhone,
       aliasPago,
+      hasShipping,
+      shippingCost,
       addressText,
       lat,
       lng,
@@ -139,6 +145,16 @@ export async function PUT(
             : whatsappPhone,
         aliasPago:
           aliasPago === undefined ? existingBusiness.aliasPago : aliasPago,
+        hasShipping:
+          hasShipping === undefined
+            ? existingBusiness.hasShipping
+            : hasShipping,
+        shippingCost:
+          shippingCost === undefined
+            ? existingBusiness.shippingCost
+            : hasShipping && shippingCost
+            ? shippingCost
+            : 0,
         addressText:
           addressText === undefined
             ? existingBusiness.addressText

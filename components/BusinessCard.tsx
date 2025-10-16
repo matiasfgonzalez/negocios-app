@@ -117,6 +117,30 @@ export default function BusinessCard({
               <span>Pagos digitales</span>
             </div>
           )}
+
+          {/* Información de envío */}
+          {business.hasShipping ? (
+            <div className="flex items-center gap-2.5 text-sm">
+              <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-accent/20 text-accent flex-shrink-0">
+                <Package className="w-4 h-4" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-foreground font-medium">
+                  Envío disponible
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  ${business.shippingCost?.toFixed(2) || "0.00"}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2.5 text-sm text-muted-foreground">
+              <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-muted flex-shrink-0">
+                <Package className="w-4 h-4" />
+              </div>
+              <span>Solo retiro en local</span>
+            </div>
+          )}
         </div>
 
         {/* UI improved: Enhanced statistics section */}

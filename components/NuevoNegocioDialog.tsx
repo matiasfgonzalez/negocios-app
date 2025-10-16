@@ -47,6 +47,8 @@ export default function NuevoNegocioDialog({
     img: "",
     whatsappPhone: "",
     aliasPago: "",
+    hasShipping: false,
+    shippingCost: "",
     addressText: "",
     lat: "",
     lng: "",
@@ -73,6 +75,11 @@ export default function NuevoNegocioDialog({
         body: JSON.stringify({
           ...formData,
           ownerId: userId,
+          hasShipping: formData.hasShipping,
+          shippingCost:
+            formData.hasShipping && formData.shippingCost
+              ? Number.parseFloat(formData.shippingCost)
+              : 0,
           lat: formData.lat ? Number.parseFloat(formData.lat) : null,
           lng: formData.lng ? Number.parseFloat(formData.lng) : null,
         }),
@@ -92,6 +99,8 @@ export default function NuevoNegocioDialog({
         img: "",
         whatsappPhone: "",
         aliasPago: "",
+        hasShipping: false,
+        shippingCost: "",
         addressText: "",
         lat: "",
         lng: "",
@@ -257,6 +266,58 @@ export default function NuevoNegocioDialog({
                 className="bg-background border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
+
+            <div className="space-y-4 pt-4 border-t border-border">
+              <div className="flex items-center space-x-3">
+                <input
+                  id="hasShipping"
+                  name="hasShipping"
+                  type="checkbox"
+                  checked={formData.hasShipping}
+                  onChange={(e) =>
+                    setFormData({ ...formData, hasShipping: e.target.checked })
+                  }
+                  className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-2 focus:ring-primary/20"
+                />
+                <Label
+                  htmlFor="hasShipping"
+                  className="text-sm font-medium text-foreground cursor-pointer"
+                >
+                  El negocio ofrece servicio de envío a domicilio
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground ml-7">
+                Si está activado, los clientes podrán solicitar envío a
+                domicilio
+              </p>
+            </div>
+
+            {formData.hasShipping && (
+              <div className="space-y-2">
+                <Label
+                  htmlFor="shippingCost"
+                  className="text-sm font-medium text-foreground"
+                >
+                  Costo de Envío *
+                </Label>
+                <Input
+                  id="shippingCost"
+                  name="shippingCost"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.shippingCost}
+                  onChange={handleChange}
+                  placeholder="0.00"
+                  required={formData.hasShipping}
+                  className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Valor que se sumará al total cuando el cliente seleccione
+                  envío a domicilio
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Ubicación */}

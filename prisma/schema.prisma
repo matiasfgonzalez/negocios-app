@@ -65,6 +65,10 @@ model Business {
   lng           Float?
   // URL de la imagen o logo del negocio
   img           String?
+  // Indica si el negocio ofrece servicio de envío a domicilio
+  hasShipping   Boolean  @default(false)
+  // Valor del envío del negocio
+  shippingCost  Float?   @default(0)
   // Productos ofrecidos por el negocio
   products      Product[]
   // Órdenes asociadas al negocio

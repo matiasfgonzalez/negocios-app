@@ -218,6 +218,12 @@ export type Business = {
   // Longitud de la ubicación del negocio (opcional: Float?)
   lng?: number;
 
+  // Indica si el negocio ofrece envío
+  hasShipping: boolean;
+
+  // Costo del envío (opcional: Float?)
+  shippingCost?: number;
+
   // Productos ofrecidos por el negocio (Relación)
   products: Product[];
 

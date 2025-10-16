@@ -177,6 +177,8 @@ interface BusinessDetailClientProps {
     addressText: string | null;
     lat: number | null;
     lng: number | null;
+    hasShipping: boolean;
+    shippingCost: number | null;
     products: Array<{
       id: string;
       name: string;
@@ -252,8 +254,16 @@ export default function BusinessDetailClient({
     setCart((prev) => prev.filter((item) => item.productId !== productId));
   };
 
-  // Calcular total
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // Calcular subtotal y total
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const shippingCost =
+    deliveryType === "delivery" && business.hasShipping
+      ? business.shippingCost || 0
+      : 0;
+  const total = subtotal + shippingCost;
 
   // Obtener cantidad de un producto en el carrito
   const getCartQuantity = (productId: string) => {
@@ -273,6 +283,8 @@ export default function BusinessDetailClient({
       items: cart,
       deliveryType,
       deliveryLocation,
+      subtotal,
+      shippingCost,
       total,
     });
 
@@ -342,6 +354,21 @@ export default function BusinessDetailClient({
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400" />
                     <span>Alias: {business.aliasPago}</span>
+                  </div>
+                )}
+                {business.hasShipping && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Truck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent" />
+                    <span>
+                      Envío disponible: $
+                      {business.shippingCost?.toFixed(2) || "0.00"}
+                    </span>
+                  </div>
+                )}
+                {!business.hasShipping && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Package className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    <span>Solo retiro en local</span>
                   </div>
                 )}
               </div>
@@ -567,24 +594,43 @@ export default function BusinessDetailClient({
                               </span>
                             </Label>
                           </div>
-                          <div
-                            className={`flex items-center space-x-3 p-2.5 sm:p-3 border-2 rounded-lg transition-all cursor-pointer ${
-                              deliveryType === "delivery"
-                                ? "border-primary bg-primary/10 shadow-sm"
-                                : "border-border hover:bg-accent/50"
-                            }`}
-                          >
-                            <RadioGroupItem value="delivery" id="delivery" />
-                            <Label
-                              htmlFor="delivery"
-                              className="flex items-center gap-2 cursor-pointer flex-1"
+
+                          {business.hasShipping && (
+                            <div
+                              className={`flex items-center space-x-3 p-2.5 sm:p-3 border-2 rounded-lg transition-all cursor-pointer ${
+                                deliveryType === "delivery"
+                                  ? "border-primary bg-primary/10 shadow-sm"
+                                  : "border-border hover:bg-accent/50"
+                              }`}
                             >
-                              <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-                              <span className="text-xs sm:text-sm text-foreground font-medium">
-                                Envío a domicilio
-                              </span>
-                            </Label>
-                          </div>
+                              <RadioGroupItem value="delivery" id="delivery" />
+                              <Label
+                                htmlFor="delivery"
+                                className="flex items-center gap-2 cursor-pointer flex-1"
+                              >
+                                <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+                                  <span className="text-xs sm:text-sm text-foreground font-medium">
+                                    Envío a domicilio
+                                  </span>
+                                  <span className="text-xs text-accent font-semibold">
+                                    (+$
+                                    {business.shippingCost?.toFixed(2) ||
+                                      "0.00"}
+                                    )
+                                  </span>
+                                </div>
+                              </Label>
+                            </div>
+                          )}
+
+                          {!business.hasShipping && (
+                            <div className="p-2.5 sm:p-3 bg-muted/50 border border-border rounded-lg">
+                              <p className="text-xs text-muted-foreground text-center">
+                                Este negocio solo ofrece retiro en el local
+                              </p>
+                            </div>
+                          )}
                         </RadioGroup>
                       </div>
 
@@ -612,8 +658,33 @@ export default function BusinessDetailClient({
 
                       {/* UI improved: Enhanced Total and Checkout */}
                       <div className="pt-4 border-t border-border space-y-3 sm:space-y-4">
-                        <div className="flex justify-between items-center">
-                          <span className="text-base sm:text-lg font-semibold text-foreground">
+                        {/* Subtotal */}
+                        <div className="flex justify-between items-center text-sm sm:text-base">
+                          <span className="text-muted-foreground">
+                            Subtotal:
+                          </span>
+                          <span className="font-semibold text-foreground">
+                            ${subtotal.toFixed(2)}
+                          </span>
+                        </div>
+
+                        {/* Costo de Envío */}
+                        {deliveryType === "delivery" &&
+                          business.hasShipping && (
+                            <div className="flex justify-between items-center text-sm sm:text-base">
+                              <span className="text-muted-foreground flex items-center gap-1.5">
+                                <Truck className="w-3.5 h-3.5 text-accent" />
+                                Envío:
+                              </span>
+                              <span className="font-semibold text-accent">
+                                +${shippingCost.toFixed(2)}
+                              </span>
+                            </div>
+                          )}
+
+                        {/* Total Final */}
+                        <div className="flex justify-between items-center pt-2 border-t border-border">
+                          <span className="text-base sm:text-lg font-bold text-foreground">
                             Total:
                           </span>
                           <span className="text-xl sm:text-2xl font-bold text-primary">

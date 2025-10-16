@@ -19,6 +19,8 @@ interface BusinessData {
   addressText: string | null;
   lat: number | null;
   lng: number | null;
+  hasShipping: boolean;
+  shippingCost: number | null;
   products: Array<{
     id: string;
     name: string;
