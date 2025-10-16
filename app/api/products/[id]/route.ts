@@ -4,9 +4,11 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+type tParams = Promise<{ id: string }>;
+
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: tParams }
 ) {
   try {
     const { userId } = await auth();
@@ -35,7 +37,7 @@ export async function PUT(
       );
     }
 
-    const productId = params.id;
+    const { id: productId } = await params;
 
     // Verificar que el producto existe
     const existingProduct = await prisma.product.findUnique({
@@ -138,7 +140,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: tParams }
 ) {
   try {
     const { userId } = await auth();
@@ -165,7 +167,7 @@ export async function DELETE(
       );
     }
 
-    const productId = params.id;
+    const { id: productId } = await params;
 
     // Verificar que el producto existe
     const existingProduct = await prisma.product.findUnique({

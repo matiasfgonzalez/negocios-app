@@ -3,8 +3,11 @@ import { useCart } from "@/lib/store/cart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
+import { Product } from "@/app/types/types";
 
-export default function ProductCard({ product }: Readonly<{ product: any }>) {
+export default function ProductCard({
+  product,
+}: Readonly<{ product: Product }>) {
   const add = useCart((s) => s.addItem);
 
   return (

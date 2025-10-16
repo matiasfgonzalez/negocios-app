@@ -138,7 +138,7 @@ type OrderItem = {
   unitPrice: number; // Mapea Float de Prisma
 };
 
-type Product = {
+export type Product = {
   // Identificador único del producto
   id: string;
 
