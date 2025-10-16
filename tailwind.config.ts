@@ -10,71 +10,84 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Colores principales para negocios profesionales
+        // NeoBiz Pulse - Paleta de Colores Principal
         primary: {
           50: "#eff6ff",
           100: "#dbeafe",
           200: "#bfdbfe",
           300: "#93c5fd",
           400: "#60a5fa",
-          500: "#3b82f6", // Azul profesional principal
-          600: "#2563eb",
+          500: "#3b82f6", // Azul brillante (dark mode)
+          600: "#2563eb", // Azul vibrante (light mode)
           700: "#1d4ed8",
           800: "#1e40af",
           900: "#1e3a8a",
           950: "#172554",
         },
         secondary: {
+          50: "#faf5ff",
+          100: "#f3e8ff",
+          200: "#e9d5ff",
+          300: "#d8b4fe",
+          400: "#c084fc",
+          500: "#a78bfa", // Púrpura suave (dark mode)
+          600: "#7c3aed", // Púrpura energético (light mode)
+          700: "#6d28d9",
+          800: "#5b21b6",
+          900: "#4c1d95",
+          950: "#2e1065",
+        },
+        accent: {
           50: "#ecfdf5",
           100: "#d1fae5",
           200: "#a7f3d0",
           300: "#6ee7b7",
-          400: "#34d399",
-          500: "#10b981", // Verde esmeralda para crecimiento
+          400: "#34d399", // Verde brillante (dark mode)
+          500: "#10b981", // Verde esmeralda (light mode)
           600: "#059669",
           700: "#047857",
           800: "#065f46",
           900: "#064e3b",
           950: "#022c22",
         },
-        // Colores neutros elegantes
-        neutral: {
-          50: "#fafafa",
-          100: "#f5f5f5",
-          200: "#e5e5e5",
-          300: "#d4d4d4",
-          400: "#a3a3a3",
-          500: "#737373",
-          600: "#525252",
-          700: "#404040",
-          800: "#262626",
-          900: "#171717",
-          950: "#0a0a0a",
+        // Colores neutros slate (coordinados con el tema)
+        slate: {
+          50: "#f8fafc", // background light
+          100: "#f1f5f9",
+          200: "#e2e8f0", // muted light
+          300: "#cbd5e1", // border light
+          400: "#94a3b8",
+          500: "#64748b",
+          600: "#475569",
+          700: "#334155", // border dark
+          800: "#1e293b", // card/muted dark
+          900: "#0f172a", // background dark
+          950: "#020617",
         },
-        // Colores de estado
+        // Colores de estado mejorados
         success: {
-          50: "#f0fdf4",
-          500: "#22c55e",
-          600: "#16a34a",
+          50: "#ecfdf5",
+          500: "#10b981",
+          600: "#059669",
+          foreground: "#ffffff",
         },
         warning: {
           50: "#fffbeb",
           500: "#f59e0b",
           600: "#d97706",
+          foreground: "#ffffff",
         },
         error: {
           50: "#fef2f2",
           500: "#ef4444",
           600: "#dc2626",
+          foreground: "#ffffff",
         },
-        // Fondos específicos para temas
-        background: {
-          light: "#ffffff",
-          dark: "#0f172a",
-        },
-        surface: {
-          light: "#f8fafc",
-          dark: "#1e293b",
+        info: {
+          50: "#eff6ff",
+          500: "#3b82f6",
+          600: "#2563eb",
+          foreground: "#ffffff",
         },
       },
       backgroundImage: {
