@@ -378,7 +378,7 @@ export default function ProductosClient({
                 Nuevo Producto
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
+            <DialogContent className="md:min-w-3xl max-w-2xl max-h-[90vh] overflow-y-auto bg-card border-border">
               <DialogHeader>
                 <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground">
                   {isEditMode ? "Editar Producto" : "Crear Nuevo Producto"}
@@ -457,7 +457,7 @@ export default function ProductosClient({
                     }
                     placeholder="Describe el producto..."
                     rows={3}
-                    className="bg-background border-border text-foreground resize-none"
+                    className="bg-background border-border text-foreground resize-none break-all"
                   />
                 </div>
 
@@ -567,7 +567,7 @@ export default function ProductosClient({
                     }
                     placeholder="https://ejemplo.com/imagen1.jpg, https://ejemplo.com/imagen2.jpg"
                     rows={2}
-                    className="bg-background border-border text-foreground resize-none"
+                    className="bg-background border-border text-foreground resize-none break-all"
                   />
                   <p className="text-xs text-muted-foreground">
                     Separa múltiples URLs con comas
