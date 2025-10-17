@@ -1,6 +1,9 @@
-// Nota: Deberás tener los tipos 'AppUser', 'Product' y 'Order' definidos
-// para que este Type funcione completamente.
-type OrderState =
+// ============================================
+// TIPOS BASADOS EN EL SCHEMA DE PRISMA
+// ============================================
+
+// Enums
+export type OrderState =
   | "REGISTRADA"
   | "PENDIENTE_PAGO"
   | "PAGADA"
@@ -9,32 +12,32 @@ type OrderState =
   | "ENTREGADA"
   | "CANCELADA";
 
-type Role = "ADMINISTRADOR" | "PROPIETARIO" | "CLIENTE";
+export type Role = "ADMINISTRADOR" | "PROPIETARIO" | "CLIENTE";
 
-type AppUser = {
+export type AppUser = {
   // Identificador único del usuario
   id: string;
 
-  // ID de Clerk (autenticación externa) (opcional: String?)
-  clerkId?: string;
+  // ID de Clerk (autenticación externa)
+  clerkId: string | null;
 
-  // Correo electrónico del usuario (opcional: String?)
-  email?: string;
+  // Correo electrónico del usuario
+  email: string | null;
 
-  // Nombre del usuario (opcional: String?)
-  name?: string;
+  // Nombre del usuario
+  name: string | null;
 
-  // Teléfono del usuario (opcional: String?)
-  phone?: string;
+  // Teléfono del usuario
+  phone: string | null;
 
-  // Rol del usuario (Asume que Role es un enum o string)
+  // Rol del usuario (ADMINISTRADOR, PROPIETARIO, CLIENTE)
   role: Role;
 
   // Negocios que posee el usuario (Relación)
-  businesses: Business[];
+  businesses?: Business[];
 
   // Órdenes realizadas por el usuario (Relación)
-  orders: Order[];
+  orders?: Order[];
 
   // Fecha de creación del usuario
   createdAt: Date;
@@ -43,72 +46,74 @@ type AppUser = {
   updatedAt: Date;
 };
 
-type OrderEvent = {
+export type OrderEvent = {
   // Identificador único del evento
   id: string;
 
   // ID de la orden asociada al evento
   orderId: string;
-  // Relación con la orden
-  order: Order;
 
-  // ID del usuario que realizó el evento (opcional: String?)
-  actorId?: string;
-  // Nota: Si OrderEvent no tiene una relación directa con AppUser, solo necesitas el ID.
+  // Relación con la orden (opcional cuando solo se usa el ID)
+  order?: Order;
 
-  // Tipo de evento (ej: 'CREADA', 'PAGO_RECIBIDO', 'CANCELADA')
+  // ID del usuario que realizó el evento
+  actorId: string | null;
+
+  // Tipo de evento
   type: string;
 
-  // Nota adicional del evento (opcional: String?)
-  note?: string;
+  // Nota adicional del evento
+  note: string | null;
 
   // Fecha de creación del evento
   createdAt: Date;
 };
 
-type Order = {
+export type Order = {
   // Identificador único de la orden
   id: string;
 
   // ID del negocio asociado a la orden
   businessId: string;
-  // Relación con el negocio
-  business: Business;
+
+  // Relación con el negocio (opcional cuando solo se usa el ID)
+  business?: Business;
 
   // ID del cliente que realiza la orden
   customerId: string;
-  // Relación con el usuario cliente
-  customer: AppUser;
+
+  // Relación con el usuario cliente (opcional cuando solo se usa el ID)
+  customer?: AppUser;
 
   // Ítems incluidos en la orden (Relación)
-  items: OrderItem[];
+  items?: OrderItem[];
 
   // Total de la orden
-  total: number; // Mapea Float de Prisma
+  total: number;
 
   // Indica si la orden requiere envío
   shipping: boolean;
 
-  // Latitud de la dirección de envío (opcional: Float?)
-  lat?: number;
+  // Latitud de la dirección de envío
+  lat: number | null;
 
-  // Longitud de la dirección de envío (opcional: Float?)
-  lng?: number;
+  // Longitud de la dirección de envío
+  lng: number | null;
 
-  // Dirección textual de envío (opcional: String?)
-  addressText?: string;
+  // Dirección textual de envío
+  addressText: string | null;
 
-  // Estado actual de la orden (Asume que OrderState es un enum o string)
+  // Estado actual de la orden
   state: OrderState;
 
-  // Comprobante de pago (opcional: String?)
-  paymentProof?: string;
+  // Comprobante de pago
+  paymentProof: string | null;
 
-  // Nota adicional de la orden (opcional: String?)
-  note?: string;
+  // Nota adicional de la orden
+  note: string | null;
 
   // Eventos asociados a la orden (Relación)
-  events: OrderEvent[];
+  events?: OrderEvent[];
 
   // Fecha de creación de la orden
   createdAt: Date;
@@ -117,25 +122,27 @@ type Order = {
   updatedAt: Date;
 };
 
-type OrderItem = {
+export type OrderItem = {
   // Identificador único del ítem
   id: string;
 
   // ID de la orden a la que pertenece el ítem
   orderId: string;
-  // Relación con la orden
-  order: Order;
+
+  // Relación con la orden (opcional cuando solo se usa el ID)
+  order?: Order;
 
   // ID del producto incluido en el ítem
   productId: string;
-  // Relación con el producto
-  product: Product;
+
+  // Relación con el producto (opcional cuando solo se usa el ID)
+  product?: Product;
 
   // Cantidad de productos en el ítem
-  quantity: number; // Mapea Int de Prisma
+  quantity: number;
 
   // Precio unitario del producto en el ítem
-  unitPrice: number; // Mapea Float de Prisma
+  unitPrice: number;
 };
 
 export type Product = {
@@ -144,33 +151,34 @@ export type Product = {
 
   // ID del negocio al que pertenece el producto
   businessId: string;
-  // Relación con el negocio (opcional si sólo usas el ID)
-  business: Business;
+
+  // Relación con el negocio (opcional cuando solo se usa el ID)
+  business?: Business;
 
   // Nombre del producto
   name: string;
 
-  // Descripción del producto (opcional: String?)
-  description?: string;
+  // Descripción del producto
+  description: string | null;
 
   // Precio del producto
-  price: number; // Mapea Float de Prisma
+  price: number;
 
   // Stock disponible del producto
-  stock: number; // Mapea Int de Prisma
+  stock: number;
 
-  // Código SKU del producto (opcional: String?)
-  sku?: string;
+  // Código SKU del producto
+  sku: string | null;
 
   // Indica si el producto está disponible
   available: boolean;
 
-  // Imágenes del producto (Json? - puedes usar 'any' o un tipo de objeto más específico)
-  images?: any;
-  // Alternativa más precisa si sabes la estructura: images?: { url: string, alt?: string }[]
+  // Imágenes del producto (JSON)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  images: any;
 
   // Ítems de orden que incluyen este producto (Relación)
-  orderItems: OrderItem[];
+  orderItems?: OrderItem[];
 
   // Fecha de creación del producto
   createdAt: Date;
@@ -185,8 +193,9 @@ export type Business = {
 
   // ID del propietario del negocio
   ownerId: string;
-  // Relación con el usuario propietario (opcional si sólo usas el ID)
-  owner: AppUser;
+
+  // Relación con el usuario propietario (opcional cuando solo se usa el ID)
+  owner?: AppUser;
 
   // Nombre del negocio
   name: string;
@@ -194,41 +203,41 @@ export type Business = {
   // Slug único para el negocio
   slug: string;
 
-  // Descripción del negocio (opcional: String?)
-  description?: string;
+  // Descripción del negocio
+  description: string | null;
 
-  // Rubro o categoría del negocio (Corresponde a 'rubro' en el modelo)
+  // Rubro o categoría del negocio
   rubro: string;
 
-  // Imagen del negocio (opcional: String?)
-  img?: string;
+  // URL de la imagen o logo del negocio
+  img: string | null;
 
-  // Teléfono de WhatsApp del negocio (opcional: String?)
-  whatsappPhone?: string;
+  // Teléfono de WhatsApp del negocio
+  whatsappPhone: string | null;
 
-  // Alias para pagos del negocio (opcional: String?)
-  aliasPago?: string;
+  // Alias para pagos del negocio
+  aliasPago: string | null;
 
-  // Dirección textual del negocio (opcional: String?)
-  addressText?: string;
+  // Dirección textual del negocio
+  addressText: string | null;
 
-  // Latitud de la ubicación del negocio (opcional: Float?)
-  lat?: number;
+  // Latitud de la ubicación del negocio
+  lat: number | null;
 
-  // Longitud de la ubicación del negocio (opcional: Float?)
-  lng?: number;
+  // Longitud de la ubicación del negocio
+  lng: number | null;
 
-  // Indica si el negocio ofrece envío
+  // Indica si el negocio ofrece servicio de envío a domicilio
   hasShipping: boolean;
 
-  // Costo del envío (opcional: Float?)
-  shippingCost?: number;
+  // Valor del envío del negocio
+  shippingCost: number | null;
 
   // Productos ofrecidos por el negocio (Relación)
-  products: Product[];
+  products?: Product[];
 
   // Órdenes asociadas al negocio (Relación)
-  orders: Order[];
+  orders?: Order[];
 
   // Fecha de creación del negocio
   createdAt: Date;
