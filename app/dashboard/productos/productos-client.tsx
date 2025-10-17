@@ -45,7 +45,10 @@ import {
 } from "@/components/ui/select";
 import { Product, Business } from "@/app/types/types";
 
-type Producto = Omit<Product, "createdAt" | "updatedAt" | "images"> & {
+type Producto = Omit<
+  Product,
+  "createdAt" | "updatedAt" | "images" | "business"
+> & {
   images: string[] | null;
   business: {
     id: string;
