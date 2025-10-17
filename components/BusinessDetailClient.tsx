@@ -18,6 +18,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import dynamic from "next/dynamic";
 
 const OrderMapSelector = dynamic(
@@ -202,6 +204,8 @@ export default function BusinessDetailClient({
     lat: number;
     lng: number;
   } | null>(null);
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [deliveryNote, setDeliveryNote] = useState("");
   const [showCart, setShowCart] = useState(false);
 
   // Función para agregar producto al carrito
@@ -272,9 +276,15 @@ export default function BusinessDetailClient({
 
   // Función para procesar el pedido
   const handleCheckout = () => {
-    if (deliveryType === "delivery" && !deliveryLocation) {
-      alert("Por favor, selecciona tu ubicación en el mapa");
-      return;
+    if (deliveryType === "delivery") {
+      if (!deliveryLocation) {
+        alert("Por favor, selecciona tu ubicación en el mapa");
+        return;
+      }
+      if (!deliveryAddress.trim()) {
+        alert("Por favor, ingresa la dirección de entrega");
+        return;
+      }
     }
 
     // Aquí implementarías la lógica para crear la orden
@@ -282,7 +292,10 @@ export default function BusinessDetailClient({
       businessId: business.id,
       items: cart,
       deliveryType,
-      deliveryLocation,
+      shipping: deliveryType === "delivery",
+      deliveryLocation: deliveryType === "delivery" ? deliveryLocation : null,
+      addressText: deliveryType === "delivery" ? deliveryAddress : null,
+      note: deliveryType === "delivery" ? deliveryNote : null,
       subtotal,
       shippingCost,
       total,
@@ -290,6 +303,8 @@ export default function BusinessDetailClient({
 
     alert("¡Pedido realizado con éxito!");
     setCart([]);
+    setDeliveryAddress("");
+    setDeliveryNote("");
     setShowCart(false);
   };
 
@@ -636,23 +651,68 @@ export default function BusinessDetailClient({
 
                       {/* UI improved: Enhanced Map Selector */}
                       {deliveryType === "delivery" && (
-                        <div className="pt-4 border-t border-border">
-                          <Label className="text-xs sm:text-sm font-semibold mb-2 block text-foreground">
-                            Selecciona tu ubicación
-                          </Label>
-                          <OrderMapSelector
-                            onLocationSelect={setDeliveryLocation}
-                            businessLocation={
-                              business.lat && business.lng
-                                ? { lat: business.lat, lng: business.lng }
-                                : undefined
-                            }
-                          />
-                          {deliveryLocation && (
-                            <p className="text-xs text-green-600 dark:text-green-400 mt-2">
-                              ✓ Ubicación seleccionada
+                        <div className="pt-4 border-t border-border space-y-4">
+                          <div>
+                            <Label className="text-xs sm:text-sm font-semibold mb-2 block text-foreground">
+                              Selecciona tu ubicación en el mapa
+                            </Label>
+                            <OrderMapSelector
+                              onLocationSelect={setDeliveryLocation}
+                              businessLocation={
+                                business.lat && business.lng
+                                  ? { lat: business.lat, lng: business.lng }
+                                  : undefined
+                              }
+                            />
+                            {deliveryLocation && (
+                              <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                                ✓ Ubicación seleccionada
+                              </p>
+                            )}
+                          </div>
+
+                          <div>
+                            <Label
+                              htmlFor="deliveryAddress"
+                              className="text-xs sm:text-sm font-semibold mb-2 block text-foreground"
+                            >
+                              Dirección de entrega{" "}
+                              <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                              id="deliveryAddress"
+                              placeholder="Ej: Calle 123, Piso 4, Depto B"
+                              value={deliveryAddress}
+                              onChange={(e) =>
+                                setDeliveryAddress(e.target.value)
+                              }
+                              className="bg-background border-border text-foreground"
+                              required
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Incluye calle, número, piso, departamento, etc.
                             </p>
-                          )}
+                          </div>
+
+                          <div>
+                            <Label
+                              htmlFor="deliveryNote"
+                              className="text-xs sm:text-sm font-semibold mb-2 block text-foreground"
+                            >
+                              Indicaciones adicionales (opcional)
+                            </Label>
+                            <Textarea
+                              id="deliveryNote"
+                              placeholder="Ej: Timbre roto, puerta verde, portero eléctrico, referencias del lugar..."
+                              value={deliveryNote}
+                              onChange={(e) => setDeliveryNote(e.target.value)}
+                              className="bg-background border-border text-foreground min-h-[80px] resize-none"
+                              maxLength={500}
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Ayúdanos a encontrar tu domicilio más fácilmente
+                            </p>
+                          </div>
                         </div>
                       )}
 
@@ -696,7 +756,8 @@ export default function BusinessDetailClient({
                           onClick={handleCheckout}
                           disabled={
                             cart.length === 0 ||
-                            (deliveryType === "delivery" && !deliveryLocation)
+                            (deliveryType === "delivery" &&
+                              (!deliveryLocation || !deliveryAddress.trim()))
                           }
                           className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2.5 sm:py-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
                           size="lg"
@@ -704,11 +765,14 @@ export default function BusinessDetailClient({
                           Realizar Pedido
                         </Button>
 
-                        {deliveryType === "delivery" && !deliveryLocation && (
-                          <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
-                            Selecciona tu ubicación en el mapa
-                          </p>
-                        )}
+                        {deliveryType === "delivery" &&
+                          (!deliveryLocation || !deliveryAddress.trim()) && (
+                            <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
+                              {deliveryLocation
+                                ? "⚠️ Completa la dirección de entrega"
+                                : "⚠️ Selecciona tu ubicación en el mapa"}
+                            </p>
+                          )}
                       </div>
                     </>
                   )}

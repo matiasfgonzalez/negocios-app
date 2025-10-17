@@ -199,11 +199,11 @@ export default async function NegociosPage() {
                         {negocio._count.products}
                       </p>
                     </div>
-                    <Link href={`/businesses/${negocio.slug}`}>
+                    <Link href={`/businesses/${negocio.id}`}>
                       <Button
                         variant="outline"
                         size="sm"
-                        className="hover:bg-accent border-border text-xs sm:text-sm"
+                        className="cursor-pointer hover:bg-accent border-border text-xs sm:text-sm"
                       >
                         Ver Negocio
                       </Button>
