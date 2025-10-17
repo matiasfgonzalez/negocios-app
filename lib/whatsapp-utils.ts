@@ -1,16 +1,14 @@
 // Utilidades para generar mensajes de WhatsApp
+import { Order } from "@/app/types/types";
 
-interface OrderForWhatsApp {
-  readonly id: string;
-  readonly state: string;
-  readonly total: number;
-  readonly shipping: boolean;
-  readonly addressText: string | null;
-  readonly note: string | null;
-  readonly createdAt: Date;
+// Tipo específico para el mensaje de WhatsApp (con las relaciones necesarias)
+type OrderForWhatsApp = Pick<
+  Order,
+  "id" | "state" | "total" | "shipping" | "addressText" | "note" | "createdAt"
+> & {
   readonly customer: {
     readonly name: string | null;
-    readonly email: string;
+    readonly email: string | null;
     readonly phone: string | null;
   };
   readonly business: {
@@ -18,12 +16,13 @@ interface OrderForWhatsApp {
   };
   readonly items: ReadonlyArray<{
     readonly quantity: number;
-    readonly price: number;
+    readonly price?: number;
+    readonly unitPrice?: number;
     readonly product: {
       readonly name: string;
     };
   }>;
-}
+};
 
 export function generateOrderWhatsAppMessage(
   order: Readonly<OrderForWhatsApp>
@@ -48,7 +47,8 @@ export function generateOrderWhatsAppMessage(
   // Lista de productos
   let productsText = "";
   for (const item of order.items) {
-    const subtotal = item.quantity * item.price;
+    const itemPrice = item.price ?? item.unitPrice ?? 0;
+    const subtotal = item.quantity * itemPrice;
     productsText += `\n• ${item.quantity}x ${
       item.product.name
     } - $${subtotal.toFixed(2)}`;
@@ -67,11 +67,14 @@ export function generateOrderWhatsAppMessage(
     : "";
 
   // Calcular subtotal (total - shipping si aplica)
+  const itemsTotal = order.items.reduce((sum, item) => {
+    const itemPrice = item.price ?? item.unitPrice ?? 0;
+    return sum + item.quantity * itemPrice;
+  }, 0);
+
   const shippingCost = order.shipping
-    ? order.items.reduce((sum, item) => sum + item.quantity * item.price, 0) <
-      order.total
-      ? order.total -
-        order.items.reduce((sum, item) => sum + item.quantity * item.price, 0)
+    ? itemsTotal < order.total
+      ? order.total - itemsTotal
       : 0
     : 0;
 

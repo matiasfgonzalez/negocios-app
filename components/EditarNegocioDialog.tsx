@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Loader2 } from "lucide-react";
 import dynamic from "next/dynamic";
+import { Business } from "@/app/types/types";
 import {
   Dialog,
   DialogContent,
@@ -29,21 +30,6 @@ const MapSelector = dynamic<{
     </div>
   ),
 });
-
-interface Business {
-  id: string;
-  name: string;
-  rubro: string;
-  description: string | null;
-  img: string | null;
-  whatsappPhone: string | null;
-  aliasPago: string | null;
-  hasShipping: boolean;
-  shippingCost: number | null;
-  addressText: string | null;
-  lat: number | null;
-  lng: number | null;
-}
 
 interface EditarNegocioDialogProps {
   business: Business;

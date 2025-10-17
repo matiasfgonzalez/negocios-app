@@ -43,17 +43,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Product, Business } from "@/app/types/types";
 
-type Producto = {
-  id: string;
-  name: string;
-  description: string | null;
-  price: number;
-  stock: number;
-  sku: string | null;
-  available: boolean;
+type Producto = Omit<Product, "createdAt" | "updatedAt" | "images"> & {
   images: string[] | null;
-  businessId: string;
   business: {
     id: string;
     name: string;
@@ -62,10 +55,7 @@ type Producto = {
   updatedAt: string;
 };
 
-type Negocio = {
-  id: string;
-  name: string;
-};
+type Negocio = Pick<Business, "id" | "name">;
 
 type ProductosClientProps = {
   productos: Producto[];

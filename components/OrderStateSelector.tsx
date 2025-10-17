@@ -10,8 +10,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { OrderState } from "@/app/types/types";
 
-const ORDER_STATES = [
+const ORDER_STATES: Array<{ value: OrderState; label: string }> = [
   { value: "REGISTRADA", label: "Registrada" },
   { value: "PENDIENTE_PAGO", label: "Pendiente de Pago" },
   { value: "PAGADA", label: "Pagada" },
@@ -23,7 +24,7 @@ const ORDER_STATES = [
 
 interface OrderStateSelectorProps {
   orderId: string;
-  currentState: string;
+  currentState: OrderState;
 }
 
 export default function OrderStateSelector({

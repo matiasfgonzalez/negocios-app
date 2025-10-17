@@ -24,6 +24,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Business, Product } from "@/app/types/types";
 import OrderSuccessDialog from "@/components/OrderSuccessDialog";
 import OrderErrorDialog from "@/components/OrderErrorDialog";
 import dynamic from "next/dynamic";
@@ -173,29 +174,8 @@ interface CartItem {
 }
 
 interface BusinessDetailClientProps {
-  business: {
-    id: string;
-    name: string;
-    slug: string;
-    description: string | null;
-    rubro: string;
-    img: string | null;
-    whatsappPhone: string | null;
-    aliasPago: string | null;
-    addressText: string | null;
-    lat: number | null;
-    lng: number | null;
-    hasShipping: boolean;
-    shippingCost: number | null;
-    products: Array<{
-      id: string;
-      name: string;
-      description: string | null;
-      price: number;
-      stock: number;
-      available: boolean;
-      images: any;
-    }>;
+  business: Business & {
+    products: Product[];
   };
 }
 

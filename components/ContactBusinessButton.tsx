@@ -4,19 +4,13 @@ import { MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { generateOrderWhatsAppMessage } from "@/lib/whatsapp-utils";
+import { Order } from "@/app/types/types";
 
 interface ContactBusinessButtonProps {
-  readonly order: {
-    readonly id: string;
-    readonly state: string;
-    readonly total: number;
-    readonly shipping: boolean;
-    readonly addressText: string | null;
-    readonly note: string | null;
-    readonly createdAt: Date;
+  readonly order: Order & {
     readonly customer: {
       readonly name: string | null;
-      readonly email: string;
+      readonly email: string | null;
       readonly phone: string | null;
     };
     readonly business: {
@@ -25,7 +19,7 @@ interface ContactBusinessButtonProps {
     };
     readonly items: ReadonlyArray<{
       readonly quantity: number;
-      readonly price: number;
+      readonly unitPrice: number;
       readonly product: {
         readonly name: string;
       };

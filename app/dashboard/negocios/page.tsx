@@ -214,20 +214,7 @@ export default async function NegociosPage() {
                   <div className="flex flex-col gap-2 sm:gap-3 pt-2">
                     <div className="flex gap-2 sm:gap-3">
                       <EditarNegocioDialog
-                        business={{
-                          id: negocio.id,
-                          name: negocio.name,
-                          rubro: negocio.rubro,
-                          description: negocio.description,
-                          img: negocio.img,
-                          whatsappPhone: negocio.whatsappPhone,
-                          aliasPago: negocio.aliasPago,
-                          hasShipping: negocio.hasShipping,
-                          shippingCost: negocio.shippingCost,
-                          addressText: negocio.addressText,
-                          lat: negocio.lat,
-                          lng: negocio.lng,
-                        }}
+                        business={negocio}
                         triggerButton={
                           <Button
                             variant="outline"

@@ -3,39 +3,17 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import BusinessDetailClient from "@/components/BusinessDetailClient";
+import { Business, Product } from "@/app/types/types";
 import { Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-interface BusinessData {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  rubro: string;
-  img: string | null;
-  whatsappPhone: string | null;
-  aliasPago: string | null;
-  addressText: string | null;
-  lat: number | null;
-  lng: number | null;
-  hasShipping: boolean;
-  shippingCost: number | null;
-  products: Array<{
-    id: string;
-    name: string;
-    description: string | null;
-    price: number;
-    stock: number;
-    available: boolean;
-    images: any;
-  }>;
-}
+type BusinessWithProducts = Business & { products: Product[] };
 
 export default function BusinessPage() {
   const params = useParams();
   const slug = params.slug as string;
-  const [business, setBusiness] = useState<BusinessData | null>(null);
+  const [business, setBusiness] = useState<Business | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -166,5 +144,5 @@ export default function BusinessPage() {
     );
   }
 
-  return <BusinessDetailClient business={business} />;
+  return <BusinessDetailClient business={business as BusinessWithProducts} />;
 }

@@ -25,9 +25,31 @@ import {
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import PaymentAliasDisplay from "@/components/PaymentAliasDisplay";
+import { Order } from "@/app/types/types";
 
 interface OrderDetailsDialogProps {
-  order: any;
+  order: Order & {
+    business: {
+      name: string;
+      rubro: string;
+      addressText: string | null;
+      whatsappPhone: string | null;
+      aliasPago: string | null;
+    };
+    customer: {
+      name: string | null;
+      email: string | null;
+      phone: string | null;
+    };
+    items: Array<{
+      id: string;
+      quantity: number;
+      unitPrice: number;
+      product: {
+        name: string;
+      };
+    }>;
+  };
   userRole: string;
 }
 
