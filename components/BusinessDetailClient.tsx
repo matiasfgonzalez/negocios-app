@@ -12,6 +12,7 @@ import {
   Package,
   Truck,
   Store as StoreIcon,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +21,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import OrderSuccessDialog from "@/components/OrderSuccessDialog";
+import OrderErrorDialog from "@/components/OrderErrorDialog";
 import dynamic from "next/dynamic";
 
 const OrderMapSelector = dynamic(
@@ -207,6 +210,15 @@ export default function BusinessDetailClient({
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [deliveryNote, setDeliveryNote] = useState("");
   const [showCart, setShowCart] = useState(false);
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [orderData, setOrderData] = useState<{
+    orderId: string;
+    total: number;
+    whatsappLink: string | null;
+  } | null>(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // Función para agregar producto al carrito
   const addToCart = (product: (typeof business.products)[0]) => {
@@ -275,37 +287,84 @@ export default function BusinessDetailClient({
   };
 
   // Función para procesar el pedido
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (deliveryType === "delivery") {
       if (!deliveryLocation) {
-        alert("Por favor, selecciona tu ubicación en el mapa");
+        setErrorMessage("Por favor, selecciona tu ubicación en el mapa");
+        setShowErrorDialog(true);
         return;
       }
       if (!deliveryAddress.trim()) {
-        alert("Por favor, ingresa la dirección de entrega");
+        setErrorMessage("Por favor, ingresa la dirección de entrega");
+        setShowErrorDialog(true);
         return;
       }
     }
 
-    // Aquí implementarías la lógica para crear la orden
-    console.log("Pedido:", {
-      businessId: business.id,
-      items: cart,
-      deliveryType,
-      shipping: deliveryType === "delivery",
-      deliveryLocation: deliveryType === "delivery" ? deliveryLocation : null,
-      addressText: deliveryType === "delivery" ? deliveryAddress : null,
-      note: deliveryType === "delivery" ? deliveryNote : null,
-      subtotal,
-      shippingCost,
-      total,
-    });
+    setIsProcessingOrder(true);
 
-    alert("¡Pedido realizado con éxito!");
-    setCart([]);
-    setDeliveryAddress("");
-    setDeliveryNote("");
-    setShowCart(false);
+    try {
+      // Preparar los datos de la orden
+      const orderPayload = {
+        businessId: business.id,
+        items: cart.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          name: item.name,
+          price: item.price,
+        })),
+        shipping: deliveryType === "delivery",
+        lat: deliveryType === "delivery" ? deliveryLocation?.lat : undefined,
+        lng: deliveryType === "delivery" ? deliveryLocation?.lng : undefined,
+        addressText: deliveryType === "delivery" ? deliveryAddress : undefined,
+        note:
+          deliveryType === "delivery" && deliveryNote
+            ? deliveryNote
+            : undefined,
+        subtotal,
+        shippingCost,
+        total,
+      };
+
+      // Llamar al API para crear la orden
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderPayload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error al crear el pedido");
+      }
+
+      const data = await response.json();
+
+      // Limpiar el carrito
+      setCart([]);
+      setDeliveryAddress("");
+      setDeliveryNote("");
+      setDeliveryLocation(null);
+      setShowCart(false);
+
+      // Guardar datos de la orden y mostrar diálogo de éxito
+      setOrderData({
+        orderId: data.order.id,
+        total,
+        whatsappLink: data.whatsappLink,
+      });
+      setShowSuccessDialog(true);
+    } catch (error) {
+      console.error("Error al procesar el pedido:", error);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Error desconocido al procesar el pedido"
+      );
+      setShowErrorDialog(true);
+    } finally {
+      setIsProcessingOrder(false);
+    }
   };
 
   return (
@@ -756,13 +815,21 @@ export default function BusinessDetailClient({
                           onClick={handleCheckout}
                           disabled={
                             cart.length === 0 ||
+                            isProcessingOrder ||
                             (deliveryType === "delivery" &&
                               (!deliveryLocation || !deliveryAddress.trim()))
                           }
                           className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2.5 sm:py-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
                           size="lg"
                         >
-                          Realizar Pedido
+                          {isProcessingOrder ? (
+                            <>
+                              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+                              Procesando...
+                            </>
+                          ) : (
+                            "Realizar Pedido"
+                          )}
                         </Button>
 
                         {deliveryType === "delivery" &&
@@ -782,6 +849,26 @@ export default function BusinessDetailClient({
           </div>
         </div>
       </div>
+
+      {/* Success Dialog */}
+      {orderData && (
+        <OrderSuccessDialog
+          isOpen={showSuccessDialog}
+          onClose={() => setShowSuccessDialog(false)}
+          orderId={orderData.orderId}
+          total={orderData.total}
+          businessName={business.name}
+          whatsappLink={orderData.whatsappLink}
+          deliveryType={deliveryType}
+        />
+      )}
+
+      {/* Error Dialog */}
+      <OrderErrorDialog
+        isOpen={showErrorDialog}
+        onClose={() => setShowErrorDialog(false)}
+        error={errorMessage}
+      />
     </div>
   );
 }
