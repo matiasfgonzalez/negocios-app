@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
 import {
   MapPin,
   Phone,
@@ -13,6 +14,8 @@ import {
   Truck,
   Store as StoreIcon,
   Loader2,
+  LogIn,
+  CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -199,6 +202,7 @@ interface BusinessDetailClientProps {
 export default function BusinessDetailClient({
   business,
 }: Readonly<BusinessDetailClientProps>) {
+  const { isSignedIn, isLoaded } = useUser();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [deliveryType, setDeliveryType] = useState<"pickup" | "delivery">(
     "pickup"
@@ -286,6 +290,38 @@ export default function BusinessDetailClient({
     return cart.find((item) => item.productId === productId)?.quantity || 0;
   };
 
+  // Función para generar mensaje de WhatsApp para usuarios sin sesión
+  const generateWhatsAppMessage = () => {
+    let message = `Hola! Quiero realizar un pedido en *${business.name}*\n\n`;
+    message += `📋 *Detalle del pedido:*\n`;
+
+    for (const item of cart) {
+      message += `• ${item.quantity}x ${item.name} - $${(
+        item.price * item.quantity
+      ).toFixed(2)}\n`;
+    }
+
+    message += `\n💰 *Resumen:*\n`;
+    message += `Subtotal: $${subtotal.toFixed(2)}\n`;
+
+    if (deliveryType === "delivery") {
+      message += `Envío: $${shippingCost.toFixed(2)}\n`;
+      message += `*Total: $${total.toFixed(2)}*\n\n`;
+      message += `🚚 *Envío a domicilio*\n`;
+      message += `📍 Dirección: ${deliveryAddress}\n`;
+      if (deliveryNote) {
+        message += `📝 Nota: ${deliveryNote}\n`;
+      }
+    } else {
+      message += `*Total: $${total.toFixed(2)}*\n\n`;
+      message += `📦 *Retiro en local*\n`;
+    }
+
+    message += `\n¿Podrían confirmar mi pedido?`;
+
+    return encodeURIComponent(message);
+  };
+
   // Función para procesar el pedido
   const handleCheckout = async () => {
     if (deliveryType === "delivery") {
@@ -299,6 +335,21 @@ export default function BusinessDetailClient({
         setShowErrorDialog(true);
         return;
       }
+    }
+
+    // Si el usuario no está autenticado, redirigir a WhatsApp
+    if (!isSignedIn) {
+      if (!business.whatsappPhone) {
+        setErrorMessage("Este negocio no tiene WhatsApp configurado");
+        setShowErrorDialog(true);
+        return;
+      }
+
+      const message = generateWhatsAppMessage();
+      const phoneNumber = business.whatsappPhone.replaceAll(/\D/g, "");
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+      window.open(whatsappUrl, "_blank");
+      return;
     }
 
     setIsProcessingOrder(true);
@@ -359,7 +410,9 @@ export default function BusinessDetailClient({
     } catch (error) {
       console.error("Error al procesar el pedido:", error);
       setErrorMessage(
-        error instanceof Error ? error.message : "Error desconocido al procesar el pedido"
+        error instanceof Error
+          ? error.message
+          : "Error desconocido al procesar el pedido"
       );
       setShowErrorDialog(true);
     } finally {
@@ -811,35 +864,135 @@ export default function BusinessDetailClient({
                           </span>
                         </div>
 
-                        <Button
-                          onClick={handleCheckout}
-                          disabled={
-                            cart.length === 0 ||
-                            isProcessingOrder ||
-                            (deliveryType === "delivery" &&
-                              (!deliveryLocation || !deliveryAddress.trim()))
-                          }
-                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2.5 sm:py-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
-                          size="lg"
-                        >
-                          {isProcessingOrder ? (
-                            <>
-                              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
-                              Procesando...
-                            </>
-                          ) : (
-                            "Realizar Pedido"
-                          )}
-                        </Button>
+                        {isLoaded && isSignedIn && (
+                          <>
+                            <Button
+                              onClick={handleCheckout}
+                              disabled={
+                                cart.length === 0 ||
+                                isProcessingOrder ||
+                                (deliveryType === "delivery" &&
+                                  (!deliveryLocation ||
+                                    !deliveryAddress.trim()))
+                              }
+                              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2.5 sm:py-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                              size="lg"
+                            >
+                              {isProcessingOrder ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+                                  Procesando...
+                                </>
+                              ) : (
+                                "Realizar Pedido"
+                              )}
+                            </Button>
 
-                        {deliveryType === "delivery" &&
-                          (!deliveryLocation || !deliveryAddress.trim()) && (
-                            <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
-                              {deliveryLocation
-                                ? "⚠️ Completa la dirección de entrega"
-                                : "⚠️ Selecciona tu ubicación en el mapa"}
-                            </p>
-                          )}
+                            {deliveryType === "delivery" &&
+                              (!deliveryLocation ||
+                                !deliveryAddress.trim()) && (
+                                <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
+                                  {deliveryLocation
+                                    ? "⚠️ Completa la dirección de entrega"
+                                    : "⚠️ Selecciona tu ubicación en el mapa"}
+                                </p>
+                              )}
+                          </>
+                        )}
+                        {isLoaded && !isSignedIn && (
+                          <div className="space-y-3">
+                            {/* Botón principal para pedir por WhatsApp */}
+                            <Button
+                              onClick={handleCheckout}
+                              disabled={
+                                cart.length === 0 ||
+                                !business.whatsappPhone ||
+                                (deliveryType === "delivery" &&
+                                  (!deliveryLocation ||
+                                    !deliveryAddress.trim()))
+                              }
+                              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 sm:py-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                              size="lg"
+                            >
+                              <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                              Pedir por WhatsApp
+                            </Button>
+
+                            {deliveryType === "delivery" &&
+                              (!deliveryLocation ||
+                                !deliveryAddress.trim()) && (
+                                <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
+                                  {deliveryLocation
+                                    ? "⚠️ Completa la dirección de entrega"
+                                    : "⚠️ Selecciona tu ubicación en el mapa"}
+                                </p>
+                              )}
+
+                            {!business.whatsappPhone && (
+                              <p className="text-xs text-red-600 dark:text-red-400 text-center">
+                                ⚠️ Este negocio no tiene WhatsApp configurado
+                              </p>
+                            )}
+
+                            {/* Separador */}
+                            <div className="relative py-2">
+                              <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t border-border" />
+                              </div>
+                              <div className="relative flex justify-center text-xs">
+                                <span className="bg-card px-2 text-muted-foreground">
+                                  o registrate para más beneficios
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Tarjeta de beneficios (colapsada) */}
+                            <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg space-y-2">
+                              <div className="flex items-center gap-2">
+                                <LogIn className="w-4 h-4 text-primary flex-shrink-0" />
+                                <h3 className="font-semibold text-xs text-foreground">
+                                  Regístrate y obtén:
+                                </h3>
+                              </div>
+                              <ul className="space-y-1 text-xs text-muted-foreground pl-6">
+                                <li className="flex items-start gap-1.5">
+                                  <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                                  <span>Historial de pedidos</span>
+                                </li>
+                                <li className="flex items-start gap-1.5">
+                                  <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                                  <span>Seguimiento en tiempo real</span>
+                                </li>
+                                <li className="flex items-start gap-1.5">
+                                  <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                                  <span>Ofertas exclusivas</span>
+                                </li>
+                              </ul>
+                            </div>
+
+                            <Button
+                              onClick={() =>
+                                (globalThis.location.href = "/sign-in")
+                              }
+                              variant="outline"
+                              className="w-full border-primary/50 hover:bg-primary/10 font-semibold py-2.5 sm:py-3 transition-all"
+                              size="lg"
+                            >
+                              <LogIn className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                              Iniciar Sesión / Registrarse
+                            </Button>
+                          </div>
+                        )}
+                        {!isLoaded && (
+                          <Button
+                            disabled
+                            className="w-full bg-muted text-muted-foreground font-bold py-2.5 sm:py-3"
+                            size="lg"
+                          >
+                            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+                            Cargando...
+                          </Button>
+                        )}
                       </div>
                     </>
                   )}
