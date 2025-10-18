@@ -27,29 +27,31 @@ import { Separator } from "@/components/ui/separator";
 import PaymentAliasDisplay from "@/components/PaymentAliasDisplay";
 import { Order } from "@/app/types/types";
 
-interface OrderDetailsDialogProps {
-  order: Order & {
-    business: {
-      name: string;
-      rubro: string;
-      addressText: string | null;
-      whatsappPhone: string | null;
-      aliasPago: string | null;
-    };
-    customer: {
-      name: string | null;
-      email: string | null;
-      phone: string | null;
-    };
-    items: Array<{
-      id: string;
-      quantity: number;
-      unitPrice: number;
-      product: {
-        name: string;
-      };
-    }>;
+type OrderDetailsData = Omit<Order, "business" | "customer" | "items"> & {
+  business: {
+    name: string;
+    rubro: string;
+    addressText: string | null;
+    whatsappPhone: string | null;
+    aliasPago: string | null;
   };
+  customer: {
+    name: string | null;
+    email: string | null;
+    phone: string | null;
+  };
+  items: Array<{
+    id: string;
+    quantity: number;
+    unitPrice: number;
+    product: {
+      name: string;
+    };
+  }>;
+};
+
+interface OrderDetailsDialogProps {
+  order: OrderDetailsData;
   userRole: string;
 }
 
@@ -178,7 +180,7 @@ export default function OrderDetailsDialog({
               Productos ({order.items.length})
             </div>
             <div className="space-y-2">
-              {order.items.map((item: any) => (
+              {order.items.map((item) => (
                 <div
                   key={item.id}
                   className="flex items-center justify-between bg-accent/20 border border-border rounded-lg p-3"
@@ -259,8 +261,7 @@ export default function OrderDetailsDialog({
                   $
                   {order.items
                     .reduce(
-                      (sum: number, item: any) =>
-                        sum + item.unitPrice * item.quantity,
+                      (sum, item) => sum + item.unitPrice * item.quantity,
                       0
                     )
                     .toFixed(2)}
@@ -274,8 +275,7 @@ export default function OrderDetailsDialog({
                     {(
                       order.total -
                       order.items.reduce(
-                        (sum: number, item: any) =>
-                          sum + item.unitPrice * item.quantity,
+                        (sum, item) => sum + item.unitPrice * item.quantity,
                         0
                       )
                     ).toFixed(2)}
