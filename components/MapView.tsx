@@ -33,9 +33,9 @@ export default function MapView({
 
   useEffect(() => {
     // Fix para el icono por defecto en SSR de Leaflet
-    if (typeof window !== "undefined") {
-      // @ts-ignore
-      delete L.Icon.Default.prototype._getIconUrl;
+    if (typeof globalThis.window !== "undefined") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
         shadowUrl:
