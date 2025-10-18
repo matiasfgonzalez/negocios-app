@@ -2,8 +2,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import BusinessCard from "@/components/BusinessCard";
-import MapView from "@/components/MapView";
 import { Business } from "./types/types";
 import {
   Store,
@@ -24,6 +24,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+// Cargar MapView solo en el cliente (no en SSR)
+const MapView = dynamic(() => import("@/components/MapView"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[400px] rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-700 shadow-soft dark:shadow-soft-dark flex items-center justify-center bg-neutral-100 dark:bg-neutral-800">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+    </div>
+  ),
+});
 
 export default function HomePage() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
