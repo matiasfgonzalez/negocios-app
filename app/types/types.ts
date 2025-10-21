@@ -155,6 +155,12 @@ export type Product = {
   // Relación con el negocio (opcional cuando solo se usa el ID)
   business?: Business;
 
+  // ID de la categoría del producto
+  categoryId: string | null;
+
+  // Relación con la categoría (opcional cuando solo se usa el ID)
+  category?: ProductCategory;
+
   // Nombre del producto
   name: string;
 
@@ -184,6 +190,32 @@ export type Product = {
   createdAt: Date;
 
   // Fecha de última actualización del producto
+  updatedAt: Date;
+};
+
+export type ProductCategory = {
+  // Identificador único de la categoría
+  id: string;
+
+  // Nombre de la categoría
+  name: string;
+
+  // Descripción de la categoría
+  description: string | null;
+
+  // Icono o emoji representativo de la categoría
+  icon: string | null;
+
+  // Orden de visualización de la categoría
+  order: number;
+
+  // Productos que pertenecen a esta categoría (Relación)
+  products?: Product[];
+
+  // Fecha de creación de la categoría
+  createdAt: Date;
+
+  // Fecha de última actualización de la categoría
   updatedAt: Date;
 };
 

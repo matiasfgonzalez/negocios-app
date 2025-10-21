@@ -79,6 +79,26 @@ model Business {
   updatedAt     DateTime @updatedAt
 }
 
+// Modelo que representa una categoría de productos predefinida del sistema
+model ProductCategory {
+  // Identificador único de la categoría
+  id          String    @id @default(cuid())
+  // Nombre de la categoría (ej: "Empanadas", "Pizzas", "Bebidas")
+  name        String    @unique
+  // Descripción de la categoría
+  description String?
+  // Icono o emoji representativo de la categoría
+  icon        String?
+  // Orden de visualización de la categoría
+  order       Int       @default(0)
+  // Productos que pertenecen a esta categoría
+  products    Product[]
+  // Fecha de creación de la categoría
+  createdAt   DateTime  @default(now())
+  // Fecha de última actualización de la categoría
+  updatedAt   DateTime  @updatedAt
+}
+
 // Modelo que representa un producto ofrecido por un negocio
 model Product {
   // Identificador único del producto
@@ -87,6 +107,10 @@ model Product {
   businessId String
   // Relación con el negocio
   business   Business @relation(fields: [businessId], references: [id])
+  // ID de la categoría del producto (opcional)
+  categoryId String?
+  // Relación con la categoría
+  category   ProductCategory? @relation(fields: [categoryId], references: [id])
   // Nombre del producto
   name       String
   // Descripción del producto
