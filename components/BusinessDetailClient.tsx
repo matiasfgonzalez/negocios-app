@@ -39,6 +39,16 @@ const OrderMapSelector = dynamic(
   }
 );
 
+const SingleBusinessMap = dynamic(
+  () => import("@/components/SingleBusinessMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-full bg-gray-100 dark:bg-gray-800 rounded-lg animate-pulse" />
+    ),
+  }
+);
+
 // Componente de Carrusel de Imágenes (Estilo Flowbite)
 type ImageCarouselProps = {
   images: string[];
@@ -402,14 +412,19 @@ export default function BusinessDetailClient({
 
   return (
     <div className="min-h-screen">
-      {/* UI improved: Enhanced Business Header */}
-      <div className="bg-card/80 backdrop-blur-xl border-b border-border shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 sm:gap-4 mb-3">
+      {/* UI improved: Enhanced Business Header with Map */}
+      <div className="relative bg-gradient-to-br from-card via-card/95 to-card/90 backdrop-blur-xl border-b border-border shadow-2xl overflow-hidden">
+        {/* Decorative background pattern */}
+        <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            {/* Business Information Section */}
+            <div className="space-y-6">
+              {/* Business Logo and Name */}
+              <div className="flex items-start gap-4 sm:gap-6">
                 {business.img ? (
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shadow-md flex-shrink-0 bg-muted">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0 bg-muted ring-4 ring-primary/20">
                     <img
                       src={business.img}
                       alt={`Logo de ${business.name}`}
@@ -417,84 +432,174 @@ export default function BusinessDetailClient({
                     />
                   </div>
                 ) : (
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-md">
-                    <StoreIcon className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary via-primary/90 to-primary/80 rounded-2xl flex items-center justify-center shadow-2xl ring-4 ring-primary/20">
+                    <StoreIcon className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
                   </div>
                 )}
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-3 tracking-tight">
                     {business.name}
                   </h1>
-                  <Badge className="mt-1.5 bg-primary/10 text-primary border-primary/20">
-                    {business.rubro}
-                  </Badge>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <Badge className="bg-primary/15 text-primary border-primary/30 text-sm px-3 py-1">
+                      <StoreIcon className="w-3.5 h-3.5 mr-1.5" />
+                      {business.rubro}
+                    </Badge>
+                    {business.hasShipping && (
+                      <Badge className="bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30 text-sm px-3 py-1">
+                        <Truck className="w-3.5 h-3.5 mr-1.5" />
+                        Envío disponible
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </div>
 
+              {/* Description */}
               {business.description && (
-                <p className="text-sm sm:text-base text-muted-foreground mb-4">
-                  {business.description}
-                </p>
+                <div className="bg-muted/30 backdrop-blur-sm rounded-xl p-4 border border-border/50">
+                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                    {business.description}
+                  </p>
+                </div>
               )}
 
-              <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm">
+              {/* Contact Information Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {business.addressText && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
-                    <span>{business.addressText}</span>
+                  <div className="bg-background/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-primary/50 transition-colors group">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-primary/10 rounded-lg p-2 group-hover:bg-primary/20 transition-colors">
+                        <MapPin className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-muted-foreground mb-1">
+                          Dirección
+                        </p>
+                        <p className="text-sm text-foreground font-medium">
+                          {business.addressText}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
+
                 {business.whatsappPhone && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600 dark:text-green-400" />
-                    <a
-                      href={`https://wa.me/${business.whatsappPhone}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-green-600 dark:hover:text-green-400 transition-colors"
-                    >
-                      {business.whatsappPhone}
-                    </a>
-                  </div>
+                  <a
+                    href={`https://wa.me/${business.whatsappPhone}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-background/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-green-500/50 hover:bg-green-500/5 transition-all group"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="bg-green-500/10 rounded-lg p-2 group-hover:bg-green-500/20 transition-colors">
+                        <Phone className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-muted-foreground mb-1">
+                          WhatsApp
+                        </p>
+                        <p className="text-sm text-foreground font-medium">
+                          {business.whatsappPhone}
+                        </p>
+                      </div>
+                    </div>
+                  </a>
                 )}
+
                 {business.aliasPago && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400" />
-                    <span>Alias: {business.aliasPago}</span>
+                  <div className="bg-background/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-amber-500/50 transition-colors group">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-amber-500/10 rounded-lg p-2 group-hover:bg-amber-500/20 transition-colors">
+                        <DollarSign className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-muted-foreground mb-1">
+                          Alias de Pago
+                        </p>
+                        <p className="text-sm text-foreground font-medium">
+                          {business.aliasPago}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
+
                 {business.hasShipping && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Truck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent" />
-                    <span>
-                      Envío disponible: $
-                      {business.shippingCost?.toFixed(2) || "0.00"}
-                    </span>
+                  <div className="bg-background/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-accent/50 transition-colors group">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-accent/10 rounded-lg p-2 group-hover:bg-accent/20 transition-colors">
+                        <Truck className="w-5 h-5 text-accent" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-muted-foreground mb-1">
+                          Costo de Envío
+                        </p>
+                        <p className="text-sm text-foreground font-medium">
+                          ${business.shippingCost?.toFixed(2) || "0.00"}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
-                {!business.hasShipping && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Package className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                    <span>Solo retiro en local</span>
+              </div>
+
+              {/* Cart Button */}
+              <Button
+                onClick={() => setShowCart(!showCart)}
+                className="w-full relative bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] py-6 text-lg font-bold"
+                size="lg"
+              >
+                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 mr-3" />
+                Ver Carrito {cart.length > 0 && `(${cart.length} productos)`}
+                {cart.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-7 h-7 flex items-center justify-center font-bold animate-bounce shadow-lg ring-4 ring-red-500/20">
+                    {cart.reduce((sum, item) => sum + item.quantity, 0)}
+                  </span>
+                )}
+              </Button>
+            </div>
+
+            {/* Map Section */}
+            <div className="lg:sticky lg:top-8">
+              <div className="bg-background/50 backdrop-blur-sm rounded-2xl p-4 border border-border/50 shadow-xl">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-primary" />
+                    Ubicación del Local
+                  </h3>
+                </div>
+
+                {business.lat && business.lng ? (
+                  <div className="rounded-xl overflow-hidden shadow-lg border border-border/50 h-[300px] sm:h-[350px] lg:h-[400px]">
+                    <SingleBusinessMap
+                      lat={business.lat}
+                      lng={business.lng}
+                      businessName={business.name}
+                      addressText={business.addressText}
+                    />
+                  </div>
+                ) : (
+                  <div className="rounded-xl bg-muted/50 border border-border/50 h-[300px] sm:h-[350px] lg:h-[400px] flex flex-col items-center justify-center text-center p-6">
+                    <MapPin className="w-16 h-16 text-muted-foreground/30 mb-4" />
+                    <p className="text-muted-foreground text-sm">
+                      Este negocio no tiene ubicación configurada
+                    </p>
+                  </div>
+                )}
+
+                {business.addressText && (
+                  <div className="mt-4 bg-muted/30 rounded-lg p-3 border border-border/30">
+                    <p className="text-xs text-muted-foreground font-semibold mb-1">
+                      DIRECCIÓN COMPLETA
+                    </p>
+                    <p className="text-sm text-foreground font-medium">
+                      {business.addressText}
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-
-            {/* UI improved: Enhanced Cart Button */}
-            <Button
-              onClick={() => setShowCart(!showCart)}
-              className="relative bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all"
-              size="lg"
-            >
-              <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              Carrito {cart.length > 0 && `(${cart.length})`}
-              {cart.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center font-bold animate-bounce shadow-md">
-                  {cart.reduce((sum, item) => sum + item.quantity, 0)}
-                </span>
-              )}
-            </Button>
           </div>
         </div>
       </div>
