@@ -17,7 +17,17 @@ export async function GET(
       },
       include: {
         owner: true,
-        products: true,
+        products: {
+          include: {
+            category: {
+              select: {
+                id: true,
+                name: true,
+                icon: true,
+              },
+            },
+          },
+        },
         _count: {
           select: { products: true },
         },

@@ -13,7 +13,19 @@ export async function GET(request: Request) {
 
   const businesses = await prisma.business.findMany({
     where,
-    include: { products: true },
+    include: {
+      products: {
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+              icon: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   return NextResponse.json(businesses);

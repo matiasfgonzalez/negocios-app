@@ -74,6 +74,7 @@ export async function PUT(
       available,
       images,
       businessId,
+      categoryId,
     } = body;
 
     // Validar campos requeridos
@@ -116,6 +117,8 @@ export async function PUT(
         sku: sku || null,
         available: available !== false,
         images: images !== undefined ? images : existingProduct.images,
+        categoryId:
+          categoryId !== undefined ? categoryId : existingProduct.categoryId,
         ...(businessId && { businessId }),
       },
       include: {
@@ -123,6 +126,13 @@ export async function PUT(
           select: {
             id: true,
             name: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            icon: true,
           },
         },
       },

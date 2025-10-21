@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
       available,
       images,
       businessId,
+      categoryId,
     } = body;
 
     // Validar campos requeridos
@@ -79,12 +80,20 @@ export async function POST(request: NextRequest) {
         available: available !== false,
         images: images || null,
         businessId,
+        categoryId: categoryId || null,
       },
       include: {
         business: {
           select: {
             id: true,
             name: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            icon: true,
           },
         },
       },
