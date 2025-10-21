@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/Navbar";
+import UserSync from "@/components/UserSync";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +25,9 @@ export default function RootLayout({
           className={`${inter.className} bg-background text-foreground antialiased transition-colors duration-200`}
         >
           <ThemeProvider>
+            {/* Sincronización automática de usuario con la base de datos */}
+            <UserSync />
+
             {/* UI improved: Added gradient background overlay */}
             <div className="fixed inset-0 -z-10 bg-gradient-to-br from-background via-background to-muted/20 dark:from-background dark:via-background dark:to-muted/10" />
 
