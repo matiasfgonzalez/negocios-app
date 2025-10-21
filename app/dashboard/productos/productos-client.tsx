@@ -45,15 +45,28 @@ import {
 } from "@/components/ui/select";
 import { Product, Business } from "@/app/types/types";
 
+type ProductCategory = {
+  id: string;
+  name: string;
+  description: string | null;
+  icon: string | null;
+  order: number;
+};
+
 type Producto = Omit<
   Product,
-  "createdAt" | "updatedAt" | "images" | "business"
+  "createdAt" | "updatedAt" | "images" | "business" | "category"
 > & {
   images: string[] | null;
   business: {
     id: string;
     name: string;
   };
+  category?: {
+    id: string;
+    name: string;
+    icon: string | null;
+  } | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -63,6 +76,7 @@ type Negocio = Pick<Business, "id" | "name">;
 type ProductosClientProps = {
   productos: Producto[];
   negocios: Negocio[];
+  categorias: ProductCategory[];
   role: string;
   negocioIdFromUrl?: string;
 };
@@ -196,11 +210,13 @@ function ImageCarousel({ images, productName }: Readonly<ImageCarouselProps>) {
 export default function ProductosClient({
   productos,
   negocios,
+  categorias,
   role,
   negocioIdFromUrl,
 }: Readonly<ProductosClientProps>) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -209,13 +225,20 @@ export default function ProductosClient({
 
   const itemsPerPage = 9;
 
-  // Filtrar productos por búsqueda
-  const filteredProducts = productos.filter(
-    (p) =>
+  // Filtrar productos por búsqueda y categoría
+  const filteredProducts = productos.filter((p) => {
+    const matchesSearch =
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      p.description?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesCategory =
+      selectedCategory === "all" ||
+      (selectedCategory === "sin-categoria" && !p.categoryId) ||
+      p.categoryId === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  });
 
   // Paginación
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -233,6 +256,7 @@ export default function ProductosClient({
     available: "true",
     images: "",
     businessId: negocioIdFromUrl || "",
+    categoryId: "",
   });
 
   const handleOpenDialog = (product?: Producto) => {
@@ -248,6 +272,7 @@ export default function ProductosClient({
         available: product.available.toString(),
         images: product.images ? product.images.join(", ") : "",
         businessId: product.businessId,
+        categoryId: product.categoryId || "",
       });
     } else {
       setIsEditMode(false);
@@ -261,6 +286,7 @@ export default function ProductosClient({
         available: "true",
         images: "",
         businessId: negocioIdFromUrl || "",
+        categoryId: "",
       });
     }
     setIsDialogOpen(true);
@@ -295,6 +321,7 @@ export default function ProductosClient({
           stock: parseInt(formData.stock),
           available: formData.available === "true",
           images: imageUrls.length > 0 ? imageUrls : null,
+          categoryId: formData.categoryId || null,
         }),
       });
 
@@ -413,6 +440,33 @@ export default function ProductosClient({
                     </Select>
                   </div>
                 )}
+
+                {/* Categoría */}
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="categoryId"
+                    className="text-sm font-medium text-foreground"
+                  >
+                    Categoría
+                  </Label>
+                  <Select
+                    value={formData.categoryId || undefined}
+                    onValueChange={(value: string) =>
+                      setFormData({ ...formData, categoryId: value })
+                    }
+                  >
+                    <SelectTrigger className="bg-background border-border text-foreground">
+                      <SelectValue placeholder="Sin categoría" />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {categorias.map((categoria) => (
+                        <SelectItem key={categoria.id} value={categoria.id}>
+                          {categoria.icon} {categoria.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
                 {/* Nombre */}
                 <div className="space-y-2">
@@ -614,7 +668,7 @@ export default function ProductosClient({
         </div>
 
         {/* Search and Filter */}
-        <div className="mb-6">
+        <div className="mb-6 space-y-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
@@ -635,6 +689,50 @@ export default function ProductosClient({
                 <X className="w-4 h-4" />
               </button>
             )}
+          </div>
+
+          {/* Filtro de Categorías */}
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            <Button
+              variant={selectedCategory === "all" ? "default" : "outline"}
+              size="sm"
+              onClick={() => {
+                setSelectedCategory("all");
+                setCurrentPage(1);
+              }}
+              className="whitespace-nowrap"
+            >
+              Todas
+            </Button>
+            <Button
+              variant={
+                selectedCategory === "sin-categoria" ? "default" : "outline"
+              }
+              size="sm"
+              onClick={() => {
+                setSelectedCategory("sin-categoria");
+                setCurrentPage(1);
+              }}
+              className="whitespace-nowrap"
+            >
+              Sin categoría
+            </Button>
+            {categorias.map((categoria) => (
+              <Button
+                key={categoria.id}
+                variant={
+                  selectedCategory === categoria.id ? "default" : "outline"
+                }
+                size="sm"
+                onClick={() => {
+                  setSelectedCategory(categoria.id);
+                  setCurrentPage(1);
+                }}
+                className="whitespace-nowrap"
+              >
+                {categoria.icon} {categoria.name}
+              </Button>
+            ))}
           </div>
         </div>
 
@@ -693,6 +791,13 @@ export default function ProductosClient({
                   <CardDescription className="text-sm text-muted-foreground">
                     {producto.business.name}
                   </CardDescription>
+                  {producto.category && (
+                    <div className="mt-2">
+                      <Badge variant="outline" className="text-xs">
+                        {producto.category.icon} {producto.category.name}
+                      </Badge>
+                    </div>
+                  )}
                 </CardHeader>
 
                 <CardContent className="space-y-4">

@@ -31,6 +31,13 @@ export default async function ProductosPage({
 
   const params = await searchParams;
 
+  // Obtener todas las categorías
+  const categorias = await prisma.productCategory.findMany({
+    orderBy: {
+      order: "asc",
+    },
+  });
+
   // Obtener productos según el rol y filtro
   let productos;
   let negocios;
@@ -53,6 +60,13 @@ export default async function ProductosPage({
               name: true,
             },
           },
+          category: {
+            select: {
+              id: true,
+              name: true,
+              icon: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",
@@ -71,6 +85,13 @@ export default async function ProductosPage({
             select: {
               id: true,
               name: true,
+            },
+          },
+          category: {
+            select: {
+              id: true,
+              name: true,
+              icon: true,
             },
           },
         },
@@ -104,6 +125,13 @@ export default async function ProductosPage({
               name: true,
             },
           },
+          category: {
+            select: {
+              id: true,
+              name: true,
+              icon: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",
@@ -116,6 +144,13 @@ export default async function ProductosPage({
             select: {
               id: true,
               name: true,
+            },
+          },
+          category: {
+            select: {
+              id: true,
+              name: true,
+              icon: true,
             },
           },
         },
@@ -138,6 +173,7 @@ export default async function ProductosPage({
   const productosSerializados = productos.map((p) => ({
     ...p,
     images: p.images ? (p.images as string[]) : null,
+    category: p.category || null,
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
   }));
@@ -146,6 +182,7 @@ export default async function ProductosPage({
     <ProductosClient
       productos={productosSerializados}
       negocios={negocios}
+      categorias={categorias}
       role={role}
       negocioIdFromUrl={params.negocioId}
     />

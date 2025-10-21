@@ -517,98 +517,155 @@ export default function BusinessDetailClient({
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                {business.products.map((product) => {
-                  const cartQty = getCartQuantity(product.id);
-                  const productImages = product.images
-                    ? Array.isArray(product.images)
-                      ? product.images
-                      : []
-                    : [];
+              <div className="space-y-8">
+                {/* Agrupar productos por categoría */}
+                {(() => {
+                  // Agrupar productos por categoría
+                  const productsByCategory: Record<
+                    string,
+                    {
+                      name: string;
+                      icon: string | null;
+                      products: typeof business.products;
+                    }
+                  > = {};
 
-                  return (
-                    <Card
-                      key={product.id}
-                      className="bg-card/50 backdrop-blur-sm hover:shadow-xl hover:-translate-y-1 hover:border-primary/50 transition-all duration-300 border-border group overflow-hidden"
-                    >
-                      {/* Carrusel de Imágenes del Producto */}
-                      {productImages.length > 0 && (
-                        <ImageCarousel
-                          images={productImages}
-                          productName={product.name}
-                        />
-                      )}
+                  business.products.forEach((product) => {
+                    const categoryKey = product.category?.id || "sin-categoria";
+                    const categoryName =
+                      product.category?.name || "Sin categoría";
+                    const categoryIcon = product.category?.icon || null;
 
-                      <CardHeader>
-                        <div className="flex justify-between items-start gap-3">
-                          <CardTitle className="text-base sm:text-lg text-foreground group-hover:text-primary transition-colors">
-                            {product.name}
-                          </CardTitle>
-                          <Badge
-                            variant={
-                              product.stock > 0 ? "default" : "secondary"
-                            }
-                            className={
-                              product.stock > 0
-                                ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20"
-                                : "bg-muted text-muted-foreground border-border"
-                            }
-                          >
-                            Stock: {product.stock}
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        {product.description && (
-                          <p className="text-xs sm:text-sm text-muted-foreground mb-4">
-                            {product.description}
-                          </p>
-                        )}
+                    if (!productsByCategory[categoryKey]) {
+                      productsByCategory[categoryKey] = {
+                        name: categoryName,
+                        icon: categoryIcon,
+                        products: [],
+                      };
+                    }
+                    productsByCategory[categoryKey].products.push(product);
+                  });
 
-                        <div className="flex items-center justify-between">
-                          <span className="text-xl sm:text-2xl font-bold text-primary">
-                            ${product.price.toFixed(2)}
-                          </span>
-
-                          {cartQty > 0 ? (
-                            <div className="flex items-center gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updateQuantity(product.id, -1)}
-                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-600 dark:hover:text-red-400 transition-colors border-border"
-                              >
-                                <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                              </Button>
-                              <span className="text-base sm:text-lg font-semibold min-w-[2rem] text-center text-foreground">
-                                {cartQty}
-                              </span>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => updateQuantity(product.id, 1)}
-                                disabled={cartQty >= product.stock}
-                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-green-500/10 hover:border-green-500/50 hover:text-green-600 dark:hover:text-green-400 transition-colors disabled:opacity-50 border-border"
-                              >
-                                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                              </Button>
-                            </div>
-                          ) : (
-                            <Button
-                              onClick={() => addToCart(product)}
-                              disabled={product.stock === 0}
-                              size="sm"
-                              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all disabled:opacity-50"
-                            >
-                              <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
-                              Agregar
-                            </Button>
+                  return Object.entries(productsByCategory).map(
+                    ([categoryKey, categoryData]) => (
+                      <div key={categoryKey} className="space-y-4">
+                        {/* Título de categoría */}
+                        <h3 className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2 border-b border-border pb-2">
+                          {categoryData.icon && (
+                            <span className="text-2xl">
+                              {categoryData.icon}
+                            </span>
                           )}
+                          {categoryData.name}
+                          <span className="text-sm text-muted-foreground font-normal">
+                            ({categoryData.products.length})
+                          </span>
+                        </h3>
+
+                        {/* Productos de la categoría */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                          {categoryData.products.map((product) => {
+                            const cartQty = getCartQuantity(product.id);
+                            const productImages = product.images
+                              ? Array.isArray(product.images)
+                                ? product.images
+                                : []
+                              : [];
+
+                            return (
+                              <Card
+                                key={product.id}
+                                className="bg-card/50 backdrop-blur-sm hover:shadow-xl hover:-translate-y-1 hover:border-primary/50 transition-all duration-300 border-border group overflow-hidden"
+                              >
+                                {/* Carrusel de Imágenes del Producto */}
+                                {productImages.length > 0 && (
+                                  <ImageCarousel
+                                    images={productImages}
+                                    productName={product.name}
+                                  />
+                                )}
+
+                                <CardHeader>
+                                  <div className="flex justify-between items-start gap-3">
+                                    <CardTitle className="text-base sm:text-lg text-foreground group-hover:text-primary transition-colors">
+                                      {product.name}
+                                    </CardTitle>
+                                    <Badge
+                                      variant={
+                                        product.stock > 0
+                                          ? "default"
+                                          : "secondary"
+                                      }
+                                      className={
+                                        product.stock > 0
+                                          ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20"
+                                          : "bg-muted text-muted-foreground border-border"
+                                      }
+                                    >
+                                      Stock: {product.stock}
+                                    </Badge>
+                                  </div>
+                                </CardHeader>
+                                <CardContent>
+                                  {product.description && (
+                                    <p className="text-xs sm:text-sm text-muted-foreground mb-4">
+                                      {product.description}
+                                    </p>
+                                  )}
+
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xl sm:text-2xl font-bold text-primary">
+                                      ${product.price.toFixed(2)}
+                                    </span>
+
+                                    {cartQty > 0 ? (
+                                      <div className="flex items-center gap-2">
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() =>
+                                            updateQuantity(product.id, -1)
+                                          }
+                                          className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-600 dark:hover:text-red-400 transition-colors border-border"
+                                        >
+                                          <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                        </Button>
+                                        <span className="text-base sm:text-lg font-semibold min-w-[2rem] text-center text-foreground">
+                                          {cartQty}
+                                        </span>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() =>
+                                            updateQuantity(product.id, 1)
+                                          }
+                                          disabled={cartQty >= product.stock}
+                                          className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-green-500/10 hover:border-green-500/50 hover:text-green-600 dark:hover:text-green-400 transition-colors disabled:opacity-50 border-border"
+                                        >
+                                          <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                        </Button>
+                                      </div>
+                                    ) : (
+                                      <Button
+                                        onClick={() => addToCart(product)}
+                                        disabled={product.stock === 0}
+                                        size="sm"
+                                        className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all disabled:opacity-50"
+                                      >
+                                        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
+                                        Agregar
+                                      </Button>
+                                    )}
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            );
+                          })}
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    )
                   );
-                })}
+                })()}
               </div>
             )}
           </div>
