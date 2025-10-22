@@ -232,9 +232,11 @@ export default function BusinessDetailClient({
     : { isOpen: false, reason: "Horario no especificado" };
 
   // Determine if orders can be placed
+  // acceptOrdersOutsideHours ONLY applies when status is ABIERTO
+  // If status is CERRADO_TEMPORAL or CERRADO_PERMANENTE, orders are NEVER allowed
   const canOrderNow =
-    (business.status === "ABIERTO" && businessIsOpen) ||
-    business.acceptOrdersOutsideHours;
+    business.status === "ABIERTO" &&
+    (businessIsOpen || business.acceptOrdersOutsideHours);
 
   // Get status badge configuration (same as BusinessCard)
   const getStatusBadge = () => {
@@ -554,13 +556,13 @@ export default function BusinessDetailClient({
                       <p className="font-medium">Pedidos no disponibles</p>
                       <p className="text-xs mt-1">
                         {business.status === "CERRADO_PERMANENTE"
-                          ? "Este negocio está cerrado permanentemente"
+                          ? business.closedReason
+                            ? `Cerrado permanentemente: ${business.closedReason}`
+                            : "Este negocio está cerrado permanentemente"
                           : business.status === "CERRADO_TEMPORAL"
-                          ? `Cerrado temporalmente${
-                              business.closedReason
-                                ? `: ${business.closedReason}`
-                                : ""
-                            }`
+                          ? business.closedReason
+                            ? `Cerrado temporalmente: ${business.closedReason}`
+                            : "Cerrado temporalmente"
                           : reason || "El negocio está cerrado en este momento"}
                       </p>
                     </div>
