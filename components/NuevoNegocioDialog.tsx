@@ -16,6 +16,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import BusinessScheduleEditor from "@/components/BusinessScheduleEditor";
+import {
+  BusinessSchedule,
+  SpecialClosedDay,
+  defaultSchedule,
+} from "@/lib/business-hours";
+import { BusinessStatus } from "@/app/types/types";
 
 // Importar el mapa de forma dinámica para evitar problemas con SSR
 const MapSelector = dynamic<{
@@ -52,7 +66,15 @@ export default function NuevoNegocioDialog({
     addressText: "",
     lat: "",
     lng: "",
+    status: "ABIERTO" as BusinessStatus,
+    closedReason: "",
+    acceptOrdersOutsideHours: false,
+    preparationTime: "30",
   });
+  const [schedule, setSchedule] = useState<BusinessSchedule>(defaultSchedule);
+  const [specialClosedDays, setSpecialClosedDays] = useState<
+    SpecialClosedDay[]
+  >([]);
 
   const handleLocationSelect = (location: { lat: number; lng: number }) => {
     setFormData({
@@ -82,6 +104,14 @@ export default function NuevoNegocioDialog({
               : 0,
           lat: formData.lat ? Number.parseFloat(formData.lat) : null,
           lng: formData.lng ? Number.parseFloat(formData.lng) : null,
+          status: formData.status,
+          closedReason: formData.closedReason || null,
+          schedule: schedule,
+          specialClosedDays: specialClosedDays,
+          acceptOrdersOutsideHours: formData.acceptOrdersOutsideHours,
+          preparationTime: formData.preparationTime
+            ? Number.parseInt(formData.preparationTime)
+            : null,
         }),
       });
 
@@ -104,7 +134,13 @@ export default function NuevoNegocioDialog({
         addressText: "",
         lat: "",
         lng: "",
+        status: "ABIERTO" as BusinessStatus,
+        closedReason: "",
+        acceptOrdersOutsideHours: false,
+        preparationTime: "30",
       });
+      setSchedule(defaultSchedule);
+      setSpecialClosedDays([]);
       router.refresh();
     } catch (error) {
       console.error("Error:", error);
@@ -318,6 +354,125 @@ export default function NuevoNegocioDialog({
                 </p>
               </div>
             )}
+          </div>
+
+          {/* Estado y Operación */}
+          <div className="space-y-4 pt-4 border-t border-border">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">
+              Estado y Operación
+            </h3>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="status"
+                className="text-sm font-medium text-foreground"
+              >
+                Estado del Negocio *
+              </Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value: BusinessStatus) =>
+                  setFormData({ ...formData, status: value })
+                }
+              >
+                <SelectTrigger className="bg-background border-border text-foreground">
+                  <SelectValue placeholder="Selecciona el estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ABIERTO">Abierto</SelectItem>
+                  <SelectItem value="CERRADO_TEMPORAL">
+                    Cerrado Temporalmente
+                  </SelectItem>
+                  <SelectItem value="CERRADO_PERMANENTE">
+                    Cerrado Permanentemente
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {(formData.status === "CERRADO_TEMPORAL" ||
+              formData.status === "CERRADO_PERMANENTE") && (
+              <div className="space-y-2">
+                <Label
+                  htmlFor="closedReason"
+                  className="text-sm font-medium text-foreground"
+                >
+                  Motivo del Cierre
+                </Label>
+                <Input
+                  id="closedReason"
+                  name="closedReason"
+                  value={formData.closedReason}
+                  onChange={handleChange}
+                  placeholder="Ej: Vacaciones, renovación, etc."
+                  className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="preparationTime"
+                className="text-sm font-medium text-foreground"
+              >
+                Tiempo de Preparación (minutos)
+              </Label>
+              <Input
+                id="preparationTime"
+                name="preparationTime"
+                type="number"
+                min="0"
+                step="5"
+                value={formData.preparationTime}
+                onChange={handleChange}
+                placeholder="30"
+                className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+              />
+              <p className="text-xs text-muted-foreground">
+                Tiempo estimado que toma preparar un pedido
+              </p>
+            </div>
+
+            <div className="space-y-4 pt-4 border-t border-border">
+              <div className="flex items-center space-x-3">
+                <input
+                  id="acceptOrdersOutsideHours"
+                  name="acceptOrdersOutsideHours"
+                  type="checkbox"
+                  checked={formData.acceptOrdersOutsideHours}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      acceptOrdersOutsideHours: e.target.checked,
+                    })
+                  }
+                  className="w-4 h-4 text-primary bg-background border-border rounded focus:ring-2 focus:ring-primary/20"
+                />
+                <Label
+                  htmlFor="acceptOrdersOutsideHours"
+                  className="text-sm font-medium text-foreground cursor-pointer"
+                >
+                  Aceptar pedidos fuera del horario de atención
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground ml-7">
+                Si está activado, los clientes podrán realizar pedidos incluso
+                cuando el negocio esté cerrado
+              </p>
+            </div>
+          </div>
+
+          {/* Horarios de Atención */}
+          <div className="space-y-4 pt-4 border-t border-border">
+            <h3 className="text-base sm:text-lg font-semibold text-foreground">
+              Horarios de Atención
+            </h3>
+            <BusinessScheduleEditor
+              schedule={schedule}
+              specialClosedDays={specialClosedDays}
+              onScheduleChange={setSchedule}
+              onSpecialDaysChange={setSpecialClosedDays}
+            />
           </div>
 
           {/* Ubicación */}

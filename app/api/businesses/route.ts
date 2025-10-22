@@ -52,6 +52,12 @@ export async function POST(request: NextRequest) {
       lat,
       lng,
       ownerId,
+      status,
+      closedReason,
+      schedule,
+      specialClosedDays,
+      acceptOrdersOutsideHours,
+      preparationTime,
     } = body;
 
     // Validar campos requeridos
@@ -116,6 +122,12 @@ export async function POST(request: NextRequest) {
         addressText: addressText || null,
         lat: lat || null,
         lng: lng || null,
+        status: status || "ABIERTO",
+        closedReason: closedReason || null,
+        schedule: schedule || null,
+        specialClosedDays: specialClosedDays || null,
+        acceptOrdersOutsideHours: acceptOrdersOutsideHours || false,
+        preparationTime: preparationTime || null,
         ownerId,
       },
       include: {

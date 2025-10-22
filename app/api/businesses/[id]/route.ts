@@ -76,6 +76,12 @@ export async function PUT(
       addressText,
       lat,
       lng,
+      status,
+      closedReason,
+      schedule,
+      specialClosedDays,
+      acceptOrdersOutsideHours,
+      preparationTime,
     } = body;
 
     // Verificar que el negocio existe
@@ -171,6 +177,24 @@ export async function PUT(
             : addressText,
         lat: lat === undefined ? existingBusiness.lat : lat,
         lng: lng === undefined ? existingBusiness.lng : lng,
+        status: status === undefined ? existingBusiness.status : status,
+        closedReason:
+          closedReason === undefined
+            ? existingBusiness.closedReason
+            : closedReason,
+        schedule: schedule === undefined ? existingBusiness.schedule : schedule,
+        specialClosedDays:
+          specialClosedDays === undefined
+            ? existingBusiness.specialClosedDays
+            : specialClosedDays,
+        acceptOrdersOutsideHours:
+          acceptOrdersOutsideHours === undefined
+            ? existingBusiness.acceptOrdersOutsideHours
+            : acceptOrdersOutsideHours,
+        preparationTime:
+          preparationTime === undefined
+            ? existingBusiness.preparationTime
+            : preparationTime,
       },
       include: {
         owner: true,

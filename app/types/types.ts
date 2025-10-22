@@ -14,6 +14,11 @@ export type OrderState =
 
 export type Role = "ADMINISTRADOR" | "PROPIETARIO" | "CLIENTE";
 
+export type BusinessStatus =
+  | "ABIERTO"
+  | "CERRADO_TEMPORAL"
+  | "CERRADO_PERMANENTE";
+
 export type AppUser = {
   // Identificador único del usuario
   id: string;
@@ -264,6 +269,26 @@ export type Business = {
 
   // Valor del envío del negocio
   shippingCost: number | null;
+
+  // Estado actual del negocio
+  status: BusinessStatus;
+
+  // Motivo por el cual el negocio está cerrado
+  closedReason: string | null;
+
+  // Horarios de atención del negocio (JSON)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  schedule: any;
+
+  // Días especiales de cierre (JSON)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  specialClosedDays: any;
+
+  // Indica si el negocio acepta pedidos fuera del horario de atención
+  acceptOrdersOutsideHours: boolean;
+
+  // Tiempo estimado de preparación de pedidos (en minutos)
+  preparationTime: number | null;
 
   // Productos ofrecidos por el negocio (Relación)
   products?: Product[];

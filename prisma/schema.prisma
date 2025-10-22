@@ -69,6 +69,20 @@ model Business {
   hasShipping   Boolean  @default(false)
   // Valor del envío del negocio
   shippingCost  Float?   @default(0)
+  // Estado actual del negocio (abierto, cerrado temporalmente, cerrado permanentemente)
+  status        BusinessStatus @default(ABIERTO)
+  // Motivo por el cual el negocio está cerrado (vacaciones, día festivo, emergencia, etc.)
+  closedReason  String?
+  // Horarios de atención del negocio en formato JSON
+  // Estructura: { "lunes": { "enabled": true, "open": "09:00", "close": "18:00" }, ... }
+  schedule      Json?
+  // Días especiales de cierre (feriados, vacaciones) en formato JSON
+  // Estructura: [{ "date": "2025-12-25", "reason": "Navidad" }, ...]
+  specialClosedDays Json?
+  // Indica si el negocio acepta pedidos fuera del horario de atención
+  acceptOrdersOutsideHours Boolean @default(false)
+  // Tiempo estimado de preparación de pedidos (en minutos)
+  preparationTime Int? @default(30)
   // Productos ofrecidos por el negocio
   products      Product[]
   // Órdenes asociadas al negocio
@@ -212,6 +226,13 @@ enum Role {
   ADMINISTRADOR      // Administrador
   PROPIETARIO        // Propietario de negocio
   CLIENTE            // Cliente
+}
+
+// Enum que representa el estado de un negocio
+enum BusinessStatus {
+  ABIERTO            // Negocio abierto y operativo
+  CERRADO_TEMPORAL   // Cerrado temporalmente (vacaciones, día libre, etc.)
+  CERRADO_PERMANENTE // Cerrado permanentemente
 }
 
 // Enum que representa los estados posibles de una orden
