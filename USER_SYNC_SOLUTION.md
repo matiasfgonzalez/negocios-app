@@ -159,7 +159,29 @@ Ahora **todos los usuarios que inicien sesión** se guardarán automáticamente 
 - ✅ Tener historial completo
 - ✅ Sistema multi-negocio funcional
 
+## 🔑 Roles de Usuario
+
+Cuando un usuario se registra por primera vez, se le asignan automáticamente dos roles:
+
+1. **PostgreSQL (Base de datos)**: Rol **PROPIETARIO**
+
+   - Permite crear y gestionar negocios
+   - Permite crear productos
+   - Permite gestionar pedidos
+
+2. **Clerk (publicMetadata)**: Rol **CLIENTE**
+   - Visible en el frontend
+   - Accesible desde `user.publicMetadata.role`
+   - Útil para lógica del lado del cliente
+
+### Archivos Involucrados:
+
+- **`components/UserSync.tsx`**: Llama al endpoint de metadata
+- **`app/api/user/metadata/route.ts`**: Asigna rol en Clerk publicMetadata
+- **`app/api/me/route.ts`**: Asigna rol PROPIETARIO en base de datos
+
 ---
 
 **Fecha de implementación**: 21 de Octubre, 2025
 **Estado**: ✅ Funcionando correctamente
+**Última actualización**: 21 de Octubre, 2025 - Agregado rol en Clerk publicMetadata

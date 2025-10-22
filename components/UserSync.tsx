@@ -18,7 +18,20 @@ export default function UserSync() {
       }
 
       try {
-        // Llamar al endpoint para sincronizar/crear el usuario
+        // 1. Asignar rol en Clerk publicMetadata si no lo tiene
+        const metadataResponse = await fetch("/api/user/metadata", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (metadataResponse.ok) {
+          const metadataData = await metadataResponse.json();
+          console.log("Metadata actualizado:", metadataData);
+        }
+
+        // 2. Sincronizar usuario en la base de datos
         const response = await fetch("/api/me", {
           method: "POST",
           headers: {
