@@ -20,6 +20,8 @@ import {
   Eye,
 } from "lucide-react";
 import Link from "next/link";
+import BusinessHoursDialog from "@/components/BusinessHoursDialog";
+import { BusinessSchedule, isBusinessOpen } from "@/lib/business-hours";
 
 export default function BusinessCard({
   business,
@@ -38,6 +40,55 @@ export default function BusinessCard({
     const years = Math.floor(diffInMonths / 12);
     return years === 1 ? "1 año" : `${years} años`;
   };
+
+  // Determinar el estado del negocio
+  const schedule = business.schedule as BusinessSchedule | null;
+  const specialClosedDays = business.specialClosedDays as Array<{
+    date: string;
+    reason: string;
+  }> | null;
+
+  const { isOpen: businessIsOpen } = schedule
+    ? isBusinessOpen(schedule, business.status, specialClosedDays || [])
+    : { isOpen: false };
+
+  // Función para obtener el badge de estado
+  const getStatusBadge = () => {
+    if (business.status === "CERRADO_PERMANENTE") {
+      return {
+        label: "Cerrado permanentemente",
+        color:
+          "bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20",
+        dot: "bg-gray-500",
+      };
+    }
+
+    if (business.status === "CERRADO_TEMPORAL") {
+      return {
+        label: "Cerrado temporalmente",
+        color:
+          "bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20",
+        dot: "bg-orange-500",
+      };
+    }
+
+    if (businessIsOpen) {
+      return {
+        label: "Abierto",
+        color:
+          "bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20",
+        dot: "bg-green-500 animate-pulse",
+      };
+    }
+
+    return {
+      label: "Cerrado",
+      color: "bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20",
+      dot: "bg-red-500",
+    };
+  };
+
+  const statusBadge = getStatusBadge();
 
   return (
     // UI improved: Enhanced card with better hover effects and dark mode support
@@ -70,10 +121,25 @@ export default function BusinessCard({
             <CardTitle className="text-lg sm:text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-200 line-clamp-1">
               {business.name}
             </CardTitle>
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
                 {business.rubro}
               </span>
+
+              {/* Badge de Estado del Negocio */}
+              <div className="flex items-center gap-1">
+                <span
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${statusBadge.color}`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${statusBadge.dot}`}
+                  />
+                  {statusBadge.label}
+                </span>
+
+                {/* Botón de información de horarios */}
+                <BusinessHoursDialog business={business} />
+              </div>
             </div>
           </div>
         </div>
