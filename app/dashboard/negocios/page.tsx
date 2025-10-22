@@ -7,6 +7,7 @@ import {
   Phone,
   DollarSign,
   Trash2,
+  Pencil,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -221,6 +222,7 @@ export default async function NegociosPage() {
                             size="sm"
                             className="flex-1 hover:bg-accent border-border text-xs sm:text-sm"
                           >
+                            <Pencil className="w-4 h-4 mr-2" />
                             Editar
                           </Button>
                         }
