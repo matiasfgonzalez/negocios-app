@@ -16,6 +16,8 @@ import {
   Loader2,
   LogIn,
   CheckCircle,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +29,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Business, Product } from "@/app/types/types";
 import OrderSuccessDialog from "@/components/OrderSuccessDialog";
 import OrderErrorDialog from "@/components/OrderErrorDialog";
+import BusinessHoursDialog from "@/components/BusinessHoursDialog";
+import {
+  BusinessSchedule,
+  SpecialClosedDay,
+  isBusinessOpen,
+} from "@/lib/business-hours";
 import dynamic from "next/dynamic";
 
 const OrderMapSelector = dynamic(
@@ -213,6 +221,57 @@ export default function BusinessDetailClient({
     whatsappLink: string | null;
   } | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // ===== BUSINESS HOURS & ORDER VALIDATION =====
+  const schedule = business.schedule as BusinessSchedule | null;
+  const specialClosedDays =
+    (business.specialClosedDays as SpecialClosedDay[]) || [];
+
+  const { isOpen: businessIsOpen, reason } = schedule
+    ? isBusinessOpen(schedule, business.status, specialClosedDays)
+    : { isOpen: false, reason: "Horario no especificado" };
+
+  // Determine if orders can be placed
+  const canOrderNow =
+    (business.status === "ABIERTO" && businessIsOpen) ||
+    business.acceptOrdersOutsideHours;
+
+  // Get status badge configuration (same as BusinessCard)
+  const getStatusBadge = () => {
+    if (business.status === "CERRADO_PERMANENTE") {
+      return {
+        label: "Cerrado permanentemente",
+        color:
+          "bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600",
+        dot: "bg-gray-500",
+      };
+    }
+    if (business.status === "CERRADO_TEMPORAL") {
+      return {
+        label: "Cerrado temporalmente",
+        color:
+          "bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700",
+        dot: "bg-orange-500",
+      };
+    }
+    if (businessIsOpen) {
+      return {
+        label: "Abierto",
+        color:
+          "bg-green-100 text-green-700 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700",
+        dot: "bg-green-500 animate-pulse",
+      };
+    }
+    return {
+      label: "Cerrado",
+      color:
+        "bg-red-100 text-red-700 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700",
+      dot: "bg-red-500",
+    };
+  };
+
+  const statusBadge = getStatusBadge();
+  // ===== END BUSINESS HOURS & ORDER VALIDATION =====
 
   // Función para agregar producto al carrito
   const addToCart = (product: (typeof business.products)[0]) => {
@@ -464,6 +523,64 @@ export default function BusinessDetailClient({
                 </div>
               )}
 
+              {/* Status and Business Hours Section */}
+              <div className="bg-background/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border ${statusBadge.color}`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full ${statusBadge.dot}`}
+                      />
+                      {statusBadge.label}
+                    </span>
+                    <BusinessHoursDialog business={business} />
+                  </div>
+
+                  {business.preparationTime && (
+                    <div className="text-sm text-muted-foreground flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      Preparación: {business.preparationTime} min
+                    </div>
+                  )}
+                </div>
+
+                {/* Order availability message - when orders are NOT available */}
+                {!canOrderNow && (
+                  <div className="mt-3 flex items-start gap-2 text-sm text-amber-700 dark:text-amber-400 bg-amber-500/10 rounded-lg p-3 border border-amber-500/20">
+                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium">Pedidos no disponibles</p>
+                      <p className="text-xs mt-1">
+                        {business.status === "CERRADO_PERMANENTE"
+                          ? "Este negocio está cerrado permanentemente"
+                          : business.status === "CERRADO_TEMPORAL"
+                          ? `Cerrado temporalmente${
+                              business.closedReason
+                                ? `: ${business.closedReason}`
+                                : ""
+                            }`
+                          : reason || "El negocio está cerrado en este momento"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Order availability message - when accepting orders outside hours */}
+                {canOrderNow &&
+                  business.acceptOrdersOutsideHours &&
+                  !businessIsOpen && (
+                    <div className="mt-3 flex items-start gap-2 text-sm text-blue-700 dark:text-blue-400 bg-blue-500/10 rounded-lg p-3 border border-blue-500/20">
+                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <p>
+                        Este negocio acepta pedidos fuera del horario de
+                        atención
+                      </p>
+                    </div>
+                  )}
+              </div>
+
               {/* Contact Information Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {business.addressText && (
@@ -547,12 +664,21 @@ export default function BusinessDetailClient({
               {/* Cart Button */}
               <Button
                 onClick={() => setShowCart(!showCart)}
-                className="w-full relative bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] py-6 text-lg font-bold"
+                disabled={!canOrderNow}
+                className={`w-full relative ${
+                  canOrderNow
+                    ? "bg-primary hover:bg-primary/90 hover:scale-[1.02]"
+                    : "bg-muted cursor-not-allowed opacity-50"
+                } text-primary-foreground shadow-xl hover:shadow-2xl transition-all py-6 text-lg font-bold`}
                 size="lg"
               >
                 <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 mr-3" />
-                Ver Carrito {cart.length > 0 && `(${cart.length} productos)`}
-                {cart.length > 0 && (
+                {canOrderNow
+                  ? `Ver Carrito ${
+                      cart.length > 0 ? `(${cart.length} productos)` : ""
+                    }`
+                  : "Pedidos no disponibles"}
+                {canOrderNow && cart.length > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-7 h-7 flex items-center justify-center font-bold animate-bounce shadow-lg ring-4 ring-red-500/20">
                     {cart.reduce((sum, item) => sum + item.quantity, 0)}
                   </span>
@@ -731,7 +857,8 @@ export default function BusinessDetailClient({
                                           onClick={() =>
                                             updateQuantity(product.id, -1)
                                           }
-                                          className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-600 dark:hover:text-red-400 transition-colors border-border"
+                                          disabled={!canOrderNow}
+                                          className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-600 dark:hover:text-red-400 transition-colors disabled:opacity-50 border-border"
                                         >
                                           <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                         </Button>
@@ -744,7 +871,10 @@ export default function BusinessDetailClient({
                                           onClick={() =>
                                             updateQuantity(product.id, 1)
                                           }
-                                          disabled={cartQty >= product.stock}
+                                          disabled={
+                                            cartQty >= product.stock ||
+                                            !canOrderNow
+                                          }
                                           className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-green-500/10 hover:border-green-500/50 hover:text-green-600 dark:hover:text-green-400 transition-colors disabled:opacity-50 border-border"
                                         >
                                           <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -753,12 +883,16 @@ export default function BusinessDetailClient({
                                     ) : (
                                       <Button
                                         onClick={() => addToCart(product)}
-                                        disabled={product.stock === 0}
+                                        disabled={
+                                          product.stock === 0 || !canOrderNow
+                                        }
                                         size="sm"
                                         className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all disabled:opacity-50"
                                       >
                                         <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
-                                        Agregar
+                                        {canOrderNow
+                                          ? "Agregar"
+                                          : "No disponible"}
                                       </Button>
                                     )}
                                   </div>
@@ -1013,6 +1147,7 @@ export default function BusinessDetailClient({
                               disabled={
                                 cart.length === 0 ||
                                 isProcessingOrder ||
+                                !canOrderNow ||
                                 (deliveryType === "delivery" &&
                                   (!deliveryLocation ||
                                     !deliveryAddress.trim()))
@@ -1030,7 +1165,14 @@ export default function BusinessDetailClient({
                               )}
                             </Button>
 
-                            {deliveryType === "delivery" &&
+                            {!canOrderNow && (
+                              <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
+                                ⚠️ El negocio no acepta pedidos en este momento
+                              </p>
+                            )}
+
+                            {canOrderNow &&
+                              deliveryType === "delivery" &&
                               (!deliveryLocation ||
                                 !deliveryAddress.trim()) && (
                                 <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
@@ -1048,6 +1190,7 @@ export default function BusinessDetailClient({
                               onClick={handleCheckout}
                               disabled={
                                 cart.length === 0 ||
+                                !canOrderNow ||
                                 !business.whatsappPhone ||
                                 (deliveryType === "delivery" &&
                                   (!deliveryLocation ||
@@ -1060,7 +1203,14 @@ export default function BusinessDetailClient({
                               Pedir por WhatsApp
                             </Button>
 
-                            {deliveryType === "delivery" &&
+                            {!canOrderNow && (
+                              <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
+                                ⚠️ El negocio no acepta pedidos en este momento
+                              </p>
+                            )}
+
+                            {canOrderNow &&
+                              deliveryType === "delivery" &&
                               (!deliveryLocation ||
                                 !deliveryAddress.trim()) && (
                                 <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
