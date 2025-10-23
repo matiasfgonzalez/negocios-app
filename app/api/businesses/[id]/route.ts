@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
+import { Prisma } from "@prisma/client";
 
 // GET - Obtener un negocio por ID o slug
 export async function GET(
@@ -144,58 +145,54 @@ export async function PUT(
     }
 
     // Actualizar el negocio
+    const updateData: Prisma.BusinessUpdateInput = {
+      name: name || existingBusiness.name,
+      slug,
+      rubro: rubro || existingBusiness.rubro,
+      description:
+        description === undefined ? existingBusiness.description : description,
+      img: img === undefined ? existingBusiness.img : img,
+      whatsappPhone:
+        whatsappPhone === undefined
+          ? existingBusiness.whatsappPhone
+          : whatsappPhone,
+      aliasPago:
+        aliasPago === undefined ? existingBusiness.aliasPago : aliasPago,
+      hasShipping:
+        hasShipping === undefined ? existingBusiness.hasShipping : hasShipping,
+      shippingCost:
+        shippingCost === undefined
+          ? existingBusiness.shippingCost
+          : hasShipping && shippingCost
+          ? shippingCost
+          : 0,
+      addressText:
+        addressText === undefined ? existingBusiness.addressText : addressText,
+      lat: lat === undefined ? existingBusiness.lat : lat,
+      lng: lng === undefined ? existingBusiness.lng : lng,
+      status: status === undefined ? existingBusiness.status : status,
+      closedReason:
+        closedReason === undefined
+          ? existingBusiness.closedReason
+          : closedReason,
+      schedule: schedule === undefined ? existingBusiness.schedule : schedule,
+      specialClosedDays:
+        specialClosedDays === undefined
+          ? existingBusiness.specialClosedDays
+          : specialClosedDays,
+      acceptOrdersOutsideHours:
+        acceptOrdersOutsideHours === undefined
+          ? existingBusiness.acceptOrdersOutsideHours
+          : acceptOrdersOutsideHours,
+      preparationTime:
+        preparationTime === undefined
+          ? existingBusiness.preparationTime
+          : preparationTime,
+    };
+
     const business = await prisma.business.update({
       where: { id },
-      data: {
-        name: name || existingBusiness.name,
-        slug,
-        rubro: rubro || existingBusiness.rubro,
-        description:
-          description === undefined
-            ? existingBusiness.description
-            : description,
-        img: img === undefined ? existingBusiness.img : img,
-        whatsappPhone:
-          whatsappPhone === undefined
-            ? existingBusiness.whatsappPhone
-            : whatsappPhone,
-        aliasPago:
-          aliasPago === undefined ? existingBusiness.aliasPago : aliasPago,
-        hasShipping:
-          hasShipping === undefined
-            ? existingBusiness.hasShipping
-            : hasShipping,
-        shippingCost:
-          shippingCost === undefined
-            ? existingBusiness.shippingCost
-            : hasShipping && shippingCost
-            ? shippingCost
-            : 0,
-        addressText:
-          addressText === undefined
-            ? existingBusiness.addressText
-            : addressText,
-        lat: lat === undefined ? existingBusiness.lat : lat,
-        lng: lng === undefined ? existingBusiness.lng : lng,
-        status: status === undefined ? existingBusiness.status : status,
-        closedReason:
-          closedReason === undefined
-            ? existingBusiness.closedReason
-            : closedReason,
-        schedule: schedule === undefined ? existingBusiness.schedule : schedule,
-        specialClosedDays:
-          specialClosedDays === undefined
-            ? existingBusiness.specialClosedDays
-            : specialClosedDays,
-        acceptOrdersOutsideHours:
-          acceptOrdersOutsideHours === undefined
-            ? existingBusiness.acceptOrdersOutsideHours
-            : acceptOrdersOutsideHours,
-        preparationTime:
-          preparationTime === undefined
-            ? existingBusiness.preparationTime
-            : preparationTime,
-      },
+      data: updateData,
       include: {
         owner: true,
         _count: {
