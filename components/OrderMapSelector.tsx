@@ -35,15 +35,16 @@ if (globalThis.window !== undefined) {
       btoa(`
       <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24">
         <defs>
-          <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#2563EB"/>
+          <linearGradient id="grad2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1D4ED8"/>
             <stop offset="100%" stop-color="#3B82F6"/>
           </linearGradient>
         </defs>
-        <circle cx="12" cy="12" r="11" fill="url(#grad)" stroke="#ffffff" stroke-width="1.5"/>
-        <path d="M7 9l1-3h8l1 3" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        <rect x="5.5" y="9" width="13" height="9" rx="1.5" fill="none" stroke="#ffffff" stroke-width="1.5"/>
-        <path d="M9 12v2M15 12v2" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="12" cy="12" r="11" fill="url(#grad2)" stroke="#ffffff" stroke-width="1.5"/>
+        <rect x="7" y="9" width="10" height="9" rx="2" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+        <path d="M9 9V8a3 3 0 0 1 6 0v1" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="10" cy="12" r="0.6" fill="#ffffff"/>
+        <circle cx="14" cy="12" r="0.6" fill="#ffffff"/>
       </svg>
     `),
     iconSize: [40, 40],
