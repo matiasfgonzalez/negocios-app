@@ -54,15 +54,15 @@ export default function BusinessHoursDialog({
           <Info className="w-3.5 h-3.5" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md bg-card border-border">
-        <DialogHeader>
+      <DialogContent className="max-w-md w-[95vw] max-h-[90vh] bg-card border-border flex flex-col p-0">
+        <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
           <DialogTitle className="text-xl font-bold text-foreground flex items-center gap-2">
             <Clock className="w-5 h-5 text-primary" />
             Horarios de Atención
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-6 px-6 pb-6 overflow-y-auto flex-1">
           {/* Estado Actual */}
           <div className="p-4 bg-muted/50 rounded-lg border border-border">
             <p className="text-sm text-muted-foreground mb-2">Estado actual</p>
