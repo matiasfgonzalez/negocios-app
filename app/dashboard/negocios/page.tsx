@@ -1,5 +1,8 @@
-import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Store,
@@ -8,6 +11,7 @@ import {
   DollarSign,
   Trash2,
   Pencil,
+  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -19,53 +23,79 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { prisma } from "@/lib/prisma";
 import NuevoNegocioDialog from "@/components/NuevoNegocioDialog";
 import EditarNegocioDialog from "@/components/EditarNegocioDialog";
 import EliminarNegocioDialog from "@/components/EliminarNegocioDialog";
+import { BusinessWithRelations } from "@/app/types/types";
 
-export default async function NegociosPage() {
-  const user = await currentUser();
-  if (!user) redirect("/sign-in");
+export default function NegociosPage() {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
+  const [negocios, setNegocios] = useState<BusinessWithRelations[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState<string>("");
 
-  const role = user.publicMetadata.role as string;
+  const role = user?.publicMetadata?.role as string;
 
-  // Solo ADMINISTRADOR y PROPIETARIO pueden acceder
-  if (role !== "ADMINISTRADOR" && role !== "PROPIETARIO") {
-    redirect("/dashboard");
+  // Verificar autenticación y permisos
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (!user) {
+      router.push("/sign-in");
+      return;
+    }
+
+    if (role !== "ADMINISTRADOR" && role !== "PROPIETARIO") {
+      router.push("/dashboard");
+      return;
+    }
+
+    // Obtener el usuario de la base de datos
+    fetch("/api/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.id) {
+          setUserId(data.id);
+        }
+      })
+      .catch((error) => {
+        console.error("Error al obtener usuario:", error);
+      });
+  }, [user, isLoaded, role, router]);
+
+  // Obtener negocios desde la API
+  useEffect(() => {
+    if (!user || !role) return;
+
+    setIsLoading(true);
+    fetch("/api/businesses?forManagement=true")
+      .then((res) => {
+        if (!res.ok) throw new Error("Error al obtener negocios");
+        return res.json();
+      })
+      .then((data: BusinessWithRelations[]) => {
+        setNegocios(data);
+      })
+      .catch((error) => {
+        console.error("Error al obtener negocios:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [user, role]);
+
+  if (!isLoaded || isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
-  // Obtener el usuario de la base de datos
-  const appUser = await prisma.appUser.findUnique({
-    where: { clerkId: user.id },
-  });
-
-  if (!appUser) {
-    redirect("/dashboard");
+  if (!user || !role) {
+    return null;
   }
-
-  // Obtener negocios según el rol
-  const negocios =
-    role === "ADMINISTRADOR"
-      ? await prisma.business.findMany({
-          include: {
-            owner: true,
-            _count: {
-              select: { products: true },
-            },
-          },
-          orderBy: { createdAt: "desc" },
-        })
-      : await prisma.business.findMany({
-          where: { ownerId: appUser.id },
-          include: {
-            owner: true,
-            _count: {
-              select: { products: true },
-            },
-          },
-          orderBy: { createdAt: "desc" },
-        });
 
   return (
     <div className="min-h-screen">
@@ -92,7 +122,7 @@ export default async function NegociosPage() {
                 : "Visualiza y gestiona todos los negocios registrados"}
             </p>
           </div>
-          <NuevoNegocioDialog userId={appUser.id} />
+          {userId && <NuevoNegocioDialog userId={userId} />}
         </div>
 
         {/* UI improved: Enhanced Empty State */}
@@ -108,7 +138,7 @@ export default async function NegociosPage() {
                   ? "Crea tu primer negocio para comenzar a vender"
                   : "Aún no hay negocios registrados en el sistema"}
               </p>
-              <NuevoNegocioDialog userId={appUser.id} />
+              {userId && <NuevoNegocioDialog userId={userId} />}
             </CardContent>
           </Card>
         ) : (

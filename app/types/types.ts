@@ -232,7 +232,7 @@ export type Business = {
   ownerId: string;
 
   // Relación con el usuario propietario (opcional cuando solo se usa el ID)
-  owner?: AppUser;
+  owner?: AppUser | { id: string; name: string | null; email: string | null };
 
   // Nombre del negocio
   name: string;
@@ -301,4 +301,16 @@ export type Business = {
 
   // Fecha de última actualización del negocio
   updatedAt: Date;
+};
+
+// Tipo para negocios en el dashboard de gestión
+export type BusinessWithRelations = Business & {
+  owner: {
+    id: string;
+    name: string | null;
+    email: string | null;
+  };
+  _count: {
+    products: number;
+  };
 };

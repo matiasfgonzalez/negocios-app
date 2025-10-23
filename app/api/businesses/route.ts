@@ -4,13 +4,70 @@ import { currentUser } from "@clerk/nextjs/server";
 import { Prisma } from "@prisma/client";
 
 export async function GET(request: Request) {
-  const q = new URL(request.url).searchParams.get("q") ?? undefined;
-  const rubro = new URL(request.url).searchParams.get("rubro") ?? undefined;
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q") ?? undefined;
+  const rubro = url.searchParams.get("rubro") ?? undefined;
+  const forManagement = url.searchParams.get("forManagement") === "true";
 
   const where: Prisma.BusinessWhereInput = {};
   if (q) where.name = { contains: q, mode: "insensitive" };
   if (rubro) where.rubro = { equals: rubro };
 
+  // Si es para gestión (dashboard), filtrar por rol
+  if (forManagement) {
+    const user = await currentUser();
+    if (!user) {
+      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
+    }
+
+    const role = user.publicMetadata.role as string;
+
+    // Solo ADMINISTRADOR y PROPIETARIO pueden acceder
+    if (role !== "ADMINISTRADOR" && role !== "PROPIETARIO") {
+      return NextResponse.json(
+        { error: "No tienes permisos para gestionar negocios" },
+        { status: 403 }
+      );
+    }
+
+    // Si es PROPIETARIO, filtrar por sus negocios
+    if (role === "PROPIETARIO") {
+      const appUser = await prisma.appUser.findUnique({
+        where: { clerkId: user.id },
+      });
+
+      if (!appUser) {
+        return NextResponse.json(
+          { error: "Usuario no encontrado" },
+          { status: 404 }
+        );
+      }
+
+      where.ownerId = appUser.id;
+    }
+
+    // Para gestión, incluir owner y _count
+    const businesses = await prisma.business.findMany({
+      where,
+      include: {
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        _count: {
+          select: { products: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json(businesses);
+  }
+
+  // Para listado público, incluir solo productos
   const businesses = await prisma.business.findMany({
     where,
     include: {
