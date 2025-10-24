@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import MultiImageSelector from "@/components/MultiImageSelector";
 import {
   Select,
   SelectContent,
@@ -599,45 +600,33 @@ export default function ProductosClient({
                 </div>
 
                 {/* Imágenes */}
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="images"
-                    className="text-sm font-medium text-foreground"
-                  >
-                    URLs de Imágenes
-                  </Label>
-                  <Textarea
-                    id="images"
-                    value={formData.images}
-                    onChange={(e) =>
-                      setFormData({ ...formData, images: e.target.value })
-                    }
-                    placeholder="https://ejemplo.com/imagen1.jpg, https://ejemplo.com/imagen2.jpg"
-                    rows={2}
-                    className="bg-background border-border text-foreground resize-none break-all"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Separa múltiples URLs con comas
-                  </p>
+                <MultiImageSelector
+                  value={formData.images}
+                  onChange={(urls) =>
+                    setFormData({ ...formData, images: urls })
+                  }
+                  maxImages={3}
+                  label="Imágenes del Producto"
+                  placeholder="https://ejemplo.com/imagen1.jpg, https://ejemplo.com/imagen2.jpg"
+                />
 
-                  {/* Preview del Carrusel */}
-                  {formData.images.trim() && (
-                    <div className="mt-3">
-                      <p className="text-xs font-medium text-foreground mb-2">
-                        Vista previa:
-                      </p>
-                      <div className="rounded-lg overflow-hidden border border-border">
-                        <ImageCarousel
-                          images={formData.images
-                            .split(",")
-                            .map((url) => url.trim())
-                            .filter((url) => url.length > 0)}
-                          productName={formData.name || "Producto"}
-                        />
-                      </div>
+                {/* Preview del Carrusel */}
+                {formData.images.trim() && (
+                  <div className="mt-3">
+                    <p className="text-xs font-medium text-foreground mb-2">
+                      Vista previa del carrusel:
+                    </p>
+                    <div className="rounded-lg overflow-hidden border border-border">
+                      <ImageCarousel
+                        images={formData.images
+                          .split(",")
+                          .map((url) => url.trim())
+                          .filter((url) => url.length > 0)}
+                        productName={formData.name || "Producto"}
+                      />
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* Botones */}
                 <div className="flex gap-3 pt-4">
