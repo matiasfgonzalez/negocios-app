@@ -3,10 +3,9 @@ import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import cloudinary from "@/lib/cloudinary";
 
-export async function DELETE(
-  _: Request,
-  { params }: { params: { id: string } }
-) {
+type tParams = Promise<{ id: string }>;
+
+export async function DELETE(_: Request, { params }: { params: tParams }) {
   try {
     // Verificar autenticación
     const user = await currentUser();
@@ -26,9 +25,11 @@ export async function DELETE(
       );
     }
 
+    const { id: imageId } = await params;
+
     // Buscar la imagen
     const image = await prisma.uploadedImage.findUnique({
-      where: { id: params.id },
+      where: { id: imageId },
     });
 
     if (!image) {

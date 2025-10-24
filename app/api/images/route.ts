@@ -56,7 +56,10 @@ export async function POST(req: Request) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Subir a Cloudinary
-    const result = await new Promise<any>((resolve, reject) => {
+    const result = await new Promise<{
+      secure_url: string;
+      public_id: string;
+    }>((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
           {
@@ -68,7 +71,8 @@ export async function POST(req: Request) {
               reject(
                 new Error(error.message || "Error al subir imagen a Cloudinary")
               );
-            else resolve(result);
+            else if (result) resolve(result);
+            else reject(new Error("No se recibió respuesta de Cloudinary"));
           }
         )
         .end(buffer);
