@@ -51,17 +51,28 @@ export async function POST(req: Request) {
       );
     }
 
+    // Convertir el archivo a buffer para Cloudinary
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
     // Subir a Cloudinary
-    const upload = await new Promise((resolve, reject) => {
+    const result = await new Promise<any>((resolve, reject) => {
       cloudinary.uploader
-        .upload_stream({ folder: "nextjs-images" }, (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        })
+        .upload_stream(
+          {
+            folder: "negocios-app",
+            resource_type: "image",
+          },
+          (error, result) => {
+            if (error)
+              reject(
+                new Error(error.message || "Error al subir imagen a Cloudinary")
+              );
+            else resolve(result);
+          }
+        )
         .end(buffer);
     });
-
-    const result = upload as any;
 
     // Guardar en la base de datos
     const uploadedImage = await prisma.uploadedImage.create({
