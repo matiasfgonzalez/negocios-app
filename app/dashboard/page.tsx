@@ -10,6 +10,7 @@ import {
   BarChart3,
   FileText,
   ArrowRight,
+  Image,
 } from "lucide-react";
 import {
   Card,
@@ -92,6 +93,14 @@ export default async function DashboardPage() {
       color: "text-teal-600 dark:text-teal-400",
       gradient: "from-teal-500 to-cyan-500",
     },
+    imagenes: {
+      title: "Imágenes",
+      description: "Sube y gestiona imágenes para tus productos",
+      icon: Image,
+      href: "/dashboard/images",
+      color: "text-pink-600 dark:text-pink-400",
+      gradient: "from-purple-500 to-pink-500",
+    },
   };
 
   // Determinar qué tarjetas mostrar según el rol
@@ -107,6 +116,7 @@ export default async function DashboardPage() {
       allCards.negocios,
       allCards.productos,
       allCards.pedidos,
+      allCards.imagenes,
       allCards.estadisticas,
       allCards.reportes,
       allCards.perfil,
@@ -118,6 +128,7 @@ export default async function DashboardPage() {
       allCards.negocios,
       allCards.productos,
       allCards.pedidos,
+      allCards.imagenes,
       allCards.perfil,
     ];
   } else if (role === "CLIENTE") {
