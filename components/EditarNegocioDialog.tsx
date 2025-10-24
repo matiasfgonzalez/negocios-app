@@ -25,11 +25,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import BusinessScheduleEditor from "@/components/BusinessScheduleEditor";
+import ShippingRangesEditor from "@/components/ShippingRangesEditor";
 import {
   BusinessSchedule,
   SpecialClosedDay,
   defaultSchedule,
 } from "@/lib/business-hours";
+import { ShippingRange, createFlatShippingRate } from "@/lib/shipping-utils";
 
 // Importar el mapa de forma dinámica para evitar problemas con SSR
 const MapSelector = dynamic<{
@@ -65,6 +67,7 @@ export default function EditarNegocioDialog({
     aliasPago: business.aliasPago || "",
     hasShipping: business.hasShipping,
     shippingCost: business.shippingCost?.toString() || "0",
+    maxShippingDistance: business.maxShippingDistance?.toString() || "",
     addressText: business.addressText || "",
     lat: business.lat?.toString() || "",
     lng: business.lng?.toString() || "",
@@ -79,6 +82,10 @@ export default function EditarNegocioDialog({
   const [specialClosedDays, setSpecialClosedDays] = useState<
     SpecialClosedDay[]
   >((business.specialClosedDays as SpecialClosedDay[]) || []);
+  const [shippingRanges, setShippingRanges] = useState<ShippingRange[]>(
+    (business.shippingRanges as ShippingRange[]) ||
+      createFlatShippingRate(business.shippingCost || 0)
+  );
 
   // Actualizar formData cuando cambie el negocio
   useEffect(() => {
@@ -91,6 +98,7 @@ export default function EditarNegocioDialog({
       aliasPago: business.aliasPago || "",
       hasShipping: business.hasShipping,
       shippingCost: business.shippingCost?.toString() || "0",
+      maxShippingDistance: business.maxShippingDistance?.toString() || "",
       addressText: business.addressText || "",
       lat: business.lat?.toString() || "",
       lng: business.lng?.toString() || "",
@@ -102,6 +110,10 @@ export default function EditarNegocioDialog({
     setSchedule((business.schedule as BusinessSchedule) || defaultSchedule);
     setSpecialClosedDays(
       (business.specialClosedDays as SpecialClosedDay[]) || []
+    );
+    setShippingRanges(
+      (business.shippingRanges as ShippingRange[]) ||
+        createFlatShippingRate(business.shippingCost || 0)
     );
   }, [business]);
 
@@ -130,6 +142,11 @@ export default function EditarNegocioDialog({
             formData.hasShipping && formData.shippingCost
               ? Number.parseFloat(formData.shippingCost)
               : 0,
+          maxShippingDistance:
+            formData.hasShipping && formData.maxShippingDistance
+              ? Number.parseFloat(formData.maxShippingDistance)
+              : null,
+          shippingRanges: formData.hasShipping ? shippingRanges : null,
           lat: formData.lat ? Number.parseFloat(formData.lat) : null,
           lng: formData.lng ? Number.parseFloat(formData.lng) : null,
           status: formData.status,
@@ -346,30 +363,43 @@ export default function EditarNegocioDialog({
             </div>
 
             {formData.hasShipping && (
-              <div className="space-y-2">
-                <Label
-                  htmlFor="shippingCost"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Costo de Envío *
-                </Label>
-                <Input
-                  id="shippingCost"
-                  name="shippingCost"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.shippingCost}
-                  onChange={handleChange}
-                  placeholder="0.00"
-                  required={formData.hasShipping}
-                  className="bg-background border-border text-foreground placeholder:text-muted-foreground"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Valor que se sumará al total cuando el cliente seleccione
-                  envío a domicilio
-                </p>
-              </div>
+              <>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="maxShippingDistance"
+                    className="text-sm font-medium text-foreground"
+                  >
+                    Distancia Máxima de Envío (km)
+                  </Label>
+                  <Input
+                    id="maxShippingDistance"
+                    name="maxShippingDistance"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={formData.maxShippingDistance}
+                    onChange={handleChange}
+                    placeholder="5.0"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Distancia máxima en kilómetros que aceptas para envíos
+                    (dejar vacío para sin límite)
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-border">
+                  <ShippingRangesEditor
+                    ranges={shippingRanges}
+                    onChange={setShippingRanges}
+                    maxDistance={
+                      formData.maxShippingDistance
+                        ? Number.parseFloat(formData.maxShippingDistance)
+                        : null
+                    }
+                  />
+                </div>
+              </>
             )}
           </div>
 

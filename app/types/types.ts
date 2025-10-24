@@ -267,8 +267,15 @@ export type Business = {
   // Indica si el negocio ofrece servicio de envío a domicilio
   hasShipping: boolean;
 
-  // Valor del envío del negocio
+  // Valor del envío del negocio (deprecado - usar shippingRanges)
   shippingCost: number | null;
+
+  // Distancia máxima de envío en kilómetros (null = sin límite)
+  maxShippingDistance: number | null;
+
+  // Rangos de costos de envío por distancia (JSON)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  shippingRanges: any;
 
   // Estado actual del negocio
   status: BusinessStatus;

@@ -67,8 +67,14 @@ model Business {
   img           String?
   // Indica si el negocio ofrece servicio de envío a domicilio
   hasShipping   Boolean  @default(false)
-  // Valor del envío del negocio
+  // Valor del envío del negocio (deprecado - usar shippingRanges)
   shippingCost  Float?   @default(0)
+  // Distancia máxima de envío en kilómetros (null = sin límite)
+  maxShippingDistance Float?
+  // Rangos de costos de envío por distancia en formato JSON
+  // Estructura: [{ "fromKm": 0, "toKm": 1, "cost": 1000 }, { "fromKm": 1, "toKm": 2, "cost": 1500 }, ...]
+  // Si toKm es null, representa "hasta infinito"
+  shippingRanges Json?
   // Estado actual del negocio (abierto, cerrado temporalmente, cerrado permanentemente)
   status        BusinessStatus @default(ABIERTO)
   // Motivo por el cual el negocio está cerrado (vacaciones, día festivo, emergencia, etc.)

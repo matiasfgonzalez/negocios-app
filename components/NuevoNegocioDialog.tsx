@@ -24,11 +24,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import BusinessScheduleEditor from "@/components/BusinessScheduleEditor";
+import ShippingRangesEditor from "@/components/ShippingRangesEditor";
 import {
   BusinessSchedule,
   SpecialClosedDay,
   defaultSchedule,
 } from "@/lib/business-hours";
+import { ShippingRange, createFlatShippingRate } from "@/lib/shipping-utils";
 import { BusinessStatus } from "@/app/types/types";
 
 // Importar el mapa de forma dinámica para evitar problemas con SSR
@@ -63,6 +65,7 @@ export default function NuevoNegocioDialog({
     aliasPago: "",
     hasShipping: false,
     shippingCost: "",
+    maxShippingDistance: "",
     addressText: "",
     lat: "",
     lng: "",
@@ -75,6 +78,9 @@ export default function NuevoNegocioDialog({
   const [specialClosedDays, setSpecialClosedDays] = useState<
     SpecialClosedDay[]
   >([]);
+  const [shippingRanges, setShippingRanges] = useState<ShippingRange[]>(
+    createFlatShippingRate(0)
+  );
 
   const handleLocationSelect = (location: { lat: number; lng: number }) => {
     setFormData({
@@ -102,6 +108,11 @@ export default function NuevoNegocioDialog({
             formData.hasShipping && formData.shippingCost
               ? Number.parseFloat(formData.shippingCost)
               : 0,
+          maxShippingDistance:
+            formData.hasShipping && formData.maxShippingDistance
+              ? Number.parseFloat(formData.maxShippingDistance)
+              : null,
+          shippingRanges: formData.hasShipping ? shippingRanges : null,
           lat: formData.lat ? Number.parseFloat(formData.lat) : null,
           lng: formData.lng ? Number.parseFloat(formData.lng) : null,
           status: formData.status,
@@ -131,6 +142,7 @@ export default function NuevoNegocioDialog({
         aliasPago: "",
         hasShipping: false,
         shippingCost: "",
+        maxShippingDistance: "",
         addressText: "",
         lat: "",
         lng: "",
@@ -141,6 +153,7 @@ export default function NuevoNegocioDialog({
       });
       setSchedule(defaultSchedule);
       setSpecialClosedDays([]);
+      setShippingRanges(createFlatShippingRate(0));
       router.refresh();
     } catch (error) {
       console.error("Error:", error);
@@ -329,30 +342,43 @@ export default function NuevoNegocioDialog({
             </div>
 
             {formData.hasShipping && (
-              <div className="space-y-2">
-                <Label
-                  htmlFor="shippingCost"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Costo de Envío *
-                </Label>
-                <Input
-                  id="shippingCost"
-                  name="shippingCost"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.shippingCost}
-                  onChange={handleChange}
-                  placeholder="0.00"
-                  required={formData.hasShipping}
-                  className="bg-background border-border text-foreground placeholder:text-muted-foreground"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Valor que se sumará al total cuando el cliente seleccione
-                  envío a domicilio
-                </p>
-              </div>
+              <>
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="maxShippingDistance"
+                    className="text-sm font-medium text-foreground"
+                  >
+                    Distancia Máxima de Envío (km)
+                  </Label>
+                  <Input
+                    id="maxShippingDistance"
+                    name="maxShippingDistance"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    value={formData.maxShippingDistance}
+                    onChange={handleChange}
+                    placeholder="5.0"
+                    className="bg-background border-border text-foreground placeholder:text-muted-foreground"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Distancia máxima en kilómetros que aceptas para envíos
+                    (dejar vacío para sin límite)
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-border">
+                  <ShippingRangesEditor
+                    ranges={shippingRanges}
+                    onChange={setShippingRanges}
+                    maxDistance={
+                      formData.maxShippingDistance
+                        ? Number.parseFloat(formData.maxShippingDistance)
+                        : null
+                    }
+                  />
+                </div>
+              </>
             )}
           </div>
 
