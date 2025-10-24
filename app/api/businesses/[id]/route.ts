@@ -65,6 +65,13 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
+
+    // DEBUG: Log del body recibido
+    console.log(
+      "📦 PUT /api/businesses/[id] - Body recibido:",
+      JSON.stringify(body, null, 2)
+    );
+
     const {
       name,
       rubro,
@@ -74,6 +81,8 @@ export async function PUT(
       aliasPago,
       hasShipping,
       shippingCost,
+      maxShippingDistance,
+      shippingRanges,
       addressText,
       lat,
       lng,
@@ -84,6 +93,14 @@ export async function PUT(
       acceptOrdersOutsideHours,
       preparationTime,
     } = body;
+
+    // DEBUG: Log de campos de envío
+    console.log("🚚 Campos de envío:", {
+      hasShipping,
+      maxShippingDistance,
+      shippingRanges: JSON.stringify(shippingRanges),
+      shippingCost,
+    });
 
     // Verificar que el negocio existe
     const existingBusiness = await prisma.business.findUnique({
@@ -166,6 +183,18 @@ export async function PUT(
           : hasShipping && shippingCost
           ? shippingCost
           : 0,
+      maxShippingDistance:
+        maxShippingDistance === undefined
+          ? existingBusiness.maxShippingDistance
+          : hasShipping && maxShippingDistance
+          ? maxShippingDistance
+          : null,
+      shippingRanges:
+        shippingRanges === undefined
+          ? existingBusiness.shippingRanges
+          : hasShipping && shippingRanges
+          ? shippingRanges
+          : null,
       addressText:
         addressText === undefined ? existingBusiness.addressText : addressText,
       lat: lat === undefined ? existingBusiness.lat : lat,

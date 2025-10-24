@@ -18,6 +18,7 @@ import {
   MessageCircle,
   CreditCard,
   Eye,
+  Truck,
 } from "lucide-react";
 import Link from "next/link";
 import BusinessHoursDialog from "@/components/BusinessHoursDialog";
@@ -187,16 +188,26 @@ export default function BusinessCard({
           {/* Información de envío */}
           {business.hasShipping ? (
             <div className="flex items-center gap-2.5 text-sm">
-              <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-accent/20 text-accent flex-shrink-0">
-                <Package className="w-4 h-4" />
+              <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-green-500/10 text-green-600 dark:text-green-400 flex-shrink-0">
+                <Truck className="w-4 h-4" />
               </div>
               <div className="flex flex-col">
                 <span className="text-foreground font-medium">
                   Envío disponible
                 </span>
-                <span className="text-xs text-muted-foreground">
-                  ${business.shippingCost?.toFixed(2) || "0.00"}
-                </span>
+                {business.shippingRanges &&
+                Array.isArray(business.shippingRanges) &&
+                business.shippingRanges.length > 0 ? (
+                  <span className="text-xs text-muted-foreground">
+                    {business.maxShippingDistance
+                      ? `Hasta ${business.maxShippingDistance.toFixed(1)} km`
+                      : "Costo según distancia"}
+                  </span>
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    Costo fijo: ${business.shippingCost?.toFixed(2) || "0.00"}
+                  </span>
+                )}
               </div>
             </div>
           ) : (

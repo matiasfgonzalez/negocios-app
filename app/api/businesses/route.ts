@@ -96,6 +96,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+
+    // DEBUG: Log del body recibido
+    console.log(
+      "📦 POST /api/businesses - Body recibido:",
+      JSON.stringify(body, null, 2)
+    );
+
     const {
       name,
       rubro,
@@ -105,6 +112,8 @@ export async function POST(request: NextRequest) {
       aliasPago,
       hasShipping,
       shippingCost,
+      maxShippingDistance,
+      shippingRanges,
       addressText,
       lat,
       lng,
@@ -116,6 +125,14 @@ export async function POST(request: NextRequest) {
       acceptOrdersOutsideHours,
       preparationTime,
     } = body;
+
+    // DEBUG: Log de campos de envío
+    console.log("🚚 Campos de envío:", {
+      hasShipping,
+      maxShippingDistance,
+      shippingRanges: JSON.stringify(shippingRanges),
+      shippingCost,
+    });
 
     // Validar campos requeridos
     if (!name || !rubro || !ownerId) {
@@ -176,6 +193,9 @@ export async function POST(request: NextRequest) {
         aliasPago: aliasPago || null,
         hasShipping: hasShipping || false,
         shippingCost: hasShipping && shippingCost ? shippingCost : 0,
+        maxShippingDistance:
+          hasShipping && maxShippingDistance ? maxShippingDistance : null,
+        shippingRanges: hasShipping && shippingRanges ? shippingRanges : null,
         addressText: addressText || null,
         lat: lat || null,
         lng: lng || null,

@@ -30,11 +30,13 @@ import { Business, Product } from "@/app/types/types";
 import OrderSuccessDialog from "@/components/OrderSuccessDialog";
 import OrderErrorDialog from "@/components/OrderErrorDialog";
 import BusinessHoursDialog from "@/components/BusinessHoursDialog";
+import ShippingRangesDisplay from "@/components/ShippingRangesDisplay";
 import {
   BusinessSchedule,
   SpecialClosedDay,
   isBusinessOpen,
 } from "@/lib/business-hours";
+import { ShippingRange, isWithinShippingRange } from "@/lib/shipping-utils";
 import dynamic from "next/dynamic";
 
 const OrderMapSelector = dynamic(
@@ -221,6 +223,10 @@ export default function BusinessDetailClient({
     whatsappLink: string | null;
   } | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [calculatedShippingCost, setCalculatedShippingCost] = useState<
+    number | null
+  >(null);
+  const [deliveryDistance, setDeliveryDistance] = useState<number | null>(null);
 
   // ===== BUSINESS HOURS & ORDER VALIDATION =====
   const schedule = business.schedule as BusinessSchedule | null;
@@ -330,10 +336,13 @@ export default function BusinessDetailClient({
     (sum, item) => sum + item.price * item.quantity,
     0
   );
+
+  // Usar el costo de envío calculado dinámicamente o el fijo del negocio
   const shippingCost =
     deliveryType === "delivery" && business.hasShipping
-      ? business.shippingCost || 0
+      ? calculatedShippingCost ?? business.shippingCost ?? 0
       : 0;
+
   const total = subtotal + shippingCost;
 
   // Obtener cantidad de un producto en el carrito
@@ -383,6 +392,30 @@ export default function BusinessDetailClient({
       }
       if (!deliveryAddress.trim()) {
         setErrorMessage("Por favor, ingresa la dirección de entrega");
+        setShowErrorDialog(true);
+        return;
+      }
+
+      // Verificar que esté dentro del rango de envío
+      if (deliveryDistance !== null && business.maxShippingDistance) {
+        if (
+          !isWithinShippingRange(deliveryDistance, business.maxShippingDistance)
+        ) {
+          setErrorMessage(
+            `Esta ubicación está fuera del área de envío. Distancia máxima: ${business.maxShippingDistance.toFixed(
+              1
+            )} km`
+          );
+          setShowErrorDialog(true);
+          return;
+        }
+      }
+
+      // Verificar que se haya calculado el costo de envío
+      if (calculatedShippingCost === null && business.shippingRanges) {
+        setErrorMessage(
+          "No se pudo calcular el costo de envío para esta ubicación"
+        );
         setShowErrorDialog(true);
         return;
       }
@@ -652,11 +685,24 @@ export default function BusinessDetailClient({
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-muted-foreground mb-1">
-                          Costo de Envío
+                          Envíos a Domicilio
                         </p>
-                        <p className="text-sm text-foreground font-medium">
-                          ${business.shippingCost?.toFixed(2) || "0.00"}
-                        </p>
+                        {business.maxShippingDistance && (
+                          <p className="text-sm text-foreground font-medium mb-2">
+                            Hasta {business.maxShippingDistance.toFixed(1)} km
+                          </p>
+                        )}
+                        {/* Botón para ver tarifas */}
+                        {business.shippingRanges &&
+                          Array.isArray(business.shippingRanges) &&
+                          business.shippingRanges.length > 0 && (
+                            <ShippingRangesDisplay
+                              ranges={
+                                business.shippingRanges as ShippingRange[]
+                              }
+                              maxDistance={business.maxShippingDistance}
+                            />
+                          )}
                       </div>
                     </div>
                   </div>
@@ -1018,12 +1064,20 @@ export default function BusinessDetailClient({
                                   <span className="text-xs sm:text-sm text-foreground font-medium">
                                     Envío a domicilio
                                   </span>
-                                  <span className="text-xs text-accent font-semibold">
-                                    (+$
-                                    {business.shippingCost?.toFixed(2) ||
-                                      "0.00"}
-                                    )
-                                  </span>
+                                  {business.shippingRanges &&
+                                  Array.isArray(business.shippingRanges) &&
+                                  business.shippingRanges.length > 0 ? (
+                                    <span className="text-xs text-accent font-semibold">
+                                      (costo según distancia)
+                                    </span>
+                                  ) : (
+                                    <span className="text-xs text-accent font-semibold">
+                                      (+$
+                                      {business.shippingCost?.toFixed(2) ||
+                                        "0.00"}
+                                      )
+                                    </span>
+                                  )}
                                 </div>
                               </Label>
                             </div>
@@ -1053,8 +1107,36 @@ export default function BusinessDetailClient({
                                   ? { lat: business.lat, lng: business.lng }
                                   : undefined
                               }
+                              shippingRanges={
+                                business.shippingRanges as
+                                  | ShippingRange[]
+                                  | null
+                              }
+                              maxShippingDistance={business.maxShippingDistance}
+                              onShippingCostCalculated={(cost, distance) => {
+                                setCalculatedShippingCost(cost);
+                                setDeliveryDistance(distance);
+                              }}
                             />
-                            {deliveryLocation && (
+                            {deliveryLocation && deliveryDistance !== null && (
+                              <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                                <p className="text-xs text-green-700 dark:text-green-400 font-medium">
+                                  ✓ Ubicación seleccionada
+                                </p>
+                                <div className="flex items-center justify-between mt-1 text-xs">
+                                  <span className="text-green-600 dark:text-green-500">
+                                    Distancia: {deliveryDistance.toFixed(1)} km
+                                  </span>
+                                  {calculatedShippingCost !== null && (
+                                    <span className="font-semibold text-green-700 dark:text-green-400">
+                                      Envío: $
+                                      {calculatedShippingCost.toFixed(2)}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            {deliveryLocation && deliveryDistance === null && (
                               <p className="text-xs text-green-600 dark:text-green-400 mt-2">
                                 ✓ Ubicación seleccionada
                               </p>
@@ -1126,9 +1208,22 @@ export default function BusinessDetailClient({
                                 <Truck className="w-3.5 h-3.5 text-accent" />
                                 Envío:
                               </span>
-                              <span className="font-semibold text-accent">
-                                +${shippingCost.toFixed(2)}
-                              </span>
+                              {deliveryLocation &&
+                              calculatedShippingCost !== null ? (
+                                <span className="font-semibold text-accent">
+                                  +${shippingCost.toFixed(2)}
+                                </span>
+                              ) : business.shippingRanges &&
+                                Array.isArray(business.shippingRanges) &&
+                                business.shippingRanges.length > 0 ? (
+                                <span className="text-xs text-muted-foreground italic">
+                                  Selecciona ubicación
+                                </span>
+                              ) : (
+                                <span className="font-semibold text-accent">
+                                  +${shippingCost.toFixed(2)}
+                                </span>
+                              )}
                             </div>
                           )}
 

@@ -11,7 +11,12 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { Clock, Navigation } from "lucide-react";
+import { Clock, Navigation, DollarSign, AlertCircle } from "lucide-react";
+import {
+  ShippingRange,
+  calculateShippingCost,
+  isWithinShippingRange,
+} from "@/lib/shipping-utils";
 
 // Fix para los iconos de Leaflet (solo en el cliente)
 let businessIcon: L.Icon | undefined;
@@ -60,6 +65,9 @@ if (globalThis.window !== undefined) {
 interface OrderMapSelectorProps {
   onLocationSelect: (location: { lat: number; lng: number }) => void;
   businessLocation?: { lat: number; lng: number };
+  shippingRanges?: ShippingRange[] | null;
+  maxShippingDistance?: number | null;
+  onShippingCostCalculated?: (cost: number | null, distance: number) => void;
 }
 
 interface Route {
@@ -79,10 +87,12 @@ function LocationMarker({
   onLocationSelect,
   businessLocation,
   onRouteCalculated,
+  onDistanceCalculated,
 }: {
   onLocationSelect: (location: { lat: number; lng: number }) => void;
   businessLocation?: { lat: number; lng: number };
   onRouteCalculated: (routes: Route[]) => void;
+  onDistanceCalculated: (distance: number) => void;
 }) {
   const [position, setPosition] = useState<L.LatLng | null>(null);
 
@@ -104,6 +114,11 @@ function LocationMarker({
           .then((data: OSRMResponse) => {
             if (data.code === "Ok" && data.routes) {
               onRouteCalculated(data.routes);
+
+              // Calcular distancia y costo de envío
+              if (data.routes.length > 0) {
+                onDistanceCalculated(data.routes[0].distance / 1000); // Convertir metros a km
+              }
             }
           })
           .catch((error) => {
@@ -120,8 +135,14 @@ function LocationMarker({
 export default function OrderMapSelector({
   onLocationSelect,
   businessLocation,
+  shippingRanges,
+  maxShippingDistance,
+  onShippingCostCalculated,
 }: Readonly<OrderMapSelectorProps>) {
   const [routes, setRoutes] = useState<Route[]>([]);
+  const [selectedDistance, setSelectedDistance] = useState<number | null>(null);
+  const [shippingCost, setShippingCost] = useState<number | null>(null);
+  const [isOutOfRange, setIsOutOfRange] = useState(false);
 
   const defaultCenter: [number, number] = businessLocation
     ? [businessLocation.lat, businessLocation.lng]
@@ -211,13 +232,83 @@ export default function OrderMapSelector({
             onLocationSelect={onLocationSelect}
             businessLocation={businessLocation}
             onRouteCalculated={setRoutes}
+            onDistanceCalculated={(distance) => {
+              setSelectedDistance(distance);
+
+              // Verificar si está dentro del rango
+              const withinRange = isWithinShippingRange(
+                distance,
+                maxShippingDistance || null
+              );
+              setIsOutOfRange(!withinRange);
+
+              if (withinRange) {
+                // Calcular costo de envío
+                const cost = calculateShippingCost(
+                  distance,
+                  shippingRanges || null,
+                  0
+                );
+                setShippingCost(cost);
+
+                // Notificar al componente padre
+                if (onShippingCostCalculated) {
+                  onShippingCostCalculated(cost, distance);
+                }
+              } else {
+                setShippingCost(null);
+                if (onShippingCostCalculated) {
+                  onShippingCostCalculated(null, distance);
+                }
+              }
+            }}
           />
         </MapContainer>
       </div>
 
-      {/* Información de rutas */}
+      {/* Información de rutas y costo de envío */}
       {routes.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-3">
+          {/* Alerta si está fuera de rango */}
+          {isOutOfRange && (
+            <div className="flex items-start gap-2 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+              <div className="flex-1 text-sm">
+                <p className="font-semibold text-red-800 dark:text-red-300">
+                  Ubicación fuera del área de envío
+                </p>
+                <p className="text-red-700 dark:text-red-400 text-xs mt-1">
+                  Este negocio no realiza envíos a esta distancia.
+                  {maxShippingDistance && (
+                    <> Máximo: {maxShippingDistance.toFixed(1)} km</>
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Información de costo de envío */}
+          {!isOutOfRange && selectedDistance !== null && (
+            <div className="p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  <span className="text-sm font-semibold text-green-800 dark:text-green-300">
+                    Costo de envío:
+                  </span>
+                </div>
+                <span className="text-lg font-bold text-green-600 dark:text-green-400">
+                  {shippingCost === null
+                    ? "Calculando..."
+                    : `$${shippingCost.toFixed(2)}`}
+                </span>
+              </div>
+              <p className="text-xs text-green-700 dark:text-green-400 mt-1">
+                Distancia: {selectedDistance.toFixed(2)} km
+              </p>
+            </div>
+          )}
+
           <h4 className="text-sm font-semibold text-foreground">
             Rutas disponibles:
           </h4>
