@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import BusinessScheduleEditor from "@/components/BusinessScheduleEditor";
 import ShippingRangesEditor from "@/components/ShippingRangesEditor";
+import ImageSelector from "@/components/ImageSelector";
 import {
   BusinessSchedule,
   SpecialClosedDay,
@@ -275,26 +276,12 @@ export default function EditarNegocioDialog({
               />
             </div>
 
-            <div className="space-y-2">
-              <Label
-                htmlFor="img"
-                className="text-sm font-medium text-foreground"
-              >
-                Imagen del Negocio (URL)
-              </Label>
-              <Input
-                id="img"
-                name="img"
-                type="url"
-                value={formData.img}
-                onChange={handleChange}
-                placeholder="https://ejemplo.com/imagen-negocio.jpg"
-                className="bg-background border-border text-foreground placeholder:text-muted-foreground"
-              />
-              <p className="text-xs text-muted-foreground">
-                URL de la imagen o logo de tu negocio (opcional)
-              </p>
-            </div>
+            <ImageSelector
+              value={formData.img}
+              onChange={(url) => setFormData({ ...formData, img: url })}
+              label="Imagen del Negocio"
+              placeholder="https://ejemplo.com/imagen-negocio.jpg"
+            />
           </div>
 
           {/* Información de Contacto */}
