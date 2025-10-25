@@ -26,6 +26,7 @@ import OrderDetailsDialog from "@/components/OrderDetailsDialog";
 import DeleteOrderDialog from "@/components/DeleteOrderDialog";
 import ContactBusinessButton from "@/components/ContactBusinessButton";
 import PaymentAliasDisplay from "@/components/PaymentAliasDisplay";
+import OrderTimeline from "@/components/OrderTimeline";
 
 // Importar UserLocationMap dinámicamente
 const UserLocationMap = dynamic(() => import("@/components/UserLocationMap"), {
@@ -69,6 +70,12 @@ type OrderWithRelations = {
     product: {
       name: string;
     };
+  }>;
+  events: Array<{
+    id: string;
+    type: string;
+    note: string | null;
+    createdAt: Date;
   }>;
 };
 
@@ -289,6 +296,9 @@ export default function OrderCard({
             )}
           </div>
         )}
+
+        {/* Línea de tiempo de eventos */}
+        <OrderTimeline events={order.events} />
 
         {/* UI improved: Enhanced actions */}
         <div className="mt-6 flex flex-wrap gap-2 sm:gap-3">

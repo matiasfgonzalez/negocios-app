@@ -36,6 +36,11 @@ export default async function PedidosPage() {
             product: true,
           },
         },
+        events: {
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
         _count: {
           select: { items: true },
         },
@@ -60,6 +65,11 @@ export default async function PedidosPage() {
             product: true,
           },
         },
+        events: {
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
         _count: {
           select: { items: true },
         },
@@ -80,6 +90,11 @@ export default async function PedidosPage() {
         items: {
           include: {
             product: true,
+          },
+        },
+        events: {
+          orderBy: {
+            createdAt: "desc",
           },
         },
         _count: {
