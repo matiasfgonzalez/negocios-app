@@ -23,10 +23,40 @@ model AppUser {
   email      String?   @unique
   // Nombre del usuario
   name       String?
+  // Apellido del usuario
+  lastName   String?
+  // Nombre completo (generado automáticamente)
+  fullName   String?
   // Teléfono del usuario
   phone      String?
+  // Avatar o foto de perfil del usuario
+  avatar     String?
   // Rol del usuario (ADMINISTRADOR, PROPIETARIO, CLIENTE)
   role       Role      @default(CLIENTE)
+  // Dirección del usuario (para envíos frecuentes)
+  address    String?
+  // Latitud de la dirección del usuario
+  lat        Float?
+  // Longitud de la dirección del usuario
+  lng        Float?
+  // Ciudad del usuario
+  city       String?
+  // Provincia/Estado del usuario
+  province   String?
+  // Código postal del usuario
+  postalCode String?
+  // DNI o documento de identidad
+  documentId String?
+  // Fecha de nacimiento del usuario
+  birthDate  DateTime?
+  // Indica si el usuario está activo
+  isActive   Boolean   @default(true)
+  // Fecha de última sesión del usuario
+  lastLogin  DateTime?
+  // Preferencias del usuario en formato JSON (tema, notificaciones, etc.)
+  preferences Json?
+  // Notas internas del administrador sobre el usuario
+  adminNotes String?
   // Negocios que posee el usuario
   businesses Business[]
   // Órdenes realizadas por el usuario

@@ -1,0 +1,16 @@
+-- AlterTable
+ALTER TABLE "AppUser" ADD COLUMN     "address" TEXT,
+ADD COLUMN     "adminNotes" TEXT,
+ADD COLUMN     "avatar" TEXT,
+ADD COLUMN     "birthDate" TIMESTAMP(3),
+ADD COLUMN     "city" TEXT,
+ADD COLUMN     "documentId" TEXT,
+ADD COLUMN     "fullName" TEXT,
+ADD COLUMN     "isActive" BOOLEAN NOT NULL DEFAULT true,
+ADD COLUMN     "lastLogin" TIMESTAMP(3),
+ADD COLUMN     "lastName" TEXT,
+ADD COLUMN     "lat" DOUBLE PRECISION,
+ADD COLUMN     "lng" DOUBLE PRECISION,
+ADD COLUMN     "postalCode" TEXT,
+ADD COLUMN     "preferences" JSONB,
+ADD COLUMN     "province" TEXT;
