@@ -506,6 +506,25 @@ export default function BusinessDetailClient({
 
   return (
     <div className="min-h-screen">
+      {/* Floating Cart Button */}
+      {cart.length > 0 && (
+        <button
+          onClick={() => setShowCart(true)}
+          className="fixed bottom-6 right-6 z-50 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full p-4 shadow-2xl hover:shadow-primary/50 transition-all hover:scale-110 active:scale-95 group"
+          aria-label="Ver carrito"
+        >
+          <ShoppingCart className="w-6 h-6" />
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-7 h-7 flex items-center justify-center font-bold animate-bounce shadow-lg ring-4 ring-red-500/20">
+            {cart.reduce((sum, item) => sum + item.quantity, 0)}
+          </span>
+          {/* Tooltip */}
+          <span className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Ver carrito ({cart.reduce((sum, item) => sum + item.quantity, 0)}{" "}
+            productos)
+          </span>
+        </button>
+      )}
+
       {/* UI improved: Enhanced Business Header with Map */}
       <div className="relative bg-gradient-to-br from-card via-card/95 to-card/90 backdrop-blur-xl border-b border-border shadow-2xl overflow-hidden">
         {/* Decorative background pattern */}
