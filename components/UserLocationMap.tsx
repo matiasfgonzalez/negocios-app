@@ -20,6 +20,7 @@ interface UserLocationMapProps {
   lng: number;
   name: string;
   address?: string;
+  height?: string;
 }
 
 export default function UserLocationMap({
@@ -27,6 +28,7 @@ export default function UserLocationMap({
   lng,
   name,
   address,
+  height = "h-64",
 }: Readonly<UserLocationMapProps>) {
   useEffect(() => {
     // Fix para el icono por defecto en SSR de Leaflet
@@ -49,7 +51,7 @@ export default function UserLocationMap({
     <MapContainer
       center={[lat, lng]}
       zoom={15}
-      className="h-64 w-full rounded-lg"
+      className={`${height} w-full rounded-lg`}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
