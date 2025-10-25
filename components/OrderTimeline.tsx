@@ -10,6 +10,12 @@ import {
   XCircle,
   FileText,
 } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 type OrderEvent = {
   id: string;
@@ -118,54 +124,64 @@ export default function OrderTimeline({
   );
 
   return (
-    <div className="mt-4 p-4 bg-accent/30 rounded-xl border border-border">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-primary/10">
-          <Clock className="w-4 h-4 text-primary" />
-        </div>
-        <h4 className="text-sm font-semibold text-foreground">
-          Historial del Pedido
-        </h4>
-      </div>
-
-      <div className="space-y-3">
-        {sortedEvents.map((event, index) => (
-          <div key={event.id} className="flex gap-3">
-            {/* Timeline Line */}
-            <div className="flex flex-col items-center">
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${getEventColor(
-                  event.type
-                )}`}
-              >
-                {getEventIcon(event.type)}
+    <div className="mt-4">
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem
+          value="timeline"
+          className="border border-border rounded-xl bg-accent/30"
+        >
+          <AccordionTrigger className="px-4 py-3 hover:no-underline">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-primary/10">
+                <Clock className="w-4 h-4 text-primary" />
               </div>
-              {index < sortedEvents.length - 1 && (
-                <div className="w-0.5 h-full min-h-[20px] bg-border mt-1" />
-              )}
+              <h4 className="text-sm font-semibold text-foreground">
+                Historial del Pedido ({sortedEvents.length})
+              </h4>
             </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4">
+            <div className="space-y-3 pt-2">
+              {sortedEvents.map((event, index) => (
+                <div key={event.id} className="flex gap-3">
+                  {/* Timeline Line */}
+                  <div className="flex flex-col items-center">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center ${getEventColor(
+                        event.type
+                      )}`}
+                    >
+                      {getEventIcon(event.type)}
+                    </div>
+                    {index < sortedEvents.length - 1 && (
+                      <div className="w-0.5 h-full min-h-[20px] bg-border mt-1" />
+                    )}
+                  </div>
 
-            {/* Event Content */}
-            <div className="flex-1 pb-3">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground">
-                    {getEventLabel(event.type)}
-                  </p>
-                  {event.note && (
-                    <p className="text-xs text-muted-foreground mt-1 break-words">
-                      {event.note}
-                    </p>
-                  )}
+                  {/* Event Content */}
+                  <div className="flex-1 pb-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground">
+                          {getEventLabel(event.type)}
+                        </p>
+                        {event.note && (
+                          <p className="text-xs text-muted-foreground mt-1 break-words">
+                            {event.note}
+                          </p>
+                        )}
+                      </div>
+                      <time className="text-xs text-muted-foreground whitespace-nowrap">
+                        {formatDate(event.createdAt)}
+                      </time>
+                    </div>
+                  </div>
                 </div>
-                <time className="text-xs text-muted-foreground whitespace-nowrap">
-                  {formatDate(event.createdAt)}
-                </time>
-              </div>
+              ))}
             </div>
-          </div>
-        ))}
-      </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   );
 }
