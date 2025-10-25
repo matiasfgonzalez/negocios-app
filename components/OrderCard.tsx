@@ -55,6 +55,7 @@ type OrderWithRelations = {
   business: {
     id: string;
     name: string;
+    slug: string;
     aliasPago: string | null;
     whatsappPhone: string | null;
   };
@@ -66,17 +67,36 @@ type OrderWithRelations = {
   };
   items: Array<{
     id: string;
+    orderId: string;
+    productId: string;
     quantity: number;
+    unitPrice: number;
     product: {
+      id: string;
+      businessId: string;
+      categoryId: string | null;
       name: string;
+      description: string | null;
+      price: number;
+      stock: number;
+      sku: string | null;
+      available: boolean;
+      images: unknown;
+      createdAt: Date;
+      updatedAt: Date;
     };
   }>;
   events: Array<{
     id: string;
+    orderId: string;
+    actorId: string | null;
     type: string;
     note: string | null;
     createdAt: Date;
   }>;
+  _count?: {
+    items: number;
+  };
 };
 
 interface OrderCardProps {
@@ -302,10 +322,23 @@ export default function OrderCard({
 
         {/* UI improved: Enhanced actions */}
         <div className="mt-6 flex flex-wrap gap-2 sm:gap-3">
-          <OrderDetailsDialog order={order as any} userRole={userRole} />
+          <OrderDetailsDialog
+            order={
+              order as unknown as Parameters<
+                typeof OrderDetailsDialog
+              >[0]["order"]
+            }
+            userRole={userRole}
+          />
 
           {/* Botón para contactar al negocio por WhatsApp */}
-          <ContactBusinessButton order={order as any} />
+          <ContactBusinessButton
+            order={
+              order as unknown as Parameters<
+                typeof ContactBusinessButton
+              >[0]["order"]
+            }
+          />
 
           {/* Botón para que el propietario contacte al cliente */}
           {userRole !== "CLIENTE" &&
