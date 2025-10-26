@@ -1,195 +1,301 @@
-import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { ArrowLeft, Users, Shield, Mail, Calendar } from "lucide-react";
-import Link from "next/link";
+"use client";
+
+import { useCallback, useEffect, useState, Suspense } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import {
+  Loader2,
+  Search,
+  Users,
+  Shield,
+  Store,
+  ShoppingCart,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import UsuariosClient from "./usuarios-client";
 
-export default async function UsuariosPage() {
-  const user = await currentUser();
-  if (!user) redirect("/sign-in");
+type User = {
+  id: string;
+  clerkId: string | null;
+  email: string | null;
+  name: string | null;
+  lastName: string | null;
+  fullName: string | null;
+  phone: string | null;
+  avatar: string | null;
+  role: "ADMINISTRADOR" | "PROPIETARIO" | "CLIENTE";
+  address: string | null;
+  city: string | null;
+  province: string | null;
+  isActive: boolean;
+  lastLogin: string | null;
+  createdAt: string;
+  updatedAt: string;
+  _count: {
+    businesses: number;
+    orders: number;
+  };
+};
 
-  const role = user.publicMetadata.role as string;
+function UsuariosPageContent() {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
 
-  // Solo ADMINISTRADOR puede acceder
-  if (role !== "ADMINISTRADOR") {
-    redirect("/dashboard");
-  }
+  const [usuarios, setUsuarios] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Datos de ejemplo para usuarios
-  const usuariosEjemplo = [
-    {
-      id: "1",
-      nombre: "Juan Propietario",
-      email: "juan@example.com",
-      rol: "PROPIETARIO",
-      fechaRegistro: "2025-09-15",
-      estado: "Activo",
-    },
-    {
-      id: "2",
-      nombre: "María Cliente",
-      email: "maria@example.com",
-      rol: "CLIENTE",
-      fechaRegistro: "2025-10-01",
-      estado: "Activo",
-    },
-    {
-      id: "3",
-      nombre: "Carlos Admin",
-      email: "carlos@example.com",
-      rol: "ADMINISTRADOR",
-      fechaRegistro: "2025-08-01",
-      estado: "Activo",
-    },
-  ];
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const getRoleBadgeColor = (rol: string) => {
-    switch (rol) {
-      case "ADMINISTRADOR":
-        return "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300";
-      case "PROPIETARIO":
-        return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300";
-      case "CLIENTE":
-        return "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300";
-      default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-300";
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      const params = new URLSearchParams();
+
+      if (roleFilter !== "all") {
+        params.set("role", roleFilter);
+      }
+
+      if (statusFilter !== "all") {
+        params.set("isActive", statusFilter);
+      }
+
+      if (searchTerm) {
+        params.set("search", searchTerm);
+      }
+
+      const response = await fetch(`/api/admin/users?${params.toString()}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error al cargar usuarios");
+      }
+
+      const data = await response.json();
+      setUsuarios(data);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      setError(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setLoading(false);
     }
+  }, [roleFilter, statusFilter, searchTerm]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (!user) {
+      router.push("/sign-in");
+      return;
+    }
+
+    const role = user.publicMetadata.role as string;
+
+    // Solo ADMINISTRADOR puede acceder
+    if (role !== "ADMINISTRADOR") {
+      router.push("/dashboard");
+      return;
+    }
+
+    fetchData();
+  }, [user, isLoaded, router, fetchData]);
+
+  // Calcular estadísticas
+  const stats = {
+    total: usuarios.length,
+    admins: usuarios.filter((u) => u.role === "ADMINISTRADOR").length,
+    propietarios: usuarios.filter((u) => u.role === "PROPIETARIO").length,
+    clientes: usuarios.filter((u) => u.role === "CLIENTE").length,
+    activos: usuarios.filter((u) => u.isActive).length,
+    inactivos: usuarios.filter((u) => !u.isActive).length,
   };
 
-  return (
-    // UI improved: Clean background
-    <div className="min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {/* UI improved: Enhanced back button */}
-        <Link href="/dashboard">
-          <Button
-            variant="ghost"
-            className="mb-6 hover:bg-accent transition-colors duration-200"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver al Dashboard
-          </Button>
-        </Link>
-
-        {/* UI improved: Enhanced header */}
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-            Gestión de Usuarios
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Administra usuarios y sus permisos en el sistema
-          </p>
-        </div>
-
-        {/* UI improved: Enhanced users list */}
-        <div className="space-y-4">
-          {usuariosEjemplo.map((usuario) => (
-            <Card
-              key={usuario.id}
-              className="bg-card/50 backdrop-blur-sm border-border hover:shadow-xl hover:border-primary/50 transition-all duration-300"
-            >
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                  {/* UI improved: User info section */}
-                  <div className="flex items-start sm:items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-                      <Users className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-base sm:text-lg font-bold text-foreground truncate">
-                        {usuario.nombre}
-                      </h3>
-                      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-1 sm:gap-3 mt-1">
-                        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
-                          <Mail className="w-3 h-3 flex-shrink-0" />
-                          <span className="truncate">{usuario.email}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-xs sm:text-sm text-muted-foreground">
-                          <Calendar className="w-3 h-3 flex-shrink-0" />
-                          <span>{usuario.fechaRegistro}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* UI improved: Role and status badges */}
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <Badge className={getRoleBadgeColor(usuario.rol)}>
-                      <Shield className="w-3 h-3 mr-1" />
-                      {usuario.rol}
-                    </Badge>
-                    <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
-                      {usuario.estado}
-                    </Badge>
-                  </div>
-
-                  {/* UI improved: Enhanced actions */}
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="hover:bg-accent transition-colors duration-200"
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 hover:border-red-500/20 transition-colors duration-200"
-                    >
-                      Desactivar
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* UI improved: Enhanced statistics cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-8">
-          <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium">
-                Total Usuarios
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl sm:text-3xl font-bold text-primary">
-                {usuariosEjemplo.length}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium">
-                Propietarios
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400">
-                {usuariosEjemplo.filter((u) => u.rol === "PROPIETARIO").length}
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card/50 backdrop-blur-sm border-border hover:shadow-lg transition-all duration-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium">
-                Clientes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
-                {usuariosEjemplo.filter((u) => u.rol === "CLIENTE").length}
-              </p>
-            </CardContent>
-          </Card>
+  if (!isLoaded || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
+          <p className="text-muted-foreground">Cargando usuarios...</p>
         </div>
       </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-red-500">{error}</p>
+          <Button onClick={() => fetchData()}>Reintentar</Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
+        <p className="text-muted-foreground">
+          Administra todos los usuarios del sistema
+        </p>
+      </div>
+
+      {/* Estadísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Usuarios
+            </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.total}</div>
+            <p className="text-xs text-muted-foreground">
+              {stats.activos} activos, {stats.inactivos} inactivos
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Administradores
+            </CardTitle>
+            <Shield className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.admins}</div>
+            <p className="text-xs text-muted-foreground">
+              Acceso total al sistema
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Propietarios</CardTitle>
+            <Store className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.propietarios}</div>
+            <p className="text-xs text-muted-foreground">Dueños de negocios</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Clientes</CardTitle>
+            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.clientes}</div>
+            <p className="text-xs text-muted-foreground">
+              Usuarios compradores
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filtros y búsqueda */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtros</CardTitle>
+          <CardDescription>
+            Filtra y busca usuarios en el sistema
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Buscar</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Nombre, email, teléfono..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Rol</label>
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filtrar por rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los roles</SelectItem>
+                  <SelectItem value="ADMINISTRADOR">Administrador</SelectItem>
+                  <SelectItem value="PROPIETARIO">Propietario</SelectItem>
+                  <SelectItem value="CLIENTE">Cliente</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Estado</label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filtrar por estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="true">Activos</SelectItem>
+                  <SelectItem value="false">Inactivos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Lista de usuarios */}
+      <UsuariosClient usuarios={usuarios} onRefresh={fetchData} />
     </div>
+  );
+}
+
+export default function UsuariosPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
+            <p className="text-muted-foreground">Cargando usuarios...</p>
+          </div>
+        </div>
+      }
+    >
+      <UsuariosPageContent />
+    </Suspense>
   );
 }
