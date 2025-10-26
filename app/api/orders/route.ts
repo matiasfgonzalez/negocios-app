@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { Prisma } from "@prisma/client";
 
 const orderSchema = z.object({
   businessId: z.string(),
@@ -25,6 +26,134 @@ const orderSchema = z.object({
   shippingCost: z.number(),
   total: z.number(),
 });
+
+// GET - Obtener lista de pedidos con filtros
+export async function GET(req: Request) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Auth required" }, { status: 401 });
+    }
+
+    // Obtener usuario de la base de datos
+    const appUser = await prisma.appUser.findUnique({
+      where: { clerkId: userId },
+    });
+
+    if (!appUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Obtener parámetros de búsqueda
+    const url = new URL(req.url);
+    const businessId = url.searchParams.get("businessId");
+    const customerId = url.searchParams.get("customerId");
+    const state = url.searchParams.get("state");
+    const limit = url.searchParams.get("limit");
+
+    // Construir filtros según el rol del usuario
+    const where: Prisma.OrderWhereInput = {};
+
+    if (appUser.role === "CLIENTE") {
+      // Los clientes solo ven sus propios pedidos
+      where.customerId = appUser.id;
+    } else if (appUser.role === "PROPIETARIO") {
+      // Los propietarios ven pedidos de sus negocios
+      const ownedBusinesses = await prisma.business.findMany({
+        where: { ownerId: appUser.id },
+        select: { id: true },
+      });
+
+      const businessIds = ownedBusinesses.map((b) => b.id);
+
+      if (businessIds.length === 0) {
+        return NextResponse.json([]);
+      }
+
+      where.businessId = { in: businessIds };
+
+      // Si especifica un businessId, filtrarlo (validando que le pertenezca)
+      if (businessId && businessIds.includes(businessId)) {
+        where.businessId = businessId;
+      }
+    } else if (appUser.role === "ADMINISTRADOR") {
+      // Los administradores ven todos los pedidos, con filtros opcionales
+      if (businessId) {
+        where.businessId = businessId;
+      }
+      if (customerId) {
+        where.customerId = customerId;
+      }
+    }
+
+    // Filtro por estado (disponible para todos los roles)
+    if (state) {
+      where.state = state as Prisma.EnumOrderStateFilter;
+    }
+
+    // Consultar pedidos
+    const orders = await prisma.order.findMany({
+      where,
+      include: {
+        business: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            aliasPago: true,
+            whatsappPhone: true,
+            img: true,
+          },
+        },
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true,
+          },
+        },
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                businessId: true,
+                categoryId: true,
+                name: true,
+                description: true,
+                price: true,
+                stock: true,
+                sku: true,
+                available: true,
+                images: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            },
+          },
+        },
+        events: {
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: limit ? Number.parseInt(limit) : undefined,
+    });
+
+    return NextResponse.json(orders);
+  } catch (error) {
+    console.error("Error al obtener pedidos:", error);
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(req: Request) {
   try {

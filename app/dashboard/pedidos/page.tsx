@@ -1,110 +1,188 @@
-import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { ArrowLeft, ShoppingBag } from "lucide-react";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, ShoppingBag, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { prisma } from "@/lib/prisma";
 import OrderCard from "@/components/OrderCard";
 
-export default async function PedidosPage() {
-  const user = await currentUser();
-  if (!user) redirect("/sign-in");
+type Order = {
+  id: string;
+  businessId: string;
+  customerId: string;
+  total: number;
+  shipping: boolean;
+  lat: number | null;
+  lng: number | null;
+  addressText: string | null;
+  state: string;
+  paymentProof: string | null;
+  note: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  business: {
+    id: string;
+    name: string;
+    slug: string;
+    aliasPago: string | null;
+    whatsappPhone: string | null;
+    img: string | null;
+  };
+  customer: {
+    id: string;
+    name: string | null;
+    email: string | null;
+    phone: string | null;
+  };
+  items: Array<{
+    id: string;
+    orderId: string;
+    productId: string;
+    quantity: number;
+    unitPrice: number;
+    product: {
+      id: string;
+      businessId: string;
+      categoryId: string | null;
+      name: string;
+      description: string | null;
+      price: number;
+      stock: number;
+      sku: string | null;
+      available: boolean;
+      images: unknown;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+  }>;
+  events: Array<{
+    id: string;
+    orderId: string;
+    actorId: string | null;
+    type: string;
+    note: string | null;
+    createdAt: Date;
+  }>;
+};
+
+export default function PedidosPage() {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (!user) {
+      router.push("/sign-in");
+      return;
+    }
+
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("/api/orders");
+
+        if (!response.ok) {
+          throw new Error("Error al cargar los pedidos");
+        }
+
+        const data = await response.json();
+
+        // Convertir fechas de string a Date
+        const ordersWithDates = data.map((order: Order) => {
+          const events = order.events.map((event) => ({
+            ...event,
+            createdAt: new Date(event.createdAt),
+          }));
+
+          const items = order.items.map((item) => ({
+            ...item,
+            product: {
+              ...item.product,
+              createdAt: new Date(item.product.createdAt),
+              updatedAt: new Date(item.product.updatedAt),
+            },
+          }));
+
+          return {
+            ...order,
+            createdAt: new Date(order.createdAt),
+            updatedAt: new Date(order.updatedAt),
+            events,
+            items,
+          };
+        });
+
+        setOrders(ordersWithDates);
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+        setError(err instanceof Error ? err.message : "Error desconocido");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [user, isLoaded, router]);
+
+  if (!isLoaded || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
+          <p className="text-muted-foreground">Cargando pedidos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   const role = user.publicMetadata.role as string;
 
-  // Obtener el usuario de la base de datos
-  const appUser = await prisma.appUser.findUnique({
-    where: { clerkId: user.id },
-  });
+  if (error) {
+    return (
+      <div className="min-h-screen">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          <Link href="/dashboard">
+            <Button
+              variant="ghost"
+              className="mb-6 hover:bg-accent transition-colors duration-200"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Volver al Dashboard
+            </Button>
+          </Link>
 
-  if (!appUser) {
-    redirect("/sign-in");
-  }
-
-  // Obtener pedidos según el rol
-  let orders;
-
-  if (role === "ADMINISTRADOR") {
-    // Administrador ve todos los pedidos
-    orders = await prisma.order.findMany({
-      include: {
-        business: true,
-        customer: true,
-        items: {
-          include: {
-            product: true,
-          },
-        },
-        events: {
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
-        _count: {
-          select: { items: true },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-  } else if (role === "PROPIETARIO") {
-    // Propietario ve pedidos de sus negocios
-    orders = await prisma.order.findMany({
-      where: {
-        business: {
-          ownerId: appUser.id,
-        },
-      },
-      include: {
-        business: true,
-        customer: true,
-        items: {
-          include: {
-            product: true,
-          },
-        },
-        events: {
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
-        _count: {
-          select: { items: true },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-  } else {
-    // Cliente ve solo sus propios pedidos
-    orders = await prisma.order.findMany({
-      where: {
-        customerId: appUser.id,
-      },
-      include: {
-        business: true,
-        customer: true,
-        items: {
-          include: {
-            product: true,
-          },
-        },
-        events: {
-          orderBy: {
-            createdAt: "desc",
-          },
-        },
-        _count: {
-          select: { items: true },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+          <Card className="bg-card/50 backdrop-blur-sm border border-red-500/50">
+            <CardContent className="py-16 text-center">
+              <div className="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <ShoppingBag className="w-10 h-10 text-red-500" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                Error al cargar pedidos
+              </h3>
+              <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto mb-4">
+                {error}
+              </p>
+              <Button
+                onClick={() => globalThis.location.reload()}
+                variant="outline"
+              >
+                Reintentar
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -141,7 +219,7 @@ export default async function PedidosPage() {
               key={order.id}
               order={order}
               userRole={role}
-              currentUserId={appUser.id}
+              currentUserId={user.id}
             />
           ))}
         </div>
