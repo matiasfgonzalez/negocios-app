@@ -44,7 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Product, Business } from "@/app/types/types";
+import { Business } from "@/app/types/types";
 
 type ProductCategory = {
   id: string;
@@ -54,22 +54,30 @@ type ProductCategory = {
   order: number;
 };
 
-type Producto = Omit<
-  Product,
-  "createdAt" | "updatedAt" | "images" | "business" | "category"
-> & {
+type Producto = {
+  id: string;
+  businessId: string;
+  categoryId: string | null;
+  name: string;
+  description: string | null;
+  price: number;
+  stock: number;
+  sku: string | null;
+  available: boolean;
   images: string[] | null;
+  createdAt: string;
+  updatedAt: string;
   business: {
     id: string;
     name: string;
+    slug: string;
+    img: string | null;
   };
-  category?: {
+  category: {
     id: string;
     name: string;
     icon: string | null;
   } | null;
-  createdAt: string;
-  updatedAt: string;
 };
 
 type Negocio = Pick<Business, "id" | "name">;
@@ -80,6 +88,7 @@ type ProductosClientProps = {
   categorias: ProductCategory[];
   role: string;
   negocioIdFromUrl?: string;
+  onRefresh?: () => Promise<void>;
 };
 
 // Componente de Carrusel de Imágenes (Estilo Flowbite)
@@ -214,6 +223,7 @@ export default function ProductosClient({
   categorias,
   role,
   negocioIdFromUrl,
+  onRefresh,
 }: Readonly<ProductosClientProps>) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -318,8 +328,8 @@ export default function ProductosClient({
         },
         body: JSON.stringify({
           ...formData,
-          price: parseFloat(formData.price),
-          stock: parseInt(formData.stock),
+          price: Number.parseFloat(formData.price),
+          stock: Number.parseInt(formData.stock),
           available: formData.available === "true",
           images: imageUrls.length > 0 ? imageUrls : null,
           categoryId: formData.categoryId || null,
@@ -331,7 +341,11 @@ export default function ProductosClient({
       }
 
       setIsDialogOpen(false);
-      router.refresh();
+      if (onRefresh) {
+        await onRefresh();
+      } else {
+        router.refresh();
+      }
     } catch (error) {
       console.error(error);
       alert("Error al guardar el producto");
@@ -354,7 +368,11 @@ export default function ProductosClient({
         throw new Error("Error al eliminar el producto");
       }
 
-      router.refresh();
+      if (onRefresh) {
+        await onRefresh();
+      } else {
+        router.refresh();
+      }
     } catch (error) {
       console.error(error);
       alert("Error al eliminar el producto");

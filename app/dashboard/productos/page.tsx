@@ -1,190 +1,177 @@
-import { currentUser } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+"use client";
+
+import { useCallback, useEffect, useState, Suspense } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import ProductosClient from "./productos-client";
 
-type PageProps = {
-  readonly searchParams: Promise<{ negocioId?: string }>;
+type ProductCategory = {
+  id: string;
+  name: string;
+  description: string | null;
+  icon: string | null;
+  order: number;
 };
 
-export default async function ProductosPage({
-  searchParams,
-}: Readonly<PageProps>) {
-  const user = await currentUser();
-  if (!user) redirect("/sign-in");
+type Product = {
+  id: string;
+  businessId: string;
+  categoryId: string | null;
+  name: string;
+  description: string | null;
+  price: number;
+  stock: number;
+  sku: string | null;
+  available: boolean;
+  images: string[] | null;
+  createdAt: string;
+  updatedAt: string;
+  business: {
+    id: string;
+    name: string;
+    slug: string;
+    img: string | null;
+  };
+  category: {
+    id: string;
+    name: string;
+    icon: string | null;
+  } | null;
+};
+
+type Business = {
+  id: string;
+  name: string;
+};
+
+function ProductosPageContent() {
+  const { user, isLoaded } = useUser();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const negocioId = searchParams.get("negocioId");
+
+  const [productos, setProductos] = useState<Product[]>([]);
+  const [negocios, setNegocios] = useState<Business[]>([]);
+  const [categorias, setCategorias] = useState<ProductCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      // Obtener categorías
+      const categoriasRes = await fetch("/api/categories");
+      if (!categoriasRes.ok) throw new Error("Error al cargar categorías");
+      const categoriasData = await categoriasRes.json();
+      setCategorias(categoriasData);
+
+      // Obtener negocios
+      const negociosRes = await fetch("/api/businesses?forManagement=true");
+      if (!negociosRes.ok) throw new Error("Error al cargar negocios");
+      const negociosData = await negociosRes.json();
+      setNegocios(
+        negociosData.map((n: { id: string; name: string }) => ({
+          id: n.id,
+          name: n.name,
+        }))
+      );
+
+      // Obtener productos
+      const params = new URLSearchParams();
+      params.set("forManagement", "true");
+      if (negocioId) {
+        params.set("businessId", negocioId);
+      }
+
+      const productosRes = await fetch(`/api/products?${params.toString()}`);
+      if (!productosRes.ok) throw new Error("Error al cargar productos");
+      const productosData = await productosRes.json();
+      setProductos(productosData);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setError(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setLoading(false);
+    }
+  }, [negocioId]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    if (!user) {
+      router.push("/sign-in");
+      return;
+    }
+
+    const role = user.publicMetadata.role as string;
+
+    // Solo ADMINISTRADOR y PROPIETARIO pueden acceder
+    if (role !== "ADMINISTRADOR" && role !== "PROPIETARIO") {
+      router.push("/dashboard");
+      return;
+    }
+
+    fetchData();
+  }, [user, isLoaded, router, negocioId, fetchData]);
+
+  if (!isLoaded || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
+          <p className="text-muted-foreground">Cargando productos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   const role = user.publicMetadata.role as string;
 
-  // Solo ADMINISTRADOR y PROPIETARIO pueden acceder
-  if (role !== "ADMINISTRADOR" && role !== "PROPIETARIO") {
-    redirect("/dashboard");
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-red-500">{error}</p>
+          <Button onClick={() => globalThis.location.reload()}>
+            Reintentar
+          </Button>
+        </div>
+      </div>
+    );
   }
-
-  // Buscar el usuario en la base de datos
-  const appUser = await prisma.appUser.findUnique({
-    where: { clerkId: user.id },
-  });
-
-  if (!appUser) {
-    redirect("/sign-in");
-  }
-
-  const params = await searchParams;
-
-  // Obtener todas las categorías
-  const categorias = await prisma.productCategory.findMany({
-    orderBy: {
-      order: "asc",
-    },
-  });
-
-  // Obtener productos según el rol y filtro
-  let productos;
-  let negocios;
-
-  if (role === "PROPIETARIO") {
-    // El propietario solo ve productos de sus negocios
-    if (params.negocioId) {
-      // Filtrar por un negocio específico del propietario
-      productos = await prisma.product.findMany({
-        where: {
-          businessId: params.negocioId,
-          business: {
-            ownerId: appUser.id,
-          },
-        },
-        include: {
-          business: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          category: {
-            select: {
-              id: true,
-              name: true,
-              icon: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-    } else {
-      // Todos los productos de todos sus negocios
-      productos = await prisma.product.findMany({
-        where: {
-          business: {
-            ownerId: appUser.id,
-          },
-        },
-        include: {
-          business: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          category: {
-            select: {
-              id: true,
-              name: true,
-              icon: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-    }
-
-    // Obtener negocios del propietario para el selector
-    negocios = await prisma.business.findMany({
-      where: {
-        ownerId: appUser.id,
-      },
-      select: {
-        id: true,
-        name: true,
-      },
-    });
-  } else {
-    // ADMINISTRADOR ve todos los productos
-    if (params.negocioId) {
-      productos = await prisma.product.findMany({
-        where: {
-          businessId: params.negocioId,
-        },
-        include: {
-          business: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          category: {
-            select: {
-              id: true,
-              name: true,
-              icon: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-    } else {
-      productos = await prisma.product.findMany({
-        include: {
-          business: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          category: {
-            select: {
-              id: true,
-              name: true,
-              icon: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      });
-    }
-
-    // Obtener todos los negocios para el selector
-    negocios = await prisma.business.findMany({
-      select: {
-        id: true,
-        name: true,
-      },
-    });
-  }
-
-  // Serializar las fechas y procesar images
-  const productosSerializados = productos.map((p) => ({
-    ...p,
-    images: p.images ? (p.images as string[]) : null,
-    category: p.category || null,
-    createdAt: p.createdAt.toISOString(),
-    updatedAt: p.updatedAt.toISOString(),
-  }));
 
   return (
     <ProductosClient
-      productos={productosSerializados}
+      productos={productos}
       negocios={negocios}
       categorias={categorias}
       role={role}
-      negocioIdFromUrl={params.negocioId}
+      negocioIdFromUrl={negocioId || undefined}
+      onRefresh={fetchData}
     />
+  );
+}
+
+export default function ProductosPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
+            <p className="text-muted-foreground">Cargando productos...</p>
+          </div>
+        </div>
+      }
+    >
+      <ProductosPageContent />
+    </Suspense>
   );
 }
