@@ -7,17 +7,20 @@ Sistema completo de gestión de usuarios (CRUD) accesible únicamente para usuar
 ## Endpoints Implementados
 
 ### 1. GET /api/admin/users
+
 **Descripción**: Obtener lista de usuarios con filtros
 
 **Permisos**: Solo ADMINISTRADOR
 
 **Query Parameters**:
+
 - `role` (opcional): Filtrar por rol (ADMINISTRADOR | PROPIETARIO | CLIENTE)
 - `search` (opcional): Búsqueda por nombre, apellido, email o teléfono
 - `isActive` (opcional): Filtrar por estado (true | false)
 - `limit` (opcional): Limitar resultados
 
 **Respuesta Exitosa** (200):
+
 ```json
 [
   {
@@ -46,35 +49,38 @@ Sistema completo de gestión de usuarios (CRUD) accesible únicamente para usuar
 ```
 
 **Ejemplos de Uso**:
+
 ```javascript
 // Obtener todos los usuarios
-const response = await fetch('/api/admin/users');
+const response = await fetch("/api/admin/users");
 
 // Buscar propietarios activos
-const response = await fetch('/api/admin/users?role=PROPIETARIO&isActive=true');
+const response = await fetch("/api/admin/users?role=PROPIETARIO&isActive=true");
 
 // Buscar por nombre o email
-const response = await fetch('/api/admin/users?search=juan');
+const response = await fetch("/api/admin/users?search=juan");
 
 // Limitar resultados
-const response = await fetch('/api/admin/users?limit=10');
+const response = await fetch("/api/admin/users?limit=10");
 ```
 
 ---
 
 ### 2. POST /api/admin/users
+
 **Descripción**: Crear un nuevo usuario manualmente
 
 **Permisos**: Solo ADMINISTRADOR
 
 **Body** (JSON):
+
 ```json
 {
-  "email": "nuevo@example.com",  // REQUERIDO
+  "email": "nuevo@example.com", // REQUERIDO
   "name": "María",
   "lastName": "González",
   "phone": "+54 9 11 9876-5432",
-  "role": "CLIENTE",  // ADMINISTRADOR | PROPIETARIO | CLIENTE
+  "role": "CLIENTE", // ADMINISTRADOR | PROPIETARIO | CLIENTE
   "address": "Av. Corrientes 1234",
   "city": "Buenos Aires",
   "province": "Buenos Aires",
@@ -86,6 +92,7 @@ const response = await fetch('/api/admin/users?limit=10');
 ```
 
 **Respuesta Exitosa** (201):
+
 ```json
 {
   "id": "clxxxx",
@@ -101,17 +108,20 @@ const response = await fetch('/api/admin/users?limit=10');
 ```
 
 **Errores Comunes**:
+
 - `400`: Email requerido o ya está en uso
 - `403`: Sin permisos (no es ADMINISTRADOR)
 
 ---
 
 ### 3. GET /api/admin/users/[id]
+
 **Descripción**: Obtener detalles completos de un usuario específico
 
 **Permisos**: Solo ADMINISTRADOR
 
 **Respuesta Exitosa** (200):
+
 ```json
 {
   "id": "clxxxx",
@@ -155,11 +165,13 @@ const response = await fetch('/api/admin/users?limit=10');
 ---
 
 ### 4. PUT /api/admin/users/[id]
+
 **Descripción**: Actualizar un usuario existente
 
 **Permisos**: Solo ADMINISTRADOR
 
 **Body** (JSON):
+
 ```json
 {
   "email": "nuevo-email@example.com",
@@ -184,6 +196,7 @@ const response = await fetch('/api/admin/users?limit=10');
 **Nota**: Todos los campos son opcionales. Solo se actualizan los campos enviados.
 
 **Respuesta Exitosa** (200):
+
 ```json
 {
   "id": "clxxxx",
@@ -195,6 +208,7 @@ const response = await fetch('/api/admin/users?limit=10');
 ```
 
 **Errores Comunes**:
+
 - `400`: Email ya está en uso por otro usuario
 - `404`: Usuario no encontrado
 - `403`: Sin permisos
@@ -202,16 +216,19 @@ const response = await fetch('/api/admin/users?limit=10');
 ---
 
 ### 5. DELETE /api/admin/users/[id]
+
 **Descripción**: Eliminar un usuario del sistema
 
 **Permisos**: Solo ADMINISTRADOR
 
 **Restricciones**:
+
 - No se puede eliminar un usuario con negocios asociados
 - No se puede eliminar un usuario con pedidos asociados
 - No se puede eliminar a sí mismo
 
 **Respuesta Exitosa** (200):
+
 ```json
 {
   "message": "Usuario eliminado exitosamente"
@@ -219,6 +236,7 @@ const response = await fetch('/api/admin/users?limit=10');
 ```
 
 **Errores Comunes**:
+
 - `400`: No se puede eliminar (tiene negocios/pedidos o intenta eliminarse a sí mismo)
 - `404`: Usuario no encontrado
 - `403`: Sin permisos
@@ -232,18 +250,22 @@ const response = await fetch('/api/admin/users?limit=10');
 ### Características
 
 #### 1. **Estadísticas en Dashboard**
+
 - Total de usuarios (activos/inactivos)
 - Contador de administradores
 - Contador de propietarios
 - Contador de clientes
 
 #### 2. **Filtros Avanzados**
+
 - **Búsqueda**: Por nombre, apellido, email o teléfono
 - **Rol**: Filtrar por tipo de usuario
 - **Estado**: Activos/Inactivos/Todos
 
 #### 3. **Tabla de Usuarios**
+
 Muestra para cada usuario:
+
 - Avatar y nombre completo
 - Email y datos de contacto
 - Rol con badge de color
@@ -253,7 +275,9 @@ Muestra para cada usuario:
 - Acciones (editar/eliminar)
 
 #### 4. **Diálogo de Creación**
+
 Formulario completo con:
+
 - Email (requerido)
 - Rol (requerido)
 - Nombre y apellido
@@ -263,13 +287,16 @@ Formulario completo con:
 - Notas del administrador
 
 #### 5. **Diálogo de Edición**
+
 Permite modificar todos los campos del usuario, incluyendo:
+
 - Cambio de rol
 - Activación/desactivación
 - Actualización de datos personales
 - Notas administrativas
 
 #### 6. **Diálogo de Eliminación**
+
 - Muestra información del usuario
 - Alerta si tiene negocios o pedidos asociados
 - Previene eliminación si tiene relaciones
@@ -280,21 +307,25 @@ Permite modificar todos los campos del usuario, incluyendo:
 ## Seguridad Implementada
 
 ### 1. **Autenticación**
+
 - Verificación de sesión con Clerk
 - Validación de token en cada request
 
 ### 2. **Autorización**
+
 - Solo usuarios con rol ADMINISTRADOR pueden acceder
 - Verificación de permisos en cada endpoint
 - Respuesta 403 (Forbidden) si no tiene permisos
 
 ### 3. **Validaciones**
+
 - Email único en el sistema
 - Email requerido para creación
 - Prevención de auto-eliminación
 - Prevención de eliminación en cascada (usuarios con relaciones)
 
 ### 4. **Integridad de Datos**
+
 - Generación automática de `fullName`
 - Validación de cambios de email (unicidad)
 - Manejo de campos opcionales vs requeridos
@@ -333,17 +364,20 @@ type User = {
 ## Mensajes de Error
 
 ### Errores de Autenticación
+
 - `401 Unauthorized`: "No autenticado"
 - `404 Not Found`: "Usuario no encontrado" (el usuario autenticado no existe en DB)
 - `403 Forbidden`: "No tienes permisos para..."
 
 ### Errores de Validación
+
 - `400 Bad Request`: "El email es requerido"
 - `400 Bad Request`: "El email ya está en uso"
 - `400 Bad Request`: "No puedes eliminarte a ti mismo"
 - `400 Bad Request`: "No se puede eliminar un usuario con negocios o pedidos asociados"
 
 ### Errores del Servidor
+
 - `500 Internal Server Error`: "Error al obtener/crear/actualizar/eliminar usuario"
 
 ---
@@ -351,6 +385,7 @@ type User = {
 ## Testing Manual
 
 ### 1. Verificar Permisos
+
 ```bash
 # Como CLIENTE o PROPIETARIO (debe fallar con 403)
 curl http://localhost:3000/api/admin/users
@@ -360,6 +395,7 @@ curl http://localhost:3000/api/admin/users
 ```
 
 ### 2. Crear Usuario
+
 ```bash
 curl -X POST http://localhost:3000/api/admin/users \
   -H "Content-Type: application/json" \
@@ -371,6 +407,7 @@ curl -X POST http://localhost:3000/api/admin/users \
 ```
 
 ### 3. Actualizar Usuario
+
 ```bash
 curl -X PUT http://localhost:3000/api/admin/users/[id] \
   -H "Content-Type: application/json" \
@@ -381,6 +418,7 @@ curl -X PUT http://localhost:3000/api/admin/users/[id] \
 ```
 
 ### 4. Eliminar Usuario
+
 ```bash
 curl -X DELETE http://localhost:3000/api/admin/users/[id]
 ```
@@ -405,12 +443,14 @@ curl -X DELETE http://localhost:3000/api/admin/users/[id]
 ## Archivos Creados/Modificados
 
 ### Nuevos Archivos
+
 1. `/app/api/admin/users/route.ts` - Endpoints GET y POST
 2. `/app/api/admin/users/[id]/route.ts` - Endpoints GET, PUT y DELETE
 3. `/app/dashboard/usuarios/usuarios-client.tsx` - Componente cliente con tabla y diálogos
 4. `/components/ui/table.tsx` - Componente de tabla reutilizable
 
 ### Archivos Modificados
+
 1. `/app/dashboard/usuarios/page.tsx` - Convertido a Client Component con API
 2. `/prisma/schema.prisma` - Ya tenía el modelo AppUser completo
 
