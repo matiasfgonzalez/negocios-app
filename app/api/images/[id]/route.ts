@@ -40,8 +40,7 @@ export async function DELETE(_: Request, { params }: { params: tParams }) {
     }
 
     // Verificar permisos: solo el propietario o un administrador pueden eliminar
-    const role = user.publicMetadata.role as string;
-    const isAdmin = role === "ADMINISTRADOR";
+    const isAdmin = appUser.role === "ADMINISTRADOR";
     const isOwner = image.uploaderId === appUser.id;
 
     if (!isAdmin && !isOwner) {

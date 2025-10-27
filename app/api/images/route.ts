@@ -124,8 +124,7 @@ export async function GET(request: Request) {
     const onlyMine = url.searchParams.get("onlyMine") === "true";
 
     // Si es administrador, puede ver todas las imágenes
-    const role = user.publicMetadata.role as string;
-    const isAdmin = role === "ADMINISTRADOR";
+    const isAdmin = appUser.role === "ADMINISTRADOR";
 
     const where = onlyMine || !isAdmin ? { uploaderId: appUser.id } : {};
 

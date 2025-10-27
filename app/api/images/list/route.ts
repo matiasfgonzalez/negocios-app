@@ -23,8 +23,7 @@ export async function GET() {
     }
 
     // Verificar si es administrador
-    const role = user.publicMetadata.role as string;
-    const isAdmin = role === "ADMINISTRADOR";
+    const isAdmin = appUser.role === "ADMINISTRADOR";
 
     // Si es administrador, traer todas las imágenes
     // Si no, solo traer las imágenes del usuario actual

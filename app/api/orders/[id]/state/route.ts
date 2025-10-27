@@ -51,8 +51,7 @@ export async function PATCH(
       );
     }
 
-    // Verificar permisos
-    const role = user.publicMetadata.role as string;
+    // Obtener usuario de la base de datos para verificar permisos
     const appUser = await prisma.appUser.findUnique({
       where: { clerkId: user.id },
     });
@@ -66,7 +65,7 @@ export async function PATCH(
 
     // Solo el propietario del negocio o un administrador pueden cambiar el estado
     if (
-      role !== "ADMINISTRADOR" &&
+      appUser.role !== "ADMINISTRADOR" &&
       existingOrder.business.ownerId !== appUser.id
     ) {
       return NextResponse.json(

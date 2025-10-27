@@ -106,8 +106,6 @@ export default function PerfilPage() {
     return null;
   }
 
-  const role = user.publicMetadata.role as string;
-
   const formatDate = (date: Date | null) => {
     if (!date) return "No especificada";
     return new Date(date).toLocaleDateString("es-AR", {
@@ -164,7 +162,7 @@ export default function PerfilPage() {
                 </CardTitle>
                 <div className="flex flex-wrap gap-2">
                   <Badge className="bg-primary/10 text-primary border-primary/20">
-                    {role}
+                    {appUser.role}
                   </Badge>
                   {appUser.isActive ? (
                     <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
@@ -231,7 +229,7 @@ export default function PerfilPage() {
                   <Shield className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 }
                 label="Rol"
-                value={role}
+                value={appUser.role}
               />
             </CardContent>
           </Card>

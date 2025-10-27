@@ -1,5 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 export default async function SSOCallback() {
   const user = await currentUser();
@@ -33,16 +34,23 @@ export default async function SSOCallback() {
     console.error("Error syncing user:", error);
   }
 
-  // Redirect based on role
-  const role = user.publicMetadata.role as string;
+  // Obtener usuario de la base de datos para verificar rol
+  const appUser = await prisma.appUser.findUnique({
+    where: { clerkId: user.id },
+  });
 
-  switch (role) {
-    case "admin":
-      return redirect("/admin");
-    case "propietario":
-      return redirect("/propietario");
-    case "cliente":
-      return redirect("/cliente");
+  if (!appUser) {
+    return redirect("/");
+  }
+
+  // Redirect based on role from database
+  switch (appUser.role) {
+    case "ADMINISTRADOR":
+      return redirect("/dashboard");
+    case "PROPIETARIO":
+      return redirect("/dashboard");
+    case "CLIENTE":
+      return redirect("/dashboard");
     default:
       return redirect("/");
   }

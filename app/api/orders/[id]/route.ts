@@ -49,8 +49,7 @@ export async function DELETE(
       );
     }
 
-    // Verificar permisos
-    const role = user.publicMetadata.role as string;
+    // Obtener usuario de la base de datos para verificar permisos
     const appUser = await prisma.appUser.findUnique({
       where: { clerkId: user.id },
     });
@@ -63,7 +62,10 @@ export async function DELETE(
     }
 
     // Solo el cliente que creó la orden o un administrador pueden eliminarla
-    if (role !== "ADMINISTRADOR" && existingOrder.customerId !== appUser.id) {
+    if (
+      appUser.role !== "ADMINISTRADOR" &&
+      existingOrder.customerId !== appUser.id
+    ) {
       return NextResponse.json(
         { error: "No tienes permisos para eliminar esta orden" },
         { status: 403 }

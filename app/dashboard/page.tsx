@@ -19,6 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { prisma } from "@/lib/prisma";
 
 interface DashboardCard {
   title: string;
@@ -33,7 +34,16 @@ export default async function DashboardPage() {
   const user = await currentUser();
   if (!user) redirect("/sign-in");
 
-  const role = user.publicMetadata.role as string;
+  // Obtener usuario de la base de datos para verificar rol
+  const appUser = await prisma.appUser.findUnique({
+    where: { clerkId: user.id },
+  });
+
+  if (!appUser) {
+    redirect("/sign-in");
+  }
+
+  const role = appUser.role;
 
   // Definir las tarjetas disponibles
   const allCards: Record<string, DashboardCard> = {

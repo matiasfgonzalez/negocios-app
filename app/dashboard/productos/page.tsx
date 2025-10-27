@@ -52,11 +52,12 @@ function ProductosPageContent() {
   const searchParams = useSearchParams();
   const negocioId = searchParams.get("negocioId");
 
-  const [productos, setProductos] = useState<Product[]>([]);
-  const [negocios, setNegocios] = useState<Business[]>([]);
-  const [categorias, setCategorias] = useState<ProductCategory[]>([]);
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [negocios, setNegocios] = useState<Negocio[]>([]);
+  const [categorias, setCategorias] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string>("");
 
   const fetchData = useCallback(async () => {
     try {
@@ -106,15 +107,35 @@ function ProductosPageContent() {
       return;
     }
 
-    const role = user.publicMetadata.role as string;
+    // Verificar rol desde la base de datos
+    const checkRoleAndFetchData = async () => {
+      try {
+        const response = await fetch("/api/me");
+        if (!response.ok) {
+          router.push("/dashboard");
+          return;
+        }
 
-    // Solo ADMINISTRADOR y PROPIETARIO pueden acceder
-    if (role !== "ADMINISTRADOR" && role !== "PROPIETARIO") {
-      router.push("/dashboard");
-      return;
-    }
+        const appUser = await response.json();
 
-    fetchData();
+        // Solo ADMINISTRADOR y PROPIETARIO pueden acceder
+        if (
+          appUser.role !== "ADMINISTRADOR" &&
+          appUser.role !== "PROPIETARIO"
+        ) {
+          router.push("/dashboard");
+          return;
+        }
+
+        setUserRole(appUser.role);
+        fetchData();
+      } catch (error) {
+        console.error("Error checking role:", error);
+        router.push("/dashboard");
+      }
+    };
+
+    checkRoleAndFetchData();
   }, [user, isLoaded, router, negocioId, fetchData]);
 
   if (!isLoaded || loading) {
@@ -131,8 +152,6 @@ function ProductosPageContent() {
   if (!user) {
     return null;
   }
-
-  const role = user.publicMetadata.role as string;
 
   if (error) {
     return (
@@ -152,7 +171,7 @@ function ProductosPageContent() {
       productos={productos}
       negocios={negocios}
       categorias={categorias}
-      role={role}
+      role={userRole}
       negocioIdFromUrl={negocioId || undefined}
       onRefresh={fetchData}
     />

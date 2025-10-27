@@ -10,15 +10,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { prisma } from "@/lib/prisma";
 
 export default async function ReportesPage() {
   const user = await currentUser();
   if (!user) redirect("/sign-in");
 
-  const role = user.publicMetadata.role as string;
+  // Obtener usuario de la base de datos para verificar rol
+  const appUser = await prisma.appUser.findUnique({
+    where: { clerkId: user.id },
+  });
+
+  if (!appUser) {
+    redirect("/sign-in");
+  }
 
   // Solo ADMINISTRADOR puede acceder
-  if (role !== "ADMINISTRADOR") {
+  if (appUser.role !== "ADMINISTRADOR") {
     redirect("/dashboard");
   }
 

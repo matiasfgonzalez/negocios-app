@@ -108,15 +108,31 @@ function UsuariosPageContent() {
       return;
     }
 
-    const role = user.publicMetadata.role as string;
+    // Verificar rol desde la base de datos
+    const checkRole = async () => {
+      try {
+        const response = await fetch("/api/me");
+        if (!response.ok) {
+          router.push("/dashboard");
+          return;
+        }
 
-    // Solo ADMINISTRADOR puede acceder
-    if (role !== "ADMINISTRADOR") {
-      router.push("/dashboard");
-      return;
-    }
+        const appUser = await response.json();
 
-    fetchData();
+        // Solo ADMINISTRADOR puede acceder
+        if (appUser.role !== "ADMINISTRADOR") {
+          router.push("/dashboard");
+          return;
+        }
+
+        fetchData();
+      } catch (error) {
+        console.error("Error checking role:", error);
+        router.push("/dashboard");
+      }
+    };
+
+    checkRole();
   }, [user, isLoaded, router, fetchData]);
 
   // Calcular estadísticas

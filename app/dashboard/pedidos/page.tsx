@@ -74,6 +74,7 @@ export default function PedidosPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string>("");
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -85,6 +86,15 @@ export default function PedidosPage() {
     const fetchOrders = async () => {
       try {
         setLoading(true);
+
+        // Obtener el rol del usuario desde la base de datos
+        const userResponse = await fetch("/api/me");
+        if (!userResponse.ok) {
+          throw new Error("Error al obtener información del usuario");
+        }
+        const appUser = await userResponse.json();
+        setUserRole(appUser.role);
+
         const response = await fetch("/api/orders");
 
         if (!response.ok) {
@@ -145,8 +155,6 @@ export default function PedidosPage() {
     return null;
   }
 
-  const role = user.publicMetadata.role as string;
-
   if (error) {
     return (
       <div className="min-h-screen">
@@ -203,10 +211,10 @@ export default function PedidosPage() {
         {/* UI improved: Enhanced header */}
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-            {role === "CLIENTE" ? "Mis Pedidos" : "Gestión de Pedidos"}
+            {userRole === "CLIENTE" ? "Mis Pedidos" : "Gestión de Pedidos"}
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground">
-            {role === "CLIENTE"
+            {userRole === "CLIENTE"
               ? "Revisa el estado de tus pedidos realizados"
               : "Administra y procesa los pedidos recibidos"}
           </p>
@@ -218,7 +226,7 @@ export default function PedidosPage() {
             <OrderCard
               key={order.id}
               order={order}
-              userRole={role}
+              userRole={userRole}
               currentUserId={user.id}
             />
           ))}
@@ -235,7 +243,7 @@ export default function PedidosPage() {
                 No hay pedidos
               </h3>
               <p className="text-sm sm:text-base text-muted-foreground max-w-md mx-auto">
-                {role === "CLIENTE"
+                {userRole === "CLIENTE"
                   ? "Aún no has realizado ningún pedido"
                   : "No hay pedidos registrados en el sistema"}
               </p>

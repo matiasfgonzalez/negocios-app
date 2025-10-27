@@ -20,10 +20,20 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const role = user.publicMetadata.role as string;
+    // Obtener usuario de la base de datos para verificar rol
+    const appUser = await prisma.appUser.findUnique({
+      where: { clerkId: user.id },
+    });
+
+    if (!appUser) {
+      return NextResponse.json(
+        { error: "Usuario no encontrado" },
+        { status: 404 }
+      );
+    }
 
     // Solo ADMINISTRADOR y PROPIETARIO pueden acceder
-    if (role !== "ADMINISTRADOR" && role !== "PROPIETARIO") {
+    if (appUser.role !== "ADMINISTRADOR" && appUser.role !== "PROPIETARIO") {
       return NextResponse.json(
         { error: "No tienes permisos para gestionar negocios" },
         { status: 403 }
@@ -31,18 +41,7 @@ export async function GET(request: Request) {
     }
 
     // Si es PROPIETARIO, filtrar por sus negocios
-    if (role === "PROPIETARIO") {
-      const appUser = await prisma.appUser.findUnique({
-        where: { clerkId: user.id },
-      });
-
-      if (!appUser) {
-        return NextResponse.json(
-          { error: "Usuario no encontrado" },
-          { status: 404 }
-        );
-      }
-
+    if (appUser.role === "PROPIETARIO") {
       where.ownerId = appUser.id;
     }
 
@@ -142,8 +141,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verificar que el usuario tenga permisos
-    const role = user.publicMetadata.role as string;
+    // Obtener usuario de la base de datos para verificar permisos
     const appUser = await prisma.appUser.findUnique({
       where: { clerkId: user.id },
     });
@@ -156,7 +154,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Solo ADMINISTRADOR puede crear negocios para otros usuarios
-    if (role !== "ADMINISTRADOR" && ownerId !== appUser.id) {
+    if (appUser.role !== "ADMINISTRADOR" && ownerId !== appUser.id) {
       return NextResponse.json(
         { error: "No tienes permisos para crear negocios para otros usuarios" },
         { status: 403 }

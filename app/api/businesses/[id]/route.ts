@@ -115,8 +115,7 @@ export async function PUT(
       );
     }
 
-    // Verificar permisos
-    const role = user.publicMetadata.role as string;
+    // Obtener usuario de la base de datos para verificar permisos
     const appUser = await prisma.appUser.findUnique({
       where: { clerkId: user.id },
     });
@@ -129,7 +128,10 @@ export async function PUT(
     }
 
     // Solo el propietario o un administrador pueden editar
-    if (role !== "ADMINISTRADOR" && existingBusiness.ownerId !== appUser.id) {
+    if (
+      appUser.role !== "ADMINISTRADOR" &&
+      existingBusiness.ownerId !== appUser.id
+    ) {
       return NextResponse.json(
         { error: "No tienes permisos para editar este negocio" },
         { status: 403 }
@@ -270,8 +272,7 @@ export async function DELETE(
       );
     }
 
-    // Verificar permisos
-    const role = user.publicMetadata.role as string;
+    // Obtener usuario de la base de datos para verificar permisos
     const appUser = await prisma.appUser.findUnique({
       where: { clerkId: user.id },
     });
@@ -284,7 +285,10 @@ export async function DELETE(
     }
 
     // Solo el propietario o un administrador pueden eliminar
-    if (role !== "ADMINISTRADOR" && existingBusiness.ownerId !== appUser.id) {
+    if (
+      appUser.role !== "ADMINISTRADOR" &&
+      existingBusiness.ownerId !== appUser.id
+    ) {
       return NextResponse.json(
         { error: "No tienes permisos para eliminar este negocio" },
         { status: 403 }
