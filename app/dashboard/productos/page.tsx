@@ -52,9 +52,9 @@ function ProductosPageContent() {
   const searchParams = useSearchParams();
   const negocioId = searchParams.get("negocioId");
 
-  const [productos, setProductos] = useState<Producto[]>([]);
-  const [negocios, setNegocios] = useState<Negocio[]>([]);
-  const [categorias, setCategorias] = useState<string[]>([]);
+  const [productos, setProductos] = useState<Product[]>([]);
+  const [negocios, setNegocios] = useState<Business[]>([]);
+  const [categorias, setCategorias] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string>("");

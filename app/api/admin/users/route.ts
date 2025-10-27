@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import type { Role } from "@prisma/client";
+import type { Role, Prisma } from "@prisma/client";
 
 // GET /api/admin/users - Obtener lista de usuarios (solo ADMINISTRADOR)
 export async function GET(req: Request) {
@@ -40,7 +40,7 @@ export async function GET(req: Request) {
     const limit = searchParams.get("limit");
 
     // Construir filtros
-    const where: any = {};
+    const where: Prisma.AppUserWhereInput = {};
 
     if (role) {
       where.role = role as Role;
