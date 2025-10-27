@@ -3,6 +3,8 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 import BusinessCard from "@/components/BusinessCard";
 import { Business } from "./types/types";
 import {
@@ -14,6 +16,8 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  LogIn,
+  UserPlus,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 
 // Cargar MapView solo en el cliente (no en SSR)
 const MapView = dynamic(() => import("@/components/MapView"), {
@@ -36,6 +41,7 @@ const MapView = dynamic(() => import("@/components/MapView"), {
 });
 
 export default function HomePage() {
+  const { isSignedIn, isLoaded } = useUser();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -89,6 +95,39 @@ export default function HomePage() {
 
   return (
     <div className="space-y-16">
+      {/* Banner de invitación a iniciar sesión */}
+      {isLoaded && !isSignedIn && (
+        <Card className="bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-primary/20 shadow-lg">
+          <CardContent className="py-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-start gap-4 text-center sm:text-left">
+                <div className="hidden sm:flex w-12 h-12 bg-primary/20 rounded-xl items-center justify-center flex-shrink-0">
+                  <UserPlus className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground mb-1">
+                    ¡Unite a BarrioMarket!
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Iniciá sesión para realizar pedidos, guardar tus favoritos y
+                    gestionar tus negocios
+                  </p>
+                </div>
+              </div>
+              <Link href="/sign-in">
+                <Button
+                  size="lg"
+                  className="shadow-md hover:shadow-lg transition-all whitespace-nowrap"
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Iniciar Sesión
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* UI improved: Enhanced HERO SECTION with modern gradient and better spacing */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-primary/0 to-secondary/5 dark:from-primary/10 dark:via-primary/0 dark:to-secondary/10 rounded-3xl" />
