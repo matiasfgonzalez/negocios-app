@@ -1,6 +1,7 @@
 {
-  "name": "negocios-app",
-  "version": "0.1.0",
+  "name": "barriomarket",
+  "version": "1.0.0",
+  "description": "Plataforma argentina que conecta comercios locales con clientes. Tu barrio, tu comercio.",
   "private": true,
   "scripts": {
     "dev": "next dev",

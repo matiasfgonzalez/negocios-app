@@ -62,10 +62,10 @@ export default function SignInPage() {
             </div>
             <div className="text-left">
               <span className="text-xl sm:text-2xl font-bold text-foreground">
-                NegociosApp
+                BarrioMarket
               </span>
               <div className="text-xs text-muted-foreground font-medium">
-                Gestión de Negocios
+                Tu barrio, tu comercio
               </div>
             </div>
           </Link>
@@ -84,8 +84,8 @@ export default function SignInPage() {
             </CardTitle>
 
             <CardDescription className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-              Accede a tu cuenta con Google y gestiona tus negocios de manera
-              profesional
+              Accede a BarrioMarket con tu cuenta de Google y descubrí los
+              negocios de tu barrio
             </CardDescription>
           </CardHeader>
 
@@ -104,24 +104,24 @@ export default function SignInPage() {
             <div className="bg-primary/5 rounded-xl p-4 border border-primary/20">
               <div className="text-center space-y-3">
                 <h4 className="font-semibold text-foreground text-xs sm:text-sm">
-                  Acceso instantáneo a:
+                  ¿Qué podés hacer en BarrioMarket?
                 </h4>
                 <div className="grid grid-cols-2 gap-2.5 sm:gap-3 text-xs text-muted-foreground">
                   <div className="flex items-center space-x-2">
-                    <Shield className="w-3 h-3 text-primary flex-shrink-0" />
-                    <span>Panel de control</span>
+                    <CheckCircle className="w-3 h-3 text-primary flex-shrink-0" />
+                    <span>Comprar local</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="w-3 h-3 text-primary flex-shrink-0" />
-                    <span>Gestión segura</span>
+                    <span>Gestionar negocio</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="w-3 h-3 text-primary flex-shrink-0" />
-                    <span>Negocios</span>
+                    <span>Hacer pedidos</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <CheckCircle className="w-3 h-3 text-primary flex-shrink-0" />
-                    <span>Productos</span>
+                    <span>Ver productos</span>
                   </div>
                 </div>
               </div>

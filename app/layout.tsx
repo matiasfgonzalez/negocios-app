@@ -9,8 +9,9 @@ import UserSync from "@/components/UserSync";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Negocios App",
-  description: "Conectá con negocios cerca tuyo y hacé pedidos online",
+  title: "BarrioMarket - Tu barrio, tu comercio",
+  description:
+    "Conectá con negocios de tu barrio y hacé pedidos online. La plataforma argentina que une comerciantes locales con clientes. Comprá fácil, rápido y cerca de casa.",
 };
 
 export default function RootLayout({
@@ -43,10 +44,11 @@ export default function RootLayout({
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="text-center space-y-2">
                   <p className="text-sm font-medium text-foreground">
-                    NegociosApp
+                    BarrioMarket
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    © {new Date().getFullYear()} Todos los derechos reservados
+                    © {new Date().getFullYear()} Todos los derechos reservados ·
+                    Tu barrio, tu comercio
                   </p>
                 </div>
               </div>

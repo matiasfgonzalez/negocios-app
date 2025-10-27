@@ -4,7 +4,7 @@ import { useUser, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "./theme-toggle";
-import { Menu, X, Store, Shield, Home, LogIn } from "lucide-react";
+import { Menu, X, Store, Shield, Home, LogIn, Info } from "lucide-react";
 import CustomUserMenu from "./CustomUserMenu";
 
 export default function Navbar() {
@@ -20,6 +20,7 @@ export default function Navbar() {
     const baseItems = [
       { href: "/", label: "Inicio", icon: Home },
       { href: "/#negocios", label: "Negocios", icon: Store },
+      { href: "/about", label: "Sobre Nosotros", icon: Info },
     ];
 
     if (isSignedIn) {
@@ -59,7 +60,7 @@ export default function Navbar() {
               <Store className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent group-hover:from-primary group-hover:to-primary transition-all duration-200">
-              NegociosApp
+              BarrioMarket
             </span>
           </Link>
 
