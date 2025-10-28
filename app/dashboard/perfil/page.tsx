@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import NextImage from "next/image";
 import {
   ArrowLeft,
   User,
@@ -152,8 +153,14 @@ export default function PerfilPage() {
                   />
                 </div>
               ) : (
-                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-md flex-shrink-0">
-                  <User className="w-10 h-10 sm:w-12 sm:h-12 text-primary-foreground" />
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shadow-md flex-shrink-0">
+                  <NextImage
+                    src="/logo.PNG"
+                    alt="BarrioMarket Logo"
+                    width={96}
+                    height={96}
+                    className="object-contain"
+                  />
                 </div>
               )}
               <div className="flex-1 min-w-0">

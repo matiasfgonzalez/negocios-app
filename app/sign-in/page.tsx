@@ -2,6 +2,7 @@
 
 import { useSignIn, useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useEffect } from "react";
 import {
   Card,
@@ -57,8 +58,15 @@ export default function SignInPage() {
         {/* UI improved: Enhanced Header */}
         <div className="text-center space-y-4">
           <Link href="/" className="inline-flex items-center space-x-3 group">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
-              <Shield className="w-7 h-7 sm:w-8 sm:h-8 text-primary-foreground" />
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white dark:bg-white rounded-2xl overflow-hidden shadow-md group-hover:shadow-lg transition-all p-2">
+              <Image
+                src="/logo.PNG"
+                alt="BarrioMarket Logo"
+                width={64}
+                height={64}
+                className="object-contain w-full h-full"
+                priority
+              />
             </div>
             <div className="text-left">
               <span className="text-xl sm:text-2xl font-bold text-foreground">

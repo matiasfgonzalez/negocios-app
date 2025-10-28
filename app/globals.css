@@ -259,4 +259,27 @@
       linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 30px 30px;
   }
+
+  /* Logo adaptativo para modo oscuro y claro */
+  .logo-adaptive {
+    /* Si el logo tiene fondo blanco o elementos oscuros, 
+       descomentar la siguiente línea para invertir en modo oscuro */
+    /* filter: brightness(0) invert(1); */
+  }
+
+  .dark .logo-adaptive {
+    /* Ajustar brillo y contraste en modo oscuro */
+    /* filter: brightness(1.1) contrast(0.95); */
+    /* O si necesitas invertir colores: */
+    /* filter: brightness(0) invert(1); */
+  }
+
+  /* Contenedor del logo con fondo adaptativo */
+  .logo-container {
+    @apply bg-white dark:bg-neutral-800 rounded-2xl;
+  }
+
+  .logo-container-light {
+    @apply bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm;
+  }
 }

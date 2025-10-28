@@ -2,6 +2,7 @@
 
 import { useUser, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { ThemeToggle } from "./theme-toggle";
 import { Menu, X, Store, Shield, Home, LogIn, Info } from "lucide-react";
@@ -56,8 +57,15 @@ export default function Navbar() {
             className="flex items-center gap-2.5 group"
             onClick={() => setIsMobileMenuOpen(false)}
           >
-            <div className="relative w-9 h-9 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-200 group-hover:scale-105">
-              <Store className="w-5 h-5 text-primary-foreground" />
+            <div className="relative w-9 h-9 bg-white dark:bg-white rounded-xl overflow-hidden shadow-sm group-hover:shadow-md transition-all duration-200 group-hover:scale-105 p-1">
+              <Image
+                src="/logo.PNG"
+                alt="BarrioMarket Logo"
+                width={36}
+                height={36}
+                className="object-contain w-full h-full"
+                priority
+              />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent group-hover:from-primary group-hover:to-primary transition-all duration-200">
               BarrioMarket

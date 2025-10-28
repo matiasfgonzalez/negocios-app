@@ -1,4 +1,5 @@
 import { Loader2, CheckCircle, Shield } from "lucide-react";
+import Image from "next/image";
 
 export default function SSOCallbackLoading() {
   return (
@@ -7,8 +8,15 @@ export default function SSOCallbackLoading() {
         <div className="text-center space-y-6">
           {/* Logo */}
           <div className="flex justify-center">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-r from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg">
-              <Shield className="w-8 h-8 sm:w-10 sm:h-10 text-primary-foreground" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white dark:bg-white rounded-2xl overflow-hidden shadow-lg p-2.5">
+              <Image
+                src="/logo.PNG"
+                alt="BarrioMarket Logo"
+                width={80}
+                height={80}
+                className="object-contain w-full h-full"
+                priority
+              />
             </div>
           </div>
 

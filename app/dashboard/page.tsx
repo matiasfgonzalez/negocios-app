@@ -1,6 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import NextImage from "next/image";
 import {
   User,
   Users,
@@ -156,8 +157,15 @@ export default async function DashboardPage() {
         {/* UI improved: Enhanced header with better responsive design */}
         <div className="mb-12">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
-            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-md">
-              <User className="w-7 h-7 sm:w-8 sm:h-8 text-primary-foreground" />
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white dark:bg-white rounded-2xl overflow-hidden shadow-md p-2">
+              <NextImage
+                src="/logo.PNG"
+                alt="BarrioMarket Logo"
+                width={64}
+                height={64}
+                className="object-contain w-full h-full"
+                priority
+              />
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">
