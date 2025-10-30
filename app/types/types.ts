@@ -14,6 +14,8 @@ export type OrderState =
 
 export type Role = "ADMINISTRADOR" | "PROPIETARIO" | "CLIENTE";
 
+export type RoleRequestStatus = "PENDIENTE" | "APROBADA" | "RECHAZADA";
+
 export type BusinessStatus =
   | "ABIERTO"
   | "CERRADO_TEMPORAL"
@@ -321,3 +323,44 @@ export type BusinessWithRelations = Business & {
     products: number;
   };
 };
+
+// Tipo para solicitudes de cambio de rol
+export type RoleRequest = {
+  // Identificador único de la solicitud
+  id: string;
+
+  // ID del usuario que solicita el cambio de rol
+  userId: string;
+
+  // Relación con el usuario (opcional cuando solo se usa el ID)
+  user?: AppUser & {
+    fullName: string | null;
+    email: string | null;
+    avatar: string | null;
+  };
+
+  // Rol solicitado
+  requestedRole: Role;
+
+  // Descripción o motivo de la solicitud
+  description: string;
+
+  // Estado de la solicitud
+  status: RoleRequestStatus;
+
+  // ID del administrador que procesó la solicitud
+  reviewedBy: string | null;
+
+  // Fecha en que fue revisada la solicitud
+  reviewedAt: Date | null;
+
+  // Motivo del rechazo o aprobación
+  reviewNote: string | null;
+
+  // Fecha de creación de la solicitud
+  createdAt: Date;
+
+  // Fecha de última actualización de la solicitud
+  updatedAt: Date;
+};
+

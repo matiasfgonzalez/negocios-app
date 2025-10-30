@@ -112,6 +112,22 @@ export default async function DashboardPage() {
       color: "text-pink-600 dark:text-pink-400",
       gradient: "from-purple-500 to-pink-500",
     },
+    solicitudes: {
+      title: "Mis Solicitudes",
+      description: "Gestiona tus solicitudes de cambio de rol",
+      icon: FileText,
+      href: "/dashboard/solicitudes",
+      color: "text-blue-600 dark:text-blue-400",
+      gradient: "from-blue-500 to-cyan-500",
+    },
+    solicitudesAdmin: {
+      title: "Gestión de Solicitudes",
+      description: "Revisa solicitudes de cambio de rol",
+      icon: Users,
+      href: "/dashboard/solicitudes-admin",
+      color: "text-purple-600 dark:text-purple-400",
+      gradient: "from-purple-500 to-indigo-500",
+    },
   };
 
   // Determinar qué tarjetas mostrar según el rol
@@ -127,6 +143,7 @@ export default async function DashboardPage() {
       allCards.negocios,
       allCards.productos,
       allCards.pedidos,
+      allCards.solicitudesAdmin,
       allCards.imagenes,
       allCards.estadisticas,
       allCards.reportes,
@@ -145,7 +162,7 @@ export default async function DashboardPage() {
   } else if (role === "CLIENTE") {
     roleTitle = "Panel del Cliente";
     roleDescription = "Revisa tus pedidos y gestiona tu perfil";
-    visibleCards = [allCards.pedidos, allCards.perfil];
+    visibleCards = [allCards.pedidos, allCards.solicitudes, allCards.perfil];
   } else {
     return redirect("/sign-in");
   }

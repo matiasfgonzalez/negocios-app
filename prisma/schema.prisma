@@ -63,6 +63,8 @@ model AppUser {
   orders     Order[]
   // Imágenes subidas por el usuario
   uploadedImages UploadedImage[]
+  // Solicitudes de cambio de rol realizadas por el usuario
+  roleRequests RoleRequest[]
   // Fecha de creación del usuario
   createdAt  DateTime  @default(now())
   // Fecha de última actualización del usuario
@@ -298,4 +300,37 @@ model UploadedImage {
   publicId  String
   // Fecha de creación de la imagen
   createdAt  DateTime @default(now())
+}
+
+// Modelo que representa una solicitud de cambio de rol (CLIENTE -> PROPIETARIO)
+model RoleRequest {
+  // Identificador único de la solicitud
+  id          String              @id @default(cuid())
+  // ID del usuario que solicita el cambio de rol
+  userId      String
+  // Relación con el usuario
+  user        AppUser             @relation(fields: [userId], references: [id])
+  // Rol solicitado (por ahora solo PROPIETARIO)
+  requestedRole Role              @default(PROPIETARIO)
+  // Descripción o motivo de la solicitud
+  description String
+  // Estado de la solicitud
+  status      RoleRequestStatus   @default(PENDIENTE)
+  // ID del administrador que procesó la solicitud
+  reviewedBy  String?
+  // Fecha en que fue revisada la solicitud
+  reviewedAt  DateTime?
+  // Motivo del rechazo o aprobación (opcional para aprobación, obligatorio para rechazo)
+  reviewNote  String?
+  // Fecha de creación de la solicitud
+  createdAt   DateTime            @default(now())
+  // Fecha de última actualización de la solicitud
+  updatedAt   DateTime            @updatedAt
+}
+
+// Enum que representa el estado de una solicitud de cambio de rol
+enum RoleRequestStatus {
+  PENDIENTE   // Solicitud pendiente de revisión
+  APROBADA    // Solicitud aprobada
+  RECHAZADA   // Solicitud rechazada
 }
