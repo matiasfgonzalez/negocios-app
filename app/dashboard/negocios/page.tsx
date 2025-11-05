@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import NuevoNegocioDialog from "@/components/NuevoNegocioDialog";
 import EditarNegocioDialog from "@/components/EditarNegocioDialog";
 import EliminarNegocioDialog from "@/components/EliminarNegocioDialog";
+import SubscriptionBlockedCard from "@/components/SubscriptionBlockedCard";
 import { BusinessWithRelations } from "@/app/types/types";
 
 export default function NegociosPage() {
@@ -34,6 +35,8 @@ export default function NegociosPage() {
   const [negocios, setNegocios] = useState<BusinessWithRelations[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string>("");
+  const [subscriptionBlocked, setSubscriptionBlocked] = useState(false);
+  const [daysOverdue, setDaysOverdue] = useState(0);
 
   const role = user?.publicMetadata?.role as string;
 
@@ -51,12 +54,49 @@ export default function NegociosPage() {
       return;
     }
 
-    // Obtener el usuario de la base de datos
+    // Obtener el usuario de la base de datos y verificar suscripción
     fetch("/api/me")
       .then((res) => res.json())
       .then((data) => {
         if (data.id) {
           setUserId(data.id);
+
+          // Solo validar suscripción para propietarios (no para admins)
+          if (data.role === "PROPIETARIO") {
+            const now = new Date();
+            const becameOwnerAt = new Date(data.becameOwnerAt || now);
+            const trialEndDate = new Date(becameOwnerAt);
+            trialEndDate.setMonth(trialEndDate.getMonth() + 1);
+            const isInTrial = now < trialEndDate;
+
+            // Si no está en período de prueba, verificar estado de suscripción
+            if (!isInTrial) {
+              if (data.subscriptionPaidUntil) {
+                const paidUntil = new Date(data.subscriptionPaidUntil);
+                const diffTime = now.getTime() - paidUntil.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                // Si tiene más de 7 días de retraso, bloquear acceso
+                if (diffDays > 7) {
+                  setSubscriptionBlocked(true);
+                  setDaysOverdue(diffDays);
+                  setIsLoading(false);
+                  return;
+                }
+              } else {
+                // No tiene fecha de pago y no está en prueba = suspendido
+                setSubscriptionBlocked(true);
+                setDaysOverdue(
+                  Math.ceil(
+                    (now.getTime() - trialEndDate.getTime()) /
+                      (1000 * 60 * 60 * 24)
+                  )
+                );
+                setIsLoading(false);
+                return;
+              }
+            }
+          }
         }
       })
       .catch((error) => {
@@ -95,6 +135,17 @@ export default function NegociosPage() {
 
   if (!user || !role) {
     return null;
+  }
+
+  // Mostrar pantalla de bloqueo si la suscripción está suspendida
+  if (subscriptionBlocked) {
+    return (
+      <SubscriptionBlockedCard
+        daysOverdue={daysOverdue}
+        title="No podés gestionar tu negocio - Suscripción Suspendida"
+        description="Tu suscripción ha sido suspendida por falta de pago. Regularizá tu situación para continuar administrando tu negocio."
+      />
+    );
   }
 
   return (

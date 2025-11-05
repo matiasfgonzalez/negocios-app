@@ -65,6 +65,14 @@ model AppUser {
   uploadedImages UploadedImage[]
   // Solicitudes de cambio de rol realizadas por el usuario
   roleRequests RoleRequest[]
+  // Fecha en que se convirtió en propietario (para calcular período de prueba)
+  becameOwnerAt DateTime?
+  // Estado de la suscripción del propietario
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  // Fecha hasta la cual la suscripción está paga
+  subscriptionPaidUntil DateTime?
+  // Pagos realizados por el usuario (como propietario)
+  payments Payment[]
   // Fecha de creación del usuario
   createdAt  DateTime  @default(now())
   // Fecha de última actualización del usuario
@@ -333,4 +341,77 @@ enum RoleRequestStatus {
   PENDIENTE   // Solicitud pendiente de revisión
   APROBADA    // Solicitud aprobada
   RECHAZADA   // Solicitud rechazada
+}
+
+// Enum que representa el estado de la suscripción de un propietario
+enum SubscriptionStatus {
+  TRIAL       // Período de prueba (primer mes gratis)
+  ACTIVE      // Suscripción activa y al día
+  OVERDUE     // Pago vencido (puede seguir accediendo temporalmente)
+  SUSPENDED   // Suspendido por falta de pago (sin acceso)
+}
+
+// Enum que representa el estado de un pago
+enum PaymentStatus {
+  PENDING     // Pago pendiente de verificación
+  APPROVED    // Pago aprobado por el administrador
+  REJECTED    // Pago rechazado
+}
+
+// Modelo que representa un pago de suscripción mensual
+model Payment {
+  // Identificador único del pago
+  id          String        @id @default(cuid())
+  // ID del propietario que realizó el pago
+  ownerId     String
+  // Relación con el usuario propietario
+  owner       AppUser       @relation(fields: [ownerId], references: [id])
+  // Monto del pago
+  amount      Float
+  // Mes y año al que corresponde el pago (ej: "2025-11" para noviembre 2025)
+  periodMonth String
+  // Estado del pago
+  status      PaymentStatus @default(PENDING)
+  // URL del comprobante de pago (imagen/PDF en Cloudinary)
+  proofUrl    String?
+  // ID público de Cloudinary del comprobante
+  proofPublicId String?
+  // Nota del propietario al enviar el pago
+  ownerNote   String?
+  // Nota del administrador al revisar el pago
+  adminNote   String?
+  // ID del administrador que revisó el pago
+  reviewedBy  String?
+  // Fecha en que fue revisado el pago
+  reviewedAt  DateTime?
+  // Fecha de creación del pago
+  createdAt   DateTime      @default(now())
+  // Fecha de última actualización del pago
+  updatedAt   DateTime      @updatedAt
+}
+
+// Modelo que representa la configuración de pagos y suscripciones
+model PaymentConfig {
+  // Identificador único (siempre habrá solo un registro)
+  id              String   @id @default("payment_config")
+  // Monto mensual de la suscripción
+  monthlyFee      Float    @default(5000)
+  // Banco receptor
+  bankName        String   @default("Banco Nación")
+  // Alias bancario para transferencias
+  bankAlias       String   @default("BARRIOMARKET.PAGOS")
+  // CBU/CVU para transferencias
+  bankCbu         String   @default("0110599520000012345678")
+  // Titular de la cuenta
+  accountHolder   String   @default("BarrioMarket S.A.")
+  // Tipo de cuenta (Cuenta Corriente, Caja de Ahorro, etc.)
+  accountType     String?  @default("Cuenta Corriente")
+  // Email de contacto para pagos
+  supportEmail    String   @default("pagos@barriomarket.com")
+  // Teléfono de WhatsApp para consultas
+  supportPhone    String   @default("5491123456789")
+  // Fecha de creación de la configuración
+  createdAt       DateTime @default(now())
+  // Fecha de última actualización
+  updatedAt       DateTime @updatedAt
 }

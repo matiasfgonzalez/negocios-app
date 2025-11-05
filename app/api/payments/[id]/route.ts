@@ -2,17 +2,17 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
-type tParams = Promise<{ id: string }>;
-
-// PATCH - Aprobar o rechazar una solicitud
-export async function PATCH(req: Request, { params }: { params: tParams }) {
+// PATCH - Aprobar o rechazar un pago (solo admin)
+export async function PATCH(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const user = await currentUser();
     if (!user) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    // Obtener el usuario de la base de datos
     const appUser = await prisma.appUser.findUnique({
       where: { clerkId: user.id },
     });
@@ -24,7 +24,7 @@ export async function PATCH(req: Request, { params }: { params: tParams }) {
       );
     }
 
-    // Solo los administradores pueden aprobar/rechazar solicitudes
+    // Solo los administradores pueden aprobar/rechazar pagos
     if (appUser.role !== "ADMINISTRADOR") {
       return NextResponse.json(
         { error: "No tienes permisos para realizar esta acción" },
@@ -32,9 +32,9 @@ export async function PATCH(req: Request, { params }: { params: tParams }) {
       );
     }
 
-    const { id } = await params;
+    const { id } = params;
     const body = await req.json();
-    const { action, reviewNote } = body;
+    const { action, adminNote } = body;
 
     if (!action || (action !== "approve" && action !== "reject")) {
       return NextResponse.json(
@@ -44,91 +44,92 @@ export async function PATCH(req: Request, { params }: { params: tParams }) {
     }
 
     // Si es rechazo, la nota es obligatoria
-    if (
-      action === "reject" &&
-      (!reviewNote || reviewNote.trim().length === 0)
-    ) {
+    if (action === "reject" && (!adminNote || adminNote.trim().length === 0)) {
       return NextResponse.json(
         { error: "Debes proporcionar un motivo para el rechazo" },
         { status: 400 }
       );
     }
 
-    // Verificar que la solicitud existe
-    const roleRequest = await prisma.roleRequest.findUnique({
+    // Verificar que el pago existe
+    const payment = await prisma.payment.findUnique({
       where: { id },
       include: {
-        user: true,
+        owner: true,
       },
     });
 
-    if (!roleRequest) {
+    if (!payment) {
       return NextResponse.json(
-        { error: "Solicitud no encontrada" },
+        { error: "Pago no encontrado" },
         { status: 404 }
       );
     }
 
-    // Verificar que la solicitud está pendiente
-    if (roleRequest.status !== "PENDIENTE") {
+    // Verificar que el pago está pendiente
+    if (payment.status !== "PENDING") {
       return NextResponse.json(
-        { error: "Esta solicitud ya fue procesada" },
+        { error: "Este pago ya fue procesado" },
         { status: 400 }
       );
     }
 
-    // Actualizar la solicitud
-    const updatedRequest = await prisma.roleRequest.update({
+    // Actualizar el pago
+    const updatedPayment = await prisma.payment.update({
       where: { id },
       data: {
-        status: action === "approve" ? "APROBADA" : "RECHAZADA",
+        status: action === "approve" ? "APPROVED" : "REJECTED",
         reviewedBy: appUser.id,
         reviewedAt: new Date(),
-        reviewNote: reviewNote?.trim() || null,
+        adminNote: adminNote?.trim() || null,
       },
       include: {
-        user: {
+        owner: {
           select: {
             id: true,
             fullName: true,
             email: true,
-            avatar: true,
           },
         },
       },
     });
 
-    // Si se aprueba, actualizar el rol del usuario
+    // Si se aprueba el pago, actualizar la suscripción del usuario
     if (action === "approve") {
+      // Calcular la fecha hasta la cual está pago
+      const [year, month] = payment.periodMonth.split("-");
+      const paidUntil = new Date(parseInt(year), parseInt(month), 0); // Último día del mes
+
       await prisma.appUser.update({
-        where: { id: roleRequest.userId },
+        where: { id: payment.ownerId },
         data: {
-          role: roleRequest.requestedRole,
-          becameOwnerAt: new Date(), // Registrar cuando se convirtió en propietario
-          subscriptionStatus: "TRIAL", // Iniciar período de prueba
+          subscriptionStatus: "ACTIVE",
+          subscriptionPaidUntil: paidUntil,
         },
       });
     }
 
-    return NextResponse.json(updatedRequest);
+    return NextResponse.json(updatedPayment);
   } catch (error) {
-    console.error("Error procesando solicitud:", error);
+    console.error("Error procesando pago:", error);
     return NextResponse.json(
-      { error: "Error procesando solicitud" },
+      { error: "Error procesando pago" },
       { status: 500 }
     );
   }
 }
 
-// DELETE - Cancelar una solicitud (solo el usuario que la creó)
-export async function DELETE(req: Request, { params }: { params: tParams }) {
+// DELETE - Eliminar un pago (solo si está pendiente)
+export async function DELETE(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   try {
     const user = await currentUser();
     if (!user) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    // Obtener el usuario de la base de datos
     const appUser = await prisma.appUser.findUnique({
       where: { clerkId: user.id },
     });
@@ -140,46 +141,46 @@ export async function DELETE(req: Request, { params }: { params: tParams }) {
       );
     }
 
-    const { id } = await params;
+    const { id } = params;
 
-    // Verificar que la solicitud existe
-    const roleRequest = await prisma.roleRequest.findUnique({
+    // Verificar que el pago existe
+    const payment = await prisma.payment.findUnique({
       where: { id },
     });
 
-    if (!roleRequest) {
+    if (!payment) {
       return NextResponse.json(
-        { error: "Solicitud no encontrada" },
+        { error: "Pago no encontrado" },
         { status: 404 }
       );
     }
 
-    // Verificar que el usuario es el dueño de la solicitud
-    if (roleRequest.userId !== appUser.id) {
+    // Verificar que el usuario es el dueño del pago o es administrador
+    if (payment.ownerId !== appUser.id && appUser.role !== "ADMINISTRADOR") {
       return NextResponse.json(
-        { error: "No tienes permisos para cancelar esta solicitud" },
+        { error: "No tienes permisos para eliminar este pago" },
         { status: 403 }
       );
     }
 
-    // Solo se pueden cancelar solicitudes pendientes
-    if (roleRequest.status !== "PENDIENTE") {
+    // Solo se pueden eliminar pagos pendientes
+    if (payment.status !== "PENDING") {
       return NextResponse.json(
-        { error: "Solo puedes cancelar solicitudes pendientes" },
+        { error: "Solo puedes eliminar pagos pendientes" },
         { status: 400 }
       );
     }
 
-    // Eliminar la solicitud
-    await prisma.roleRequest.delete({
+    // Eliminar el pago
+    await prisma.payment.delete({
       where: { id },
     });
 
-    return NextResponse.json({ message: "Solicitud cancelada exitosamente" });
+    return NextResponse.json({ message: "Pago eliminado exitosamente" });
   } catch (error) {
-    console.error("Error cancelando solicitud:", error);
+    console.error("Error eliminando pago:", error);
     return NextResponse.json(
-      { error: "Error cancelando solicitud" },
+      { error: "Error eliminando pago" },
       { status: 500 }
     );
   }

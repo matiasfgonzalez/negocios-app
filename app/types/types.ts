@@ -16,6 +16,10 @@ export type Role = "ADMINISTRADOR" | "PROPIETARIO" | "CLIENTE";
 
 export type RoleRequestStatus = "PENDIENTE" | "APROBADA" | "RECHAZADA";
 
+export type SubscriptionStatus = "TRIAL" | "ACTIVE" | "OVERDUE" | "SUSPENDED";
+
+export type PaymentStatus = "PENDING" | "APPROVED" | "REJECTED";
+
 export type BusinessStatus =
   | "ABIERTO"
   | "CERRADO_TEMPORAL"
@@ -364,3 +368,87 @@ export type RoleRequest = {
   updatedAt: Date;
 };
 
+// Tipo para pagos de suscripción
+export type Payment = {
+  // Identificador único del pago
+  id: string;
+
+  // ID del propietario que realizó el pago
+  ownerId: string;
+
+  // Relación con el usuario propietario (opcional)
+  owner?: {
+    id: string;
+    fullName: string | null;
+    email: string | null;
+  };
+
+  // Monto del pago
+  amount: number;
+
+  // Mes y año al que corresponde el pago
+  periodMonth: string;
+
+  // Estado del pago
+  status: PaymentStatus;
+
+  // URL del comprobante de pago
+  proofUrl: string | null;
+
+  // ID público de Cloudinary del comprobante
+  proofPublicId: string | null;
+
+  // Nota del propietario
+  ownerNote: string | null;
+
+  // Nota del administrador
+  adminNote: string | null;
+
+  // ID del administrador que revisó
+  reviewedBy: string | null;
+
+  // Fecha de revisión
+  reviewedAt: Date | string | null;
+
+  // Fecha de creación
+  createdAt: Date | string;
+
+  // Fecha de actualización
+  updatedAt: Date | string;
+};
+
+// Tipo para configuración de pagos
+export type PaymentConfig = {
+  // Identificador único
+  id: string;
+
+  // Monto mensual de la suscripción
+  monthlyFee: number;
+
+  // Banco receptor
+  bankName: string;
+
+  // Alias bancario para transferencias
+  bankAlias: string;
+
+  // CBU/CVU para transferencias
+  bankCbu: string;
+
+  // Titular de la cuenta
+  accountHolder: string;
+
+  // Tipo de cuenta
+  accountType: string | null;
+
+  // Email de contacto para pagos
+  supportEmail: string;
+
+  // Teléfono de WhatsApp para consultas
+  supportPhone: string;
+
+  // Fecha de creación
+  createdAt: Date | string;
+
+  // Fecha de actualización
+  updatedAt: Date | string;
+};

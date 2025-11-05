@@ -12,6 +12,8 @@ import {
   FileText,
   ArrowRight,
   Image,
+  CreditCard,
+  Settings,
 } from "lucide-react";
 import {
   Card,
@@ -128,6 +130,30 @@ export default async function DashboardPage() {
       color: "text-purple-600 dark:text-purple-400",
       gradient: "from-purple-500 to-indigo-500",
     },
+    pagos: {
+      title: "Mis Pagos",
+      description: "Gestiona tu suscripción y pagos mensuales",
+      icon: CreditCard,
+      href: "/dashboard/pagos",
+      color: "text-emerald-600 dark:text-emerald-400",
+      gradient: "from-emerald-500 to-teal-500",
+    },
+    pagosAdmin: {
+      title: "Gestión de Pagos",
+      description: "Revisa y aprueba pagos de propietarios",
+      icon: CreditCard,
+      href: "/dashboard/pagos-admin",
+      color: "text-emerald-600 dark:text-emerald-400",
+      gradient: "from-emerald-500 to-green-500",
+    },
+    configuracionPagos: {
+      title: "Configuración de Pagos",
+      description: "Administra montos y datos bancarios",
+      icon: Settings,
+      href: "/dashboard/configuracion-pagos",
+      color: "text-indigo-600 dark:text-indigo-400",
+      gradient: "from-indigo-500 to-purple-500",
+    },
   };
 
   // Determinar qué tarjetas mostrar según el rol
@@ -144,6 +170,8 @@ export default async function DashboardPage() {
       allCards.productos,
       allCards.pedidos,
       allCards.solicitudesAdmin,
+      allCards.pagosAdmin,
+      allCards.configuracionPagos,
       allCards.imagenes,
       allCards.estadisticas,
       allCards.reportes,
@@ -156,6 +184,7 @@ export default async function DashboardPage() {
       allCards.negocios,
       allCards.productos,
       allCards.pedidos,
+      allCards.pagos,
       allCards.imagenes,
       allCards.perfil,
     ];

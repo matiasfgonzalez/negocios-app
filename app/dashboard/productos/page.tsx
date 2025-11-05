@@ -5,6 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SubscriptionBlockedCard from "@/components/SubscriptionBlockedCard";
 import ProductosClient from "./productos-client";
 
 type ProductCategory = {
@@ -58,6 +59,8 @@ function ProductosPageContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string>("");
+  const [subscriptionBlocked, setSubscriptionBlocked] = useState(false);
+  const [daysOverdue, setDaysOverdue] = useState(0);
 
   const fetchData = useCallback(async () => {
     try {
@@ -128,6 +131,44 @@ function ProductosPageContent() {
         }
 
         setUserRole(appUser.role);
+
+        // Validar suscripción solo para propietarios
+        if (appUser.role === "PROPIETARIO") {
+          const now = new Date();
+          const becameOwnerAt = new Date(appUser.becameOwnerAt || now);
+          const trialEndDate = new Date(becameOwnerAt);
+          trialEndDate.setMonth(trialEndDate.getMonth() + 1);
+          const isInTrial = now < trialEndDate;
+
+          // Si no está en período de prueba, verificar estado de suscripción
+          if (!isInTrial) {
+            if (appUser.subscriptionPaidUntil) {
+              const paidUntil = new Date(appUser.subscriptionPaidUntil);
+              const diffTime = now.getTime() - paidUntil.getTime();
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+              // Si tiene más de 7 días de retraso, bloquear acceso
+              if (diffDays > 7) {
+                setSubscriptionBlocked(true);
+                setDaysOverdue(diffDays);
+                setLoading(false);
+                return;
+              }
+            } else {
+              // No tiene fecha de pago y no está en prueba = suspendido
+              setSubscriptionBlocked(true);
+              setDaysOverdue(
+                Math.ceil(
+                  (now.getTime() - trialEndDate.getTime()) /
+                    (1000 * 60 * 60 * 24)
+                )
+              );
+              setLoading(false);
+              return;
+            }
+          }
+        }
+
         fetchData();
       } catch (error) {
         console.error("Error checking role:", error);
@@ -151,6 +192,17 @@ function ProductosPageContent() {
 
   if (!user) {
     return null;
+  }
+
+  // Mostrar pantalla de bloqueo si la suscripción está suspendida
+  if (subscriptionBlocked) {
+    return (
+      <SubscriptionBlockedCard
+        daysOverdue={daysOverdue}
+        title="No podés gestionar productos - Suscripción Suspendida"
+        description="Tu suscripción ha sido suspendida por falta de pago. Regularizá tu situación para continuar administrando tus productos."
+      />
+    );
   }
 
   if (error) {
