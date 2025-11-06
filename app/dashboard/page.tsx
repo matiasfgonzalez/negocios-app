@@ -14,6 +14,7 @@ import {
   Image,
   CreditCard,
   Settings,
+  Bell,
 } from "lucide-react";
 import {
   Card,
@@ -154,6 +155,14 @@ export default async function DashboardPage() {
       color: "text-indigo-600 dark:text-indigo-400",
       gradient: "from-indigo-500 to-purple-500",
     },
+    notificacionesPreview: {
+      title: "Preview de Notificaciones",
+      description: "Vista previa de notificaciones automáticas",
+      icon: Bell,
+      href: "/dashboard/notificaciones-preview",
+      color: "text-purple-600 dark:text-purple-400",
+      gradient: "from-purple-500 to-pink-500",
+    },
   };
 
   // Determinar qué tarjetas mostrar según el rol
@@ -172,6 +181,7 @@ export default async function DashboardPage() {
       allCards.solicitudesAdmin,
       allCards.pagosAdmin,
       allCards.configuracionPagos,
+      allCards.notificacionesPreview,
       allCards.imagenes,
       allCards.estadisticas,
       allCards.reportes,

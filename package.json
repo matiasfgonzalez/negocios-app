@@ -42,6 +42,7 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.64.0",
     "react-leaflet": "^5.0.0",
+    "resend": "^6.4.1",
     "svix": "^1.76.1",
     "tailwind-merge": "^3.3.1",
     "zod": "^4.1.12",
