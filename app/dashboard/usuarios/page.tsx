@@ -28,6 +28,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import UsuariosClient from "./usuarios-client";
+import BackButton from "@/components/BackButton";
 
 type User = {
   id: string;
@@ -173,6 +174,8 @@ function UsuariosPageContent() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
+      <BackButton href="/dashboard" label="Volver al Dashboard" />
+
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Gestión de Usuarios</h1>
