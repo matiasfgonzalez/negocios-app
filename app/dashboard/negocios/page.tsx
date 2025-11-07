@@ -35,10 +35,9 @@ export default function NegociosPage() {
   const [negocios, setNegocios] = useState<BusinessWithRelations[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string>("");
+  const [userRole, setUserRole] = useState<string>("");
   const [subscriptionBlocked, setSubscriptionBlocked] = useState(false);
   const [daysOverdue, setDaysOverdue] = useState(0);
-
-  const role = user?.publicMetadata?.role as string;
 
   // Verificar autenticación y permisos
   useEffect(() => {
@@ -49,64 +48,70 @@ export default function NegociosPage() {
       return;
     }
 
-    if (role !== "ADMINISTRADOR" && role !== "PROPIETARIO") {
-      router.push("/dashboard");
-      return;
-    }
-
-    // Obtener el usuario de la base de datos y verificar suscripción
+    // Obtener el usuario de la base de datos y verificar rol y suscripción
     fetch("/api/me")
       .then((res) => res.json())
       .then((data) => {
-        if (data.id) {
-          setUserId(data.id);
+        if (!data.id) {
+          router.push("/dashboard");
+          return;
+        }
 
-          // Solo validar suscripción para propietarios (no para admins)
-          if (data.role === "PROPIETARIO") {
-            const now = new Date();
-            const becameOwnerAt = new Date(data.becameOwnerAt || now);
-            const trialEndDate = new Date(becameOwnerAt);
-            trialEndDate.setMonth(trialEndDate.getMonth() + 1);
-            const isInTrial = now < trialEndDate;
+        // Verificar rol desde la base de datos
+        if (data.role !== "ADMINISTRADOR" && data.role !== "PROPIETARIO") {
+          router.push("/dashboard");
+          return;
+        }
 
-            // Si no está en período de prueba, verificar estado de suscripción
-            if (!isInTrial) {
-              if (data.subscriptionPaidUntil) {
-                const paidUntil = new Date(data.subscriptionPaidUntil);
-                const diffTime = now.getTime() - paidUntil.getTime();
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        setUserId(data.id);
+        setUserRole(data.role);
 
-                // Si tiene más de 7 días de retraso, bloquear acceso
-                if (diffDays > 7) {
-                  setSubscriptionBlocked(true);
-                  setDaysOverdue(diffDays);
-                  setIsLoading(false);
-                  return;
-                }
-              } else {
-                // No tiene fecha de pago y no está en prueba = suspendido
+        // Solo validar suscripción para propietarios (no para admins)
+        if (data.role === "PROPIETARIO") {
+          const now = new Date();
+          const becameOwnerAt = new Date(data.becameOwnerAt || now);
+          const trialEndDate = new Date(becameOwnerAt);
+          trialEndDate.setMonth(trialEndDate.getMonth() + 1);
+          const isInTrial = now < trialEndDate;
+
+          // Si no está en período de prueba, verificar estado de suscripción
+          if (!isInTrial) {
+            if (data.subscriptionPaidUntil) {
+              const paidUntil = new Date(data.subscriptionPaidUntil);
+              const diffTime = now.getTime() - paidUntil.getTime();
+              const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+              // Si tiene más de 7 días de retraso, bloquear acceso
+              if (diffDays > 7) {
                 setSubscriptionBlocked(true);
-                setDaysOverdue(
-                  Math.ceil(
-                    (now.getTime() - trialEndDate.getTime()) /
-                      (1000 * 60 * 60 * 24)
-                  )
-                );
+                setDaysOverdue(diffDays);
                 setIsLoading(false);
                 return;
               }
+            } else {
+              // No tiene fecha de pago y no está en prueba = suspendido
+              setSubscriptionBlocked(true);
+              setDaysOverdue(
+                Math.ceil(
+                  (now.getTime() - trialEndDate.getTime()) /
+                    (1000 * 60 * 60 * 24)
+                )
+              );
+              setIsLoading(false);
+              return;
             }
           }
         }
       })
       .catch((error) => {
         console.error("Error al obtener usuario:", error);
+        router.push("/dashboard");
       });
-  }, [user, isLoaded, role, router]);
+  }, [user, isLoaded, router]);
 
   // Obtener negocios desde la API
   useEffect(() => {
-    if (!user || !role) return;
+    if (!user || !userRole) return;
 
     setIsLoading(true);
     fetch("/api/businesses?forManagement=true")
@@ -123,7 +128,7 @@ export default function NegociosPage() {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [user, role]);
+  }, [user, userRole]);
 
   if (!isLoaded || isLoading) {
     return (
@@ -133,7 +138,7 @@ export default function NegociosPage() {
     );
   }
 
-  if (!user || !role) {
+  if (!user || !userRole) {
     return null;
   }
 
@@ -156,10 +161,12 @@ export default function NegociosPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
-              {role === "PROPIETARIO" ? "Mi Negocio" : "Gestión de Negocios"}
+              {userRole === "PROPIETARIO"
+                ? "Mi Negocio"
+                : "Gestión de Negocios"}
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground">
-              {role === "PROPIETARIO"
+              {userRole === "PROPIETARIO"
                 ? "Administra la información y productos de tu negocio"
                 : "Visualiza y gestiona todos los negocios registrados"}
             </p>
@@ -176,7 +183,7 @@ export default function NegociosPage() {
                 No hay negocios registrados
               </h3>
               <p className="text-sm sm:text-base text-muted-foreground mb-6 max-w-md mx-auto">
-                {role === "PROPIETARIO"
+                {userRole === "PROPIETARIO"
                   ? "Crea tu primer negocio para comenzar a vender"
                   : "Aún no hay negocios registrados en el sistema"}
               </p>
@@ -213,7 +220,7 @@ export default function NegociosPage() {
                         <CardDescription className="text-xs sm:text-sm text-muted-foreground truncate">
                           {negocio.rubro}
                         </CardDescription>
-                        {role === "ADMINISTRADOR" && negocio.owner.name && (
+                        {userRole === "ADMINISTRADOR" && negocio.owner.name && (
                           <p className="text-xs text-muted-foreground/70 mt-1 truncate">
                             Propietario: {negocio.owner.name}
                           </p>
