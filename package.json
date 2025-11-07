@@ -10,7 +10,8 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "seed": "tsx prisma/seed.ts",
-    "seed:prod": "tsx prisma/seed-prod.ts"
+    "seed:prod": "tsx prisma/seed-prod.ts",
+    "db:reset": "tsx prisma/reset.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
