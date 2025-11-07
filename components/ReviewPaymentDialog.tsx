@@ -15,7 +15,6 @@ import { Label } from "@/components/ui/label";
 import { Loader2, CheckCircle2, XCircle, AlertCircle, Eye } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Payment } from "@/app/types/types";
-import Image from "next/image";
 
 interface ReviewPaymentDialogProps {
   readonly payment: Payment;
@@ -186,10 +185,9 @@ export default function ReviewPaymentDialog({
                 <div className="border rounded-lg overflow-hidden bg-muted/30">
                   {isImage ? (
                     <div className="relative w-full h-[400px]">
-                      <Image
+                      <img
                         src={payment.proofUrl || ""}
                         alt="Comprobante de pago"
-                        fill
                         className="object-contain"
                       />
                     </div>

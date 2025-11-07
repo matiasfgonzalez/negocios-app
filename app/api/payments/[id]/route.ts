@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 // PATCH - Aprobar o rechazar un pago (solo admin)
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await currentUser();
@@ -32,7 +32,7 @@ export async function PATCH(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     const { action, adminNote } = body;
 
@@ -122,7 +122,7 @@ export async function PATCH(
 // DELETE - Eliminar un pago (solo si está pendiente)
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await currentUser();
@@ -141,7 +141,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Verificar que el pago existe
     const payment = await prisma.payment.findUnique({

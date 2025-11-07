@@ -54,7 +54,7 @@ export default function SubscriptionBlockedCard({
               ¿Qué necesitás hacer?
             </h3>
             <ol className="space-y-3 text-sm text-muted-foreground ml-7 list-decimal">
-              <li>Dirigite a la sección de "Mis Pagos"</li>
+              <li>Dirigite a la sección de Mis Pagos</li>
               <li>Registrá tu pago mensual con el comprobante</li>
               <li>
                 Esperá la aprobación del administrador (generalmente en menos de

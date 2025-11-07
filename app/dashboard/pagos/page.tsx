@@ -250,35 +250,54 @@ export default async function PagosPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {payments.map((payment) => (
-                        <TableRow key={payment.id}>
-                          <TableCell className="font-medium">
-                            {formatPeriod(payment.periodMonth)}
-                          </TableCell>
-                          <TableCell>
-                            ${payment.amount.toLocaleString("es-AR")}
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(payment.status)}
-                          </TableCell>
-                          <TableCell className="text-sm text-muted-foreground">
-                            {formatDate(payment.createdAt.toString())}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {payment.proofUrl && (
-                              <Button variant="ghost" size="sm" asChild>
-                                <a
-                                  href={payment.proofUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <Eye className="w-4 h-4 mr-1" />
-                                  Ver comprobante
-                                </a>
-                              </Button>
-                            )}
-                          </TableCell>
-                        </TableRow>
+                      {payments.map((payment, index) => (
+                        <>
+                          <TableRow key={`${payment.id}`}>
+                            <TableCell className="font-medium">
+                              {formatPeriod(payment.periodMonth)}
+                            </TableCell>
+                            <TableCell>
+                              ${payment.amount.toLocaleString("es-AR")}
+                            </TableCell>
+                            <TableCell>
+                              {getStatusBadge(payment.status)}
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {formatDate(payment.createdAt.toString())}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {payment.proofUrl && (
+                                <Button variant="ghost" size="sm" asChild>
+                                  <a
+                                    href={payment.proofUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <Eye className="w-4 h-4 mr-1" />
+                                    Ver comprobante
+                                  </a>
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                          {payment.adminNote && (
+                            <TableRow key={`${payment.id}-note`}>
+                              <TableCell
+                                colSpan={5}
+                                className="bg-muted/50 border-l-4 border-l-primary"
+                              >
+                                <div className="py-2 px-3">
+                                  <p className="text-xs font-semibold text-muted-foreground uppercase mb-1">
+                                    Nota del administrador
+                                  </p>
+                                  <p className="text-sm text-foreground">
+                                    {payment.adminNote}
+                                  </p>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </>
                       ))}
                     </TableBody>
                   </Table>

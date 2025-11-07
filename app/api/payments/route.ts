@@ -134,17 +134,25 @@ export async function POST(req: Request) {
       );
     }
 
-    // Verificar que no exista ya un pago para ese período
+    // Verificar que no exista ya un pago PENDIENTE o APROBADO para ese período
+    // Si existe un pago RECHAZADO, se permite crear uno nuevo
     const existingPayment = await prisma.payment.findFirst({
       where: {
         ownerId: appUser.id,
         periodMonth,
+        status: {
+          in: ["PENDING", "APPROVED"],
+        },
       },
     });
 
     if (existingPayment) {
+      const statusText =
+        existingPayment.status === "PENDING" ? "pendiente" : "aprobado";
       return NextResponse.json(
-        { error: "Ya existe un pago registrado para este período" },
+        {
+          error: `Ya existe un pago ${statusText} para este período. No puedes registrar otro hasta que se resuelva.`,
+        },
         { status: 400 }
       );
     }

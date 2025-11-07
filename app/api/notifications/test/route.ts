@@ -91,7 +91,11 @@ export async function POST(request: NextRequest) {
     };
 
     // Preparar datos adicionales según el tipo
-    const additionalData: any = {};
+    const additionalData: {
+      daysRemaining?: number;
+      daysOverdue?: number;
+      monthlyFee?: number;
+    } = {};
     if (mappedType.type === "TRIAL_ENDING") {
       additionalData.daysRemaining = mappedType.days;
     } else if (
@@ -104,7 +108,12 @@ export async function POST(request: NextRequest) {
     // PAYMENT_DUE no necesita datos adicionales específicos
 
     const emailContent = generateEmailContent(
-      mappedType.type as any,
+      mappedType.type as
+        | "TRIAL_ENDING"
+        | "PAYMENT_DUE"
+        | "PAYMENT_OVERDUE"
+        | "SUSPENSION_WARNING"
+        | "SUSPENDED",
       mockOwner,
       additionalData
     );
