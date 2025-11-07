@@ -46,7 +46,15 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json(appUser);
+    // Formatear birthDate para evitar problemas de zona horaria
+    const formattedUser = {
+      ...appUser,
+      birthDate: appUser.birthDate
+        ? appUser.birthDate.toISOString().split("T")[0]
+        : null,
+    };
+
+    return NextResponse.json(formattedUser);
   } catch (error) {
     console.error("Error al obtener perfil:", error);
     return NextResponse.json(
@@ -101,7 +109,14 @@ export async function PUT(req: Request) {
 
     // Manejar fecha de nacimiento
     if (body.birthDate !== undefined) {
-      updateData.birthDate = body.birthDate ? new Date(body.birthDate) : null;
+      if (body.birthDate) {
+        // Parsear la fecha en zona horaria local de Argentina (UTC-3)
+        // Usar hora 00:00:00 para representar solo la fecha
+        const [year, month, day] = body.birthDate.split("-").map(Number);
+        updateData.birthDate = new Date(year, month - 1, day, 0, 0, 0, 0);
+      } else {
+        updateData.birthDate = null;
+      }
     }
 
     // Generar fullName si se actualizan name o lastName
@@ -141,7 +156,15 @@ export async function PUT(req: Request) {
       },
     });
 
-    return NextResponse.json(updatedUser);
+    // Formatear birthDate para evitar problemas de zona horaria
+    const formattedUser = {
+      ...updatedUser,
+      birthDate: updatedUser.birthDate
+        ? updatedUser.birthDate.toISOString().split("T")[0]
+        : null,
+    };
+
+    return NextResponse.json(formattedUser);
   } catch (error) {
     console.error("Error al actualizar perfil:", error);
     return NextResponse.json(
