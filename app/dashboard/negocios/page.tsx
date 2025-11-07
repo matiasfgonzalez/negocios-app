@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
-  ArrowLeft,
   Store,
   MapPin,
   Phone,
@@ -13,7 +13,6 @@ import {
   Pencil,
   Loader2,
 } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,6 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import BackButton from "@/components/BackButton";
 import NuevoNegocioDialog from "@/components/NuevoNegocioDialog";
 import EditarNegocioDialog from "@/components/EditarNegocioDialog";
 import EliminarNegocioDialog from "@/components/EliminarNegocioDialog";
@@ -151,16 +151,7 @@ export default function NegociosPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {/* UI improved: Enhanced Header */}
-        <Link href="/dashboard">
-          <Button
-            variant="ghost"
-            className="mb-6 hover:bg-accent transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver al Dashboard
-          </Button>
-        </Link>
+        <BackButton href="/dashboard" label="Volver al Dashboard" />
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>

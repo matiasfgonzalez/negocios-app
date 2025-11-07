@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import NextImage from "next/image";
 import {
-  ArrowLeft,
   User,
   Mail,
   Shield,
@@ -19,8 +18,6 @@ import {
   Home,
   Globe,
 } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -30,6 +27,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import EditProfileDialog from "@/components/EditProfileDialog";
+import BackButton from "@/components/BackButton";
 
 // Importar UserLocationMap dinámicamente
 const UserLocationMap = dynamic(() => import("@/components/UserLocationMap"), {
@@ -119,16 +117,7 @@ export default function PerfilPage() {
   return (
     <div className="min-h-screen">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {/* Back Button */}
-        <Link href="/dashboard">
-          <Button
-            variant="ghost"
-            className="mb-6 hover:bg-accent transition-colors duration-200"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver al Dashboard
-          </Button>
-        </Link>
+        <BackButton href="/dashboard" label="Volver al Dashboard" />
 
         {/* Header */}
         <div className="mb-8">

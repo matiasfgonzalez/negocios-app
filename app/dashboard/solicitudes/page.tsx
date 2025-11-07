@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
-  ArrowLeft,
   Loader2,
   AlertCircle,
   Clock,
@@ -18,12 +15,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import BackButton from "@/components/BackButton";
 import SolicitarPropietarioDialog from "@/components/SolicitarPropietarioDialog";
 import type { RoleRequest } from "@/app/types/types";
 
 export default function SolicitudesPage() {
   const { user, isLoaded } = useUser();
-  const router = useRouter();
   const [requests, setRequests] = useState<RoleRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -123,12 +120,7 @@ export default function SolicitudesPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="mb-4 hover:bg-accent">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver al Dashboard
-            </Button>
-          </Link>
+          <BackButton href="/dashboard" label="Volver al Dashboard" />
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>

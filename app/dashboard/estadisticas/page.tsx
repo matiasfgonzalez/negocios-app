@@ -1,7 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import {
-  ArrowLeft,
   BarChart3,
   TrendingUp,
   Users,
@@ -9,9 +8,8 @@ import {
   ShoppingBag,
   DollarSign,
 } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import BackButton from "@/components/BackButton";
 import { prisma } from "@/lib/prisma";
 
 export default async function EstadisticasPage() {
@@ -60,16 +58,7 @@ export default async function EstadisticasPage() {
     // UI improved: Clean background
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {/* UI improved: Enhanced back button */}
-        <Link href="/dashboard">
-          <Button
-            variant="ghost"
-            className="mb-6 hover:bg-accent transition-colors duration-200"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver al Dashboard
-          </Button>
-        </Link>
+        <BackButton href="/dashboard" label="Volver al Dashboard" />
 
         {/* UI improved: Enhanced header */}
         <div className="mb-8">

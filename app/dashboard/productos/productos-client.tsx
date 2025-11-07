@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft,
   Package,
   Plus,
   DollarSign,
@@ -15,7 +14,6 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,6 +24,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import BackButton from "@/components/BackButton";
 import {
   Dialog,
   DialogContent,
@@ -382,16 +381,7 @@ export default function ProductosClient({
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        {/* Back Button */}
-        <Link href="/dashboard">
-          <Button
-            variant="ghost"
-            className="mb-6 hover:bg-accent transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver al Dashboard
-          </Button>
-        </Link>
+        <BackButton href="/dashboard" label="Volver al Dashboard" />
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
