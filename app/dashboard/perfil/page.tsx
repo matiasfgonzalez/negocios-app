@@ -28,6 +28,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import EditProfileDialog from "@/components/EditProfileDialog";
 import BackButton from "@/components/BackButton";
+import { formatDateToLocal } from "@/utils/date";
 
 // Importar UserLocationMap dinámicamente
 const UserLocationMap = dynamic(() => import("@/components/UserLocationMap"), {
@@ -218,7 +219,10 @@ export default function PerfilPage() {
                   <Cake className="w-5 h-5 text-pink-600 dark:text-pink-400" />
                 }
                 label="Fecha de Nacimiento"
-                value={formatDate(appUser.birthDate)}
+                value={formatDateToLocal(
+                  appUser.birthDate!,
+                  "dd 'de' MMMM 'de' yyyy"
+                )}
               />
               <InfoItem
                 icon={
@@ -324,14 +328,20 @@ export default function PerfilPage() {
                   <Calendar className="w-5 h-5 text-green-600 dark:text-green-400" />
                 }
                 label="Miembro desde"
-                value={formatDate(appUser.createdAt)}
+                value={formatDateToLocal(
+                  appUser.createdAt,
+                  "dd 'de' MMMM 'de' yyyy 'a las' HH:mm"
+                )}
               />
               <InfoItem
                 icon={
                   <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 }
                 label="Última actualización"
-                value={formatDate(appUser.updatedAt)}
+                value={formatDateToLocal(
+                  appUser.updatedAt,
+                  "dd 'de' MMMM 'de' yyyy 'a las' HH:mm"
+                )}
               />
               {appUser.lastLogin && (
                 <InfoItem
