@@ -53,7 +53,7 @@ export async function POST(req: Request) {
   const eventType = evt.type;
 
   if (eventType === "user.created" || eventType === "user.updated") {
-    const { id, email_addresses, first_name, last_name } = evt.data;
+    const { id, email_addresses, first_name, last_name, image_url } = evt.data;
 
     try {
       await prisma.appUser.upsert({
@@ -61,12 +61,14 @@ export async function POST(req: Request) {
         update: {
           email: email_addresses[0]?.email_address || "",
           name: `${first_name || ""} ${last_name || ""}`.trim(),
+          avatar: image_url || null,
           updatedAt: new Date(),
         },
         create: {
           clerkId: id,
           email: email_addresses[0]?.email_address || "",
           name: `${first_name || ""} ${last_name || ""}`.trim(),
+          avatar: image_url || null,
         },
       });
 

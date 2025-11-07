@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import ImageSelector from "@/components/ImageSelector";
 
 const MapSelector = dynamic<{
   onLocationSelect: (location: { lat: number; lng: number }) => void;
@@ -35,7 +34,6 @@ type AppUser = {
   name: string | null;
   lastName: string | null;
   phone: string | null;
-  avatar: string | null;
   address: string | null;
   lat: number | null;
   lng: number | null;
@@ -64,7 +62,6 @@ export default function EditProfileDialog({
     name: user.name || "",
     lastName: user.lastName || "",
     phone: user.phone || "",
-    avatar: user.avatar || "",
     address: user.address || "",
     lat: user.lat?.toString() || "",
     lng: user.lng?.toString() || "",
@@ -250,13 +247,6 @@ export default function EditProfileDialog({
                 className="bg-background border-border text-foreground"
               />
             </div>
-
-            <ImageSelector
-              value={formData.avatar}
-              onChange={(url) => setFormData({ ...formData, avatar: url })}
-              label="Foto de Perfil"
-              placeholder="https://ejemplo.com/avatar.jpg"
-            />
           </div>
 
           {/* Dirección */}

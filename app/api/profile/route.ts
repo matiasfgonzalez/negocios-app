@@ -83,7 +83,6 @@ export async function PUT(req: Request) {
     if (body.name !== undefined) updateData.name = body.name;
     if (body.lastName !== undefined) updateData.lastName = body.lastName;
     if (body.phone !== undefined) updateData.phone = body.phone;
-    if (body.avatar !== undefined) updateData.avatar = body.avatar;
     if (body.address !== undefined) updateData.address = body.address;
     if (body.city !== undefined) updateData.city = body.city;
     if (body.province !== undefined) updateData.province = body.province;

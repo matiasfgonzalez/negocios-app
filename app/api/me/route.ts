@@ -1,6 +1,6 @@
 // app/api/me/route.ts
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -32,18 +32,50 @@ export async function POST(request: Request) {
     // Combine first and last name into name field
     const fullName = `${firstName || ""} ${lastName || ""}`.trim();
 
+    // Obtener el avatar desde Clerk
+    let avatarUrl: string | null = null;
+    try {
+      const client = await clerkClient();
+      const clerkUser = await client.users.getUser(clerkId);
+      avatarUrl = clerkUser.imageUrl || null;
+    } catch (error) {
+      console.error("Error fetching avatar from Clerk:", error);
+      // Continuar sin avatar si hay error
+    }
+
+    // Verificar si el usuario ya existe
+    const existingUser = await prisma.appUser.findUnique({
+      where: { clerkId },
+      select: { avatar: true },
+    });
+
+    // Preparar datos de actualización
+    const updateData: {
+      email?: string;
+      name?: string;
+      avatar?: string | null;
+      updatedAt: Date;
+    } = {
+      email: email || undefined,
+      name: fullName || undefined,
+      updatedAt: new Date(),
+    };
+
+    // Agregar avatar si no existe o es diferente
+    const hasAvatarChanged = existingUser?.avatar !== avatarUrl;
+    if (hasAvatarChanged && avatarUrl) {
+      updateData.avatar = avatarUrl;
+    }
+
     // Upsert user in database
     const user = await prisma.appUser.upsert({
       where: { clerkId },
-      update: {
-        email: email || undefined,
-        name: fullName || undefined,
-        updatedAt: new Date(),
-      },
+      update: updateData,
       create: {
         clerkId,
         email: email || "",
         name: fullName || "",
+        avatar: avatarUrl,
       },
     });
 

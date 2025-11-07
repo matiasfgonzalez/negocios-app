@@ -11,7 +11,8 @@
     "postinstall": "prisma generate",
     "seed": "tsx prisma/seed.ts",
     "seed:prod": "tsx prisma/seed-prod.ts",
-    "db:reset": "tsx prisma/reset.ts"
+    "db:reset": "tsx prisma/reset.ts",
+    "sync-avatars": "tsx scripts/sync-avatars.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
