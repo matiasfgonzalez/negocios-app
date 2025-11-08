@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/Navbar";
 import UserSync from "@/components/UserSync";
+import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,18 @@ export default function RootLayout({
         <body
           className={`${inter.className} bg-background text-foreground antialiased transition-colors duration-200`}
         >
+          <NextTopLoader
+            initialPosition={0.08}
+            crawlSpeed={200}
+            height={4}
+            crawl={true}
+            showSpinner={false}
+            easing="ease"
+            speed={200}
+            shadow="0 0 10px hsl(var(--primary)),0 0 5px hsl(var(--primary))"
+            zIndex={1600}
+            showAtBottom={false}
+          />
           <ThemeProvider>
             {/* Sincronización automática de usuario con la base de datos */}
             <UserSync />
