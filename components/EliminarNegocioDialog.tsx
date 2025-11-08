@@ -90,32 +90,34 @@ export default function EliminarNegocioDialog({
               ¿Eliminar negocio?
             </AlertDialogTitle>
           </div>
-          <AlertDialogDescription className="text-sm sm:text-base text-muted-foreground space-y-3">
-            <p>
-              Estás a punto de eliminar el negocio{" "}
-              <span className="font-semibold text-foreground">
-                &quot;{businessName}&quot;
-              </span>
-              .
-            </p>
-            {productCount > 0 ? (
-              <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-                <p className="text-destructive font-medium">
-                  ⚠️ Este negocio tiene {productCount} producto
-                  {productCount === 1 ? "" : "s"} asociado
-                  {productCount === 1 ? "" : "s"}.
-                </p>
-                <p className="text-sm mt-1 text-muted-foreground">
-                  No podrás eliminarlo hasta que elimines todos los productos
-                  primero.
-                </p>
-              </div>
-            ) : (
-              <p className="text-foreground">
-                Esta acción no se puede deshacer. Todos los datos del negocio
-                serán eliminados permanentemente.
+          <AlertDialogDescription asChild>
+            <div className="text-sm sm:text-base text-muted-foreground space-y-3">
+              <p>
+                Estás a punto de eliminar el negocio{" "}
+                <span className="font-semibold text-foreground">
+                  &quot;{businessName}&quot;
+                </span>
+                .
               </p>
-            )}
+              {productCount > 0 ? (
+                <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                  <p className="text-destructive font-medium">
+                    ⚠️ Este negocio tiene {productCount} producto
+                    {productCount === 1 ? "" : "s"} asociado
+                    {productCount === 1 ? "" : "s"}.
+                  </p>
+                  <p className="text-sm mt-1 text-muted-foreground">
+                    No podrás eliminarlo hasta que elimines todos los productos
+                    primero.
+                  </p>
+                </div>
+              ) : (
+                <p className="text-foreground">
+                  Esta acción no se puede deshacer. Todos los datos del negocio
+                  serán eliminados permanentemente.
+                </p>
+              )}
+            </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-3">
