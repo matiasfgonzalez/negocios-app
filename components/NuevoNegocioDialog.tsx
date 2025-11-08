@@ -49,10 +49,12 @@ const MapSelector = dynamic<{
 
 interface NuevoNegocioDialogProps {
   userId: string;
+  onSuccess?: () => void | Promise<void>;
 }
 
 export default function NuevoNegocioDialog({
   userId,
+  onSuccess,
 }: Readonly<NuevoNegocioDialogProps>) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -155,6 +157,12 @@ export default function NuevoNegocioDialog({
       setSchedule(defaultSchedule);
       setSpecialClosedDays([]);
       setShippingRanges(createFlatShippingRate(0));
+
+      // Llamar al callback onSuccess si existe
+      if (onSuccess) {
+        await onSuccess();
+      }
+
       router.refresh();
     } catch (error) {
       console.error("Error:", error);

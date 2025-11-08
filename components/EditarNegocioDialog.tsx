@@ -50,11 +50,13 @@ const MapSelector = dynamic<{
 interface EditarNegocioDialogProps {
   business: Business;
   triggerButton?: React.ReactNode;
+  onSuccess?: () => void | Promise<void>;
 }
 
 export default function EditarNegocioDialog({
   business,
   triggerButton,
+  onSuccess,
 }: Readonly<EditarNegocioDialogProps>) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -168,6 +170,12 @@ export default function EditarNegocioDialog({
 
       // Cerrar dialog y refrescar la página
       setOpen(false);
+
+      // Llamar al callback onSuccess si existe
+      if (onSuccess) {
+        await onSuccess();
+      }
+
       router.refresh();
     } catch (error) {
       console.error("Error:", error);

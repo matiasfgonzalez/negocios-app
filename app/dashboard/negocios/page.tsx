@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -110,25 +110,26 @@ export default function NegociosPage() {
   }, [user, isLoaded, router]);
 
   // Obtener negocios desde la API
-  useEffect(() => {
-    if (!user || !userRole) return;
+  const fetchNegocios = useCallback(async () => {
+    if (!userRole) return;
 
     setIsLoading(true);
-    fetch("/api/businesses?forManagement=true")
-      .then((res) => {
-        if (!res.ok) throw new Error("Error al obtener negocios");
-        return res.json();
-      })
-      .then((data: BusinessWithRelations[]) => {
-        setNegocios(data);
-      })
-      .catch((error) => {
-        console.error("Error al obtener negocios:", error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [user, userRole]);
+    try {
+      const res = await fetch("/api/businesses?forManagement=true");
+      if (!res.ok) throw new Error("Error al obtener negocios");
+      const data: BusinessWithRelations[] = await res.json();
+      setNegocios(data);
+    } catch (error) {
+      console.error("Error al obtener negocios:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userRole]);
+
+  useEffect(() => {
+    if (!user || !userRole) return;
+    fetchNegocios();
+  }, [user, userRole, fetchNegocios]);
 
   if (!isLoaded || isLoading) {
     return (
@@ -171,7 +172,9 @@ export default function NegociosPage() {
                 : "Visualiza y gestiona todos los negocios registrados"}
             </p>
           </div>
-          {userId && <NuevoNegocioDialog userId={userId} />}
+          {userId && (
+            <NuevoNegocioDialog userId={userId} onSuccess={fetchNegocios} />
+          )}
         </div>
 
         {/* UI improved: Enhanced Empty State */}
@@ -187,7 +190,9 @@ export default function NegociosPage() {
                   ? "Crea tu primer negocio para comenzar a vender"
                   : "Aún no hay negocios registrados en el sistema"}
               </p>
-              {userId && <NuevoNegocioDialog userId={userId} />}
+              {userId && (
+                <NuevoNegocioDialog userId={userId} onSuccess={fetchNegocios} />
+              )}
             </CardContent>
           </Card>
         ) : (
@@ -295,6 +300,7 @@ export default function NegociosPage() {
                     <div className="flex gap-2 sm:gap-3">
                       <EditarNegocioDialog
                         business={negocio}
+                        onSuccess={fetchNegocios}
                         triggerButton={
                           <Button
                             variant="outline"
@@ -323,6 +329,7 @@ export default function NegociosPage() {
                       businessId={negocio.id}
                       businessName={negocio.name}
                       productCount={negocio._count.products}
+                      onSuccess={fetchNegocios}
                       triggerButton={
                         <Button
                           variant="outline"

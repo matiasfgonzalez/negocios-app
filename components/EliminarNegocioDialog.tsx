@@ -21,6 +21,7 @@ interface EliminarNegocioDialogProps {
   businessName: string;
   productCount?: number;
   triggerButton?: React.ReactNode;
+  onSuccess?: () => void | Promise<void>;
 }
 
 export default function EliminarNegocioDialog({
@@ -28,6 +29,7 @@ export default function EliminarNegocioDialog({
   businessName,
   productCount = 0,
   triggerButton,
+  onSuccess,
 }: Readonly<EliminarNegocioDialogProps>) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -48,6 +50,12 @@ export default function EliminarNegocioDialog({
 
       // Cerrar dialog y refrescar la página
       setOpen(false);
+
+      // Llamar al callback onSuccess si existe
+      if (onSuccess) {
+        await onSuccess();
+      }
+
       router.refresh();
     } catch (error) {
       console.error("Error:", error);
