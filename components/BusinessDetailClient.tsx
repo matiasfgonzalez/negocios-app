@@ -31,6 +31,7 @@ import OrderSuccessDialog from "@/components/OrderSuccessDialog";
 import OrderErrorDialog from "@/components/OrderErrorDialog";
 import BusinessHoursDialog from "@/components/BusinessHoursDialog";
 import ShippingRangesDisplay from "@/components/ShippingRangesDisplay";
+import ProductDetailDialog from "@/components/ProductDetailDialog";
 import {
   BusinessSchedule,
   SpecialClosedDay,
@@ -58,132 +59,6 @@ const SingleBusinessMap = dynamic(
     ),
   }
 );
-
-// Componente de Carrusel de Imágenes (Estilo Flowbite)
-type ImageCarouselProps = {
-  images: string[];
-  productName: string;
-};
-
-function ImageCarousel({ images, productName }: Readonly<ImageCarouselProps>) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const nextImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const prevImage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
-
-  const goToImage = (index: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentIndex(index);
-  };
-
-  return (
-    <div className="relative w-full h-48 md:h-56 rounded-t-lg overflow-hidden group">
-      {/* Carousel wrapper */}
-      <div className="relative h-full overflow-hidden">
-        {images.map((url, index) => (
-          <div
-            key={`${productName}-${index}-${url.substring(url.length - 20)}`}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <img
-              src={url}
-              alt={`${productName} - Imagen ${index + 1}`}
-              className="absolute block w-full h-full object-cover -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Overlay Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-
-      {/* Slider indicators */}
-      {images.length > 1 && (
-        <div className="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3">
-          {images.map((url, idx) => (
-            <button
-              key={`${productName}-indicator-${idx}-${url.substring(
-                url.length - 10
-              )}`}
-              type="button"
-              className={`w-3 h-3 rounded-full transition-all ${
-                idx === currentIndex
-                  ? "bg-white"
-                  : "bg-white/50 hover:bg-white/75"
-              }`}
-              aria-current={idx === currentIndex}
-              aria-label={`Slide ${idx + 1}`}
-              onClick={(e) => goToImage(idx, e)}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Slider controls */}
-      {images.length > 1 && (
-        <>
-          <button
-            type="button"
-            className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group/prev focus:outline-none"
-            onClick={prevImage}
-          >
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover/prev:bg-white/50 dark:group-hover/prev:bg-gray-800/60 group-focus/prev:ring-4 group-focus/prev:ring-white dark:group-focus/prev:ring-gray-800/70 group-focus/prev:outline-none">
-              <svg
-                className="w-4 h-4 text-white dark:text-gray-200"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 6 10"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 1 1 5l4 4"
-                />
-              </svg>
-              <span className="sr-only">Previous</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            className="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group/next focus:outline-none"
-            onClick={nextImage}
-          >
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover/next:bg-white/50 dark:group-hover/next:bg-gray-800/60 group-focus/next:ring-4 group-focus/next:ring-white dark:group-focus/next:ring-gray-800/70 group-focus/next:outline-none">
-              <svg
-                className="w-4 h-4 text-white dark:text-gray-200"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 6 10"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m1 9 4-4-4-4"
-                />
-              </svg>
-              <span className="sr-only">Next</span>
-            </span>
-          </button>
-        </>
-      )}
-    </div>
-  );
-}
 
 interface CartItem {
   productId: string;
@@ -227,6 +102,7 @@ export default function BusinessDetailClient({
     number | null
   >(null);
   const [deliveryDistance, setDeliveryDistance] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   // ===== BUSINESS HOURS & ORDER VALIDATION =====
   const schedule = business.schedule as BusinessSchedule | null;
@@ -815,10 +691,10 @@ export default function BusinessDetailClient({
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-8">
-                {/* Agrupar productos por categoría */}
+              <div className="space-y-6">
+                {/* Filtro de categorías */}
                 {(() => {
-                  // Agrupar productos por categoría
+                  // Primero agrupar productos por categoría para obtener las categorías
                   const productsByCategory: Record<
                     string,
                     {
@@ -844,132 +720,173 @@ export default function BusinessDetailClient({
                     productsByCategory[categoryKey].products.push(product);
                   });
 
-                  return Object.entries(productsByCategory).map(
-                    ([categoryKey, categoryData]) => (
-                      <div key={categoryKey} className="space-y-4">
-                        {/* Título de categoría */}
-                        <h3 className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2 border-b border-border pb-2">
-                          {categoryData.icon && (
-                            <span className="text-2xl">
-                              {categoryData.icon}
-                            </span>
-                          )}
-                          {categoryData.name}
-                          <span className="text-sm text-muted-foreground font-normal">
-                            ({categoryData.products.length})
-                          </span>
-                        </h3>
+                  const categories = Object.entries(productsByCategory);
+                  const totalProducts = business.products.length;
 
-                        {/* Productos de la categoría */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                          {categoryData.products.map((product) => {
-                            const cartQty = getCartQuantity(product.id);
-                            const productImages = product.images
-                              ? Array.isArray(product.images)
-                                ? product.images
-                                : []
-                              : [];
-
-                            return (
-                              <Card
-                                key={product.id}
-                                className="bg-card/50 backdrop-blur-sm hover:shadow-xl hover:-translate-y-1 hover:border-primary/50 transition-all duration-300 border-border group overflow-hidden"
-                              >
-                                {/* Carrusel de Imágenes del Producto */}
-                                {productImages.length > 0 && (
-                                  <ImageCarousel
-                                    images={productImages}
-                                    productName={product.name}
-                                  />
-                                )}
-
-                                <CardHeader>
-                                  <div className="flex justify-between items-start gap-3">
-                                    <CardTitle className="text-base sm:text-lg text-foreground group-hover:text-primary transition-colors">
-                                      {product.name}
-                                    </CardTitle>
-                                    <Badge
-                                      variant={
-                                        product.stock > 0
-                                          ? "default"
-                                          : "secondary"
-                                      }
-                                      className={
-                                        product.stock > 0
-                                          ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20"
-                                          : "bg-muted text-muted-foreground border-border"
-                                      }
-                                    >
-                                      Stock: {product.stock}
-                                    </Badge>
-                                  </div>
-                                </CardHeader>
-                                <CardContent>
-                                  {product.description && (
-                                    <p className="text-xs sm:text-sm text-muted-foreground mb-4">
-                                      {product.description}
-                                    </p>
-                                  )}
-
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xl sm:text-2xl font-bold text-primary">
-                                      ${product.price.toFixed(2)}
-                                    </span>
-
-                                    {cartQty > 0 ? (
-                                      <div className="flex items-center gap-2">
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          onClick={() =>
-                                            updateQuantity(product.id, -1)
-                                          }
-                                          disabled={!canOrderNow}
-                                          className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-600 dark:hover:text-red-400 transition-colors disabled:opacity-50 border-border"
-                                        >
-                                          <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                        </Button>
-                                        <span className="text-base sm:text-lg font-semibold min-w-[2rem] text-center text-foreground">
-                                          {cartQty}
-                                        </span>
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          onClick={() =>
-                                            updateQuantity(product.id, 1)
-                                          }
-                                          disabled={
-                                            cartQty >= product.stock ||
-                                            !canOrderNow
-                                          }
-                                          className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-green-500/10 hover:border-green-500/50 hover:text-green-600 dark:hover:text-green-400 transition-colors disabled:opacity-50 border-border"
-                                        >
-                                          <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                        </Button>
-                                      </div>
-                                    ) : (
-                                      <Button
-                                        onClick={() => addToCart(product)}
-                                        disabled={
-                                          product.stock === 0 || !canOrderNow
-                                        }
-                                        size="sm"
-                                        className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all disabled:opacity-50"
-                                      >
-                                        <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1" />
-                                        {canOrderNow
-                                          ? "Agregar"
-                                          : "No disponible"}
-                                      </Button>
-                                    )}
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            );
-                          })}
-                        </div>
+                  return (
+                    <>
+                      {/* Filtros de categoría */}
+                      <div className="flex flex-wrap gap-2 pb-4 border-b border-border">
+                        <Badge
+                          variant={
+                            selectedCategory === "all" ? "default" : "outline"
+                          }
+                          onClick={() => setSelectedCategory("all")}
+                          className="cursor-pointer hover:scale-105 transition-transform text-xs sm:text-sm px-3 py-1.5"
+                        >
+                          Todos ({totalProducts})
+                        </Badge>
+                        {categories.map(([key, data]) => (
+                          <Badge
+                            key={key}
+                            variant={
+                              selectedCategory === key ? "default" : "outline"
+                            }
+                            onClick={() => setSelectedCategory(key)}
+                            className="cursor-pointer hover:scale-105 transition-transform text-xs sm:text-sm px-3 py-1.5"
+                          >
+                            {data.icon && (
+                              <span className="mr-1">{data.icon}</span>
+                            )}
+                            {data.name} ({data.products.length})
+                          </Badge>
+                        ))}
                       </div>
-                    )
+
+                      {/* Lista de productos filtrados */}
+                      <div className="space-y-8">
+                        {categories
+                          .filter(
+                            ([key]) =>
+                              selectedCategory === "all" ||
+                              key === selectedCategory
+                          )
+                          .map(([categoryKey, categoryData]) => (
+                            <div key={categoryKey} className="space-y-4">
+                              {/* Título de categoría */}
+                              <h3 className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2 border-b border-border pb-2">
+                                {categoryData.icon && (
+                                  <span className="text-2xl">
+                                    {categoryData.icon}
+                                  </span>
+                                )}
+                                {categoryData.name}
+                                <span className="text-sm text-muted-foreground font-normal">
+                                  ({categoryData.products.length})
+                                </span>
+                              </h3>
+
+                              {/* Productos de la categoría */}
+                              <div className="space-y-3">
+                                {categoryData.products.map((product) => {
+                                  const cartQty = getCartQuantity(product.id);
+
+                                  return (
+                                    <Card
+                                      key={product.id}
+                                      className="bg-card/50 backdrop-blur-sm hover:shadow-lg hover:border-primary/50 transition-all duration-300 border-border group"
+                                    >
+                                      <CardContent className="p-4">
+                                        <div className="flex items-center gap-4">
+                                          {/* Nombre y stock */}
+                                          <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-1">
+                                              <h4 className="text-sm sm:text-base font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                                                {product.name}
+                                              </h4>
+                                              <Badge
+                                                variant={
+                                                  product.stock > 0
+                                                    ? "default"
+                                                    : "secondary"
+                                                }
+                                                className={
+                                                  product.stock > 0
+                                                    ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 text-xs"
+                                                    : "bg-muted text-muted-foreground border-border text-xs"
+                                                }
+                                              >
+                                                {product.stock}
+                                              </Badge>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-lg sm:text-xl font-bold text-primary">
+                                                ${product.price.toFixed(2)}
+                                              </span>
+                                              <ProductDetailDialog
+                                                product={product}
+                                              />
+                                            </div>
+                                          </div>
+
+                                          {/* Controles de cantidad */}
+                                          <div className="flex-shrink-0">
+                                            {cartQty > 0 ? (
+                                              <div className="flex items-center gap-2">
+                                                <Button
+                                                  size="sm"
+                                                  variant="outline"
+                                                  onClick={() =>
+                                                    updateQuantity(
+                                                      product.id,
+                                                      -1
+                                                    )
+                                                  }
+                                                  disabled={!canOrderNow}
+                                                  className="h-8 w-8 p-0 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-600 dark:hover:text-red-400 transition-colors disabled:opacity-50 border-border"
+                                                >
+                                                  <Minus className="w-4 h-4" />
+                                                </Button>
+                                                <span className="text-lg font-semibold min-w-[2rem] text-center text-foreground">
+                                                  {cartQty}
+                                                </span>
+                                                <Button
+                                                  size="sm"
+                                                  variant="outline"
+                                                  onClick={() =>
+                                                    updateQuantity(
+                                                      product.id,
+                                                      1
+                                                    )
+                                                  }
+                                                  disabled={
+                                                    cartQty >= product.stock ||
+                                                    !canOrderNow
+                                                  }
+                                                  className="h-8 w-8 p-0 hover:bg-green-500/10 hover:border-green-500/50 hover:text-green-600 dark:hover:text-green-400 transition-colors disabled:opacity-50 border-border"
+                                                >
+                                                  <Plus className="w-4 h-4" />
+                                                </Button>
+                                              </div>
+                                            ) : (
+                                              <Button
+                                                onClick={() =>
+                                                  addToCart(product)
+                                                }
+                                                disabled={
+                                                  product.stock === 0 ||
+                                                  !canOrderNow
+                                                }
+                                                size="sm"
+                                                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all disabled:opacity-50"
+                                              >
+                                                <Plus className="w-4 h-4 mr-1" />
+                                                {canOrderNow
+                                                  ? "Agregar"
+                                                  : "No disponible"}
+                                              </Button>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </>
                   );
                 })()}
               </div>
