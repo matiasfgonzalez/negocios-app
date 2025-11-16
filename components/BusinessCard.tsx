@@ -23,6 +23,7 @@ import {
 import Link from "next/link";
 import BusinessHoursDialog from "@/components/BusinessHoursDialog";
 import { BusinessSchedule, isBusinessOpen } from "@/lib/business-hours";
+import { optimizeBusinessCardImage } from "@/lib/cloudinary-utils";
 
 export default function BusinessCard({
   business,
@@ -106,7 +107,7 @@ export default function BusinessCard({
       <div className="relative w-full h-48 overflow-hidden">
         <img
           src={
-            business.img ||
+            optimizeBusinessCardImage(business.img) ||
             "https://www.sillasmesas.es/blog/wp-content/uploads/2021/05/montar-un-negocio-de-comida-para-llevar-1.jpg"
           }
           alt={`Imagen de ${business.name}`}

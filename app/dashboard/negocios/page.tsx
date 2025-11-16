@@ -28,6 +28,7 @@ import EditarNegocioDialog from "@/components/EditarNegocioDialog";
 import EliminarNegocioDialog from "@/components/EliminarNegocioDialog";
 import SubscriptionBlockedCard from "@/components/SubscriptionBlockedCard";
 import { BusinessWithRelations } from "@/app/types/types";
+import { optimizeThumbnail } from "@/lib/cloudinary-utils";
 
 export default function NegociosPage() {
   const { user, isLoaded } = useUser();
@@ -208,7 +209,7 @@ export default function NegociosPage() {
                       {negocio.img ? (
                         <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-shadow flex-shrink-0 bg-muted">
                           <img
-                            src={negocio.img}
+                            src={optimizeThumbnail(negocio.img)}
                             alt={`Logo de ${negocio.name}`}
                             className="w-full h-full object-cover"
                           />

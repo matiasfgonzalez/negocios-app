@@ -38,6 +38,7 @@ import {
   isBusinessOpen,
 } from "@/lib/business-hours";
 import { ShippingRange, isWithinShippingRange } from "@/lib/shipping-utils";
+import { optimizeBusinessDetailImage } from "@/lib/cloudinary-utils";
 import dynamic from "next/dynamic";
 
 const OrderMapSelector = dynamic(
@@ -415,7 +416,7 @@ export default function BusinessDetailClient({
                 {business.img ? (
                   <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0 bg-muted ring-4 ring-primary/20">
                     <img
-                      src={business.img}
+                      src={optimizeBusinessDetailImage(business.img)}
                       alt={`Logo de ${business.name}`}
                       className="w-full h-full object-cover"
                     />

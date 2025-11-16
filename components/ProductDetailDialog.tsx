@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { optimizeProductImage } from "@/lib/cloudinary-utils";
 
 // Componente de Carrusel de Imágenes
 type ImageCarouselProps = {
@@ -49,7 +50,7 @@ function ImageCarousel({ images, productName }: Readonly<ImageCarouselProps>) {
             }`}
           >
             <img
-              src={url}
+              src={optimizeProductImage(url)}
               alt={`${productName} - Imagen ${index + 1}`}
               className="absolute block w-full h-full object-contain -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 bg-muted"
             />
