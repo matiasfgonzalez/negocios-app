@@ -207,7 +207,7 @@ export default function EditarPromocionDialog({
         <DialogHeader>
           <DialogTitle>Editar Promoción</DialogTitle>
           <DialogDescription>
-            Modifica los datos de la promoción "{promotion.name}"
+            Modifica los datos de la promoción {promotion.name}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
