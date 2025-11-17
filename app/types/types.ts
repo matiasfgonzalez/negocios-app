@@ -309,6 +309,9 @@ export type Business = {
   // Órdenes asociadas al negocio (Relación)
   orders?: Order[];
 
+  // Promociones del negocio (Relación)
+  promotions?: Promotion[];
+
   // Fecha de creación del negocio
   createdAt: Date;
 
@@ -451,4 +454,80 @@ export type PaymentConfig = {
 
   // Fecha de actualización
   updatedAt: Date | string;
+};
+
+// Tipo para promociones
+export type Promotion = {
+  // Identificador único de la promoción
+  id: string;
+
+  // ID del negocio al que pertenece
+  businessId: string;
+
+  // Relación con el negocio (opcional)
+  business?: Business;
+
+  // Nombre de la promoción
+  name: string;
+
+  // Descripción de la promoción
+  description: string | null;
+
+  // Precio de la promoción
+  price: number;
+
+  // URL de la imagen de la promoción
+  image: string | null;
+
+  // Indica si está activa
+  isActive: boolean;
+
+  // Fecha de inicio
+  startDate: Date | string | null;
+
+  // Fecha de fin
+  endDate: Date | string | null;
+
+  // Stock disponible (null = ilimitado)
+  stock: number | null;
+
+  // Productos incluidos en la promoción (Relación)
+  products?: PromotionProduct[];
+
+  // Fecha de creación
+  createdAt: Date | string;
+
+  // Fecha de actualización
+  updatedAt: Date | string;
+};
+
+// Tipo para productos dentro de una promoción
+export type PromotionProduct = {
+  // Identificador único
+  id: string;
+
+  // ID de la promoción
+  promotionId: string;
+
+  // Relación con la promoción (opcional)
+  promotion?: Promotion;
+
+  // ID del producto
+  productId: string;
+
+  // Relación con el producto (opcional)
+  product?: Product;
+
+  // Cantidad de este producto en la promoción
+  quantity: number;
+
+  // Fecha de creación
+  createdAt: Date | string;
+};
+
+// Tipo para promociones con productos incluidos
+export type PromotionWithProducts = Promotion & {
+  products: (PromotionProduct & {
+    product: Product;
+  })[];
 };

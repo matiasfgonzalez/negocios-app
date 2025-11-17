@@ -28,6 +28,11 @@ const monthsMap: Record<string, string> = {
 };
 
 export function formatDateToLocal(date: Date, pattern = "dd/MM/yyyy HH:mm") {
+  // Validar si date es nulo o indefinido
+  if (!date) {
+    return "";
+  }
+
   const timeZone = "America/Argentina/Buenos_Aires";
   const zoned = fromZonedTime(date, timeZone);
   let formatted = format(zoned, pattern, { timeZone });

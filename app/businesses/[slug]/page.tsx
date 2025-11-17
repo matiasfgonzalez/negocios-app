@@ -3,12 +3,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import BusinessDetailClient from "@/components/BusinessDetailClient";
-import { Business, Product } from "@/app/types/types";
+import { Business, Product, PromotionWithProducts } from "@/app/types/types";
 import { Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-type BusinessWithProducts = Business & { products: Product[] };
+type BusinessWithProducts = Business & {
+  products: Product[];
+  promotions?: PromotionWithProducts[];
+};
 
 export default function BusinessPage() {
   const params = useParams();
@@ -94,7 +97,7 @@ export default function BusinessPage() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
               <Button
-                onClick={() => window.location.reload()}
+                onClick={() => globalThis.location.reload()}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all"
               >
                 Reintentar

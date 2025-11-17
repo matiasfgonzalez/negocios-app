@@ -18,6 +18,7 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,12 +27,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Business, Product } from "@/app/types/types";
+import { Business, Product, PromotionWithProducts } from "@/app/types/types";
 import OrderSuccessDialog from "@/components/OrderSuccessDialog";
 import OrderErrorDialog from "@/components/OrderErrorDialog";
 import BusinessHoursDialog from "@/components/BusinessHoursDialog";
 import ShippingRangesDisplay from "@/components/ShippingRangesDisplay";
 import ProductDetailDialog from "@/components/ProductDetailDialog";
+import PromotionCard from "@/components/PromotionCard";
 import {
   BusinessSchedule,
   SpecialClosedDay,
@@ -67,11 +69,14 @@ interface CartItem {
   price: number;
   quantity: number;
   stock: number;
+  type: "product" | "promotion";
+  promotionId?: string;
 }
 
 interface BusinessDetailClientProps {
   business: Business & {
     products: Product[];
+    promotions?: PromotionWithProducts[];
   };
 }
 
@@ -80,6 +85,15 @@ export default function BusinessDetailClient({
 }: Readonly<BusinessDetailClientProps>) {
   const { isSignedIn, isLoaded } = useUser();
   const [cart, setCart] = useState<CartItem[]>([]);
+
+  // Debug: verificar si llegan las promociones
+  console.log("Business data:", {
+    name: business.name,
+    hasPromotions: !!business.promotions,
+    promotionsCount: business.promotions?.length || 0,
+    promotions: business.promotions,
+  });
+
   const [deliveryType, setDeliveryType] = useState<"pickup" | "delivery">(
     "pickup"
   );
@@ -180,6 +194,38 @@ export default function BusinessDetailClient({
           price: product.price,
           quantity: 1,
           stock: product.stock,
+          type: "product",
+        },
+      ];
+    });
+    setShowCart(true);
+  };
+
+  // Función para agregar promoción al carrito
+  const addPromotionToCart = (promotion: PromotionWithProducts) => {
+    setCart((prev) => {
+      const existing = prev.find((item) => item.promotionId === promotion.id);
+      if (existing) {
+        const maxStock = promotion.stock ?? Infinity;
+        if (existing.quantity < maxStock) {
+          return prev.map((item) =>
+            item.promotionId === promotion.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          );
+        }
+        return prev;
+      }
+      return [
+        ...prev,
+        {
+          productId: promotion.id,
+          promotionId: promotion.id,
+          name: promotion.name,
+          price: promotion.price,
+          quantity: 1,
+          stock: promotion.stock ?? 999,
+          type: "promotion",
         },
       ];
     });
@@ -205,7 +251,13 @@ export default function BusinessDetailClient({
 
   // Función para remover del carrito
   const removeFromCart = (productId: string) => {
-    setCart((prev) => prev.filter((item) => item.productId !== productId));
+    setCart((prev) =>
+      prev.filter((item) =>
+        item.type === "promotion"
+          ? item.promotionId !== productId
+          : item.productId !== productId
+      )
+    );
   };
 
   // Calcular subtotal y total
@@ -224,7 +276,20 @@ export default function BusinessDetailClient({
 
   // Obtener cantidad de un producto en el carrito
   const getCartQuantity = (productId: string) => {
-    return cart.find((item) => item.productId === productId)?.quantity || 0;
+    return (
+      cart.find(
+        (item) => item.productId === productId && item.type === "product"
+      )?.quantity || 0
+    );
+  };
+
+  // Obtener cantidad de una promoción en el carrito
+  const getPromotionCartQuantity = (promotionId: string) => {
+    return (
+      cart.find(
+        (item) => item.promotionId === promotionId && item.type === "promotion"
+      )?.quantity || 0
+    );
   };
 
   // Función para generar mensaje de WhatsApp para usuarios sin sesión
@@ -233,7 +298,9 @@ export default function BusinessDetailClient({
     message += `📋 *Detalle del pedido:*\n`;
 
     for (const item of cart) {
-      message += `• ${item.quantity}x ${item.name} - $${(
+      const itemLabel =
+        item.type === "promotion" ? `🎁 PROMO: ${item.name}` : item.name;
+      message += `• ${item.quantity}x ${itemLabel} - $${(
         item.price * item.quantity
       ).toFixed(2)}\n`;
     }
@@ -319,12 +386,22 @@ export default function BusinessDetailClient({
       // Preparar los datos de la orden
       const orderPayload = {
         businessId: business.id,
-        items: cart.map((item) => ({
-          productId: item.productId,
-          quantity: item.quantity,
-          name: item.name,
-          price: item.price,
-        })),
+        items: cart
+          .filter((item) => item.type === "product")
+          .map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            name: item.name,
+            price: item.price,
+          })),
+        promotions: cart
+          .filter((item) => item.type === "promotion")
+          .map((item) => ({
+            promotionId: item.promotionId!,
+            quantity: item.quantity,
+            name: item.name,
+            price: item.price,
+          })),
         shipping: deliveryType === "delivery",
         lat: deliveryType === "delivery" ? deliveryLocation?.lat : undefined,
         lng: deliveryType === "delivery" ? deliveryLocation?.lng : undefined,
@@ -678,6 +755,45 @@ export default function BusinessDetailClient({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* UI improved: Enhanced Products List */}
           <div className="lg:col-span-2">
+            {/* Sección de Promociones */}
+            {business.promotions && business.promotions.length > 0 && (
+              <div className="mb-8">
+                <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-gradient-to-r from-fuchsia-500 to-pink-500 rounded-lg p-2">
+                      <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-foreground">
+                      Promociones Especiales
+                    </h2>
+                  </div>
+                  <Badge className="bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white border-0 shadow-md">
+                    {business.promotions.length}{" "}
+                    {business.promotions.length === 1 ? "oferta" : "ofertas"}
+                  </Badge>
+                </div>
+                <div className="space-y-4">
+                  {business.promotions.map((promotion) => {
+                    const cartQty = getPromotionCartQuantity(promotion.id);
+                    return (
+                      <PromotionCard
+                        key={promotion.id}
+                        promotion={promotion as PromotionWithProducts}
+                        canOrder={canOrderNow}
+                        cartQuantity={cartQty}
+                        onAddToCart={() =>
+                          addPromotionToCart(promotion as PromotionWithProducts)
+                        }
+                        onUpdateQuantity={(delta) =>
+                          updateQuantity(promotion.id, delta)
+                        }
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">
               Productos Disponibles
             </h2>
@@ -924,13 +1040,24 @@ export default function BusinessDetailClient({
                       <div className="space-y-2 sm:space-y-3 max-h-64 overflow-y-auto pr-1">
                         {cart.map((item) => (
                           <div
-                            key={item.productId}
+                            key={
+                              item.type === "promotion"
+                                ? item.promotionId
+                                : item.productId
+                            }
                             className="flex items-center justify-between gap-3 p-2.5 sm:p-3 bg-accent/30 rounded-lg border border-border hover:bg-accent/50 hover:shadow-sm transition-all"
                           >
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-xs sm:text-sm text-foreground truncate">
-                                {item.name}
-                              </p>
+                              <div className="flex items-center gap-1.5 mb-0.5">
+                                {item.type === "promotion" && (
+                                  <Badge className="bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white border-0 text-[10px] px-1.5 py-0">
+                                    PROMO
+                                  </Badge>
+                                )}
+                                <p className="font-medium text-xs sm:text-sm text-foreground truncate">
+                                  {item.name}
+                                </p>
+                              </div>
                               <p className="text-xs text-muted-foreground">
                                 ${item.price.toFixed(2)} x {item.quantity}
                               </p>
@@ -942,7 +1069,13 @@ export default function BusinessDetailClient({
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                onClick={() => removeFromCart(item.productId)}
+                                onClick={() =>
+                                  removeFromCart(
+                                    item.type === "promotion"
+                                      ? item.promotionId!
+                                      : item.productId
+                                  )
+                                }
                                 className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-500/10 transition-all hover:scale-110"
                               >
                                 <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

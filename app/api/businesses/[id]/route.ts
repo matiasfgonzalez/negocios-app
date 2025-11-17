@@ -29,6 +29,18 @@ export async function GET(
             },
           },
         },
+        promotions: {
+          where: {
+            isActive: true,
+          },
+          include: {
+            products: {
+              include: {
+                product: true,
+              },
+            },
+          },
+        },
         _count: {
           select: { products: true },
         },

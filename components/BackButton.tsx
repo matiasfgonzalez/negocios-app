@@ -30,6 +30,7 @@ export default function BackButton({
   };
 
   const buttonClasses = `
+    cursor-pointer
     group
     mb-4 sm:mb-6
     border

@@ -15,6 +15,7 @@ import {
   CreditCard,
   Settings,
   Bell,
+  Tag,
 } from "lucide-react";
 import {
   Card,
@@ -82,6 +83,14 @@ export default async function DashboardPage() {
       href: "/dashboard/productos",
       color: "text-orange-600 dark:text-orange-400",
       gradient: "from-orange-500 to-amber-500",
+    },
+    promociones: {
+      title: "Promociones",
+      description: "Crea y gestiona ofertas especiales",
+      icon: Tag,
+      href: "/dashboard/promociones",
+      color: "text-fuchsia-600 dark:text-fuchsia-400",
+      gradient: "from-fuchsia-500 to-pink-500",
     },
     pedidos: {
       title: "Pedidos",
@@ -177,6 +186,7 @@ export default async function DashboardPage() {
       allCards.usuarios,
       allCards.negocios,
       allCards.productos,
+      allCards.promociones,
       allCards.pedidos,
       allCards.solicitudesAdmin,
       allCards.pagosAdmin,
@@ -193,6 +203,7 @@ export default async function DashboardPage() {
     visibleCards = [
       allCards.negocios,
       allCards.productos,
+      allCards.promociones,
       allCards.pedidos,
       allCards.pagos,
       allCards.imagenes,

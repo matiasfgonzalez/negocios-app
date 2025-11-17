@@ -133,6 +133,8 @@ model Business {
   preparationTime Int? @default(30)
   // Productos ofrecidos por el negocio
   products      Product[]
+  // Promociones del negocio
+  promotions    Promotion[]
   // Órdenes asociadas al negocio
   orders        Order[]
   // Fecha de creación del negocio
@@ -189,6 +191,8 @@ model Product {
   images     Json?
   // Ítems de orden que incluyen este producto
   orderItems OrderItem[]
+  // Promociones que incluyen este producto
+  promotionProducts PromotionProduct[]
   // Fecha de creación del producto
   createdAt  DateTime @default(now())
   // Fecha de última actualización del producto
@@ -414,4 +418,56 @@ model PaymentConfig {
   createdAt       DateTime @default(now())
   // Fecha de última actualización
   updatedAt       DateTime @updatedAt
+}
+
+// Modelo que representa una promoción u oferta de un negocio
+model Promotion {
+  // Identificador único de la promoción
+  id          String             @id @default(cuid())
+  // ID del negocio al que pertenece la promoción
+  businessId  String
+  // Relación con el negocio
+  business    Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  // Nombre de la promoción
+  name        String
+  // Descripción de la promoción
+  description String?
+  // Precio de la promoción (menor a la suma de los productos individuales)
+  price       Float
+  // URL de la imagen de la promoción
+  image       String?
+  // Indica si la promoción está activa
+  isActive    Boolean            @default(true)
+  // Fecha de inicio de la promoción
+  startDate   DateTime?
+  // Fecha de fin de la promoción
+  endDate     DateTime?
+  // Stock disponible de la promoción (null = ilimitado)
+  stock       Int?
+  // Productos incluidos en la promoción
+  products    PromotionProduct[]
+  // Fecha de creación de la promoción
+  createdAt   DateTime           @default(now())
+  // Fecha de última actualización de la promoción
+  updatedAt   DateTime           @updatedAt
+}
+
+// Modelo que representa la relación entre promociones y productos
+model PromotionProduct {
+  // Identificador único
+  id          String    @id @default(cuid())
+  // ID de la promoción
+  promotionId String
+  // Relación con la promoción
+  promotion   Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  // ID del producto
+  productId   String
+  // Relación con el producto
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  // Cantidad de este producto en la promoción
+  quantity    Int       @default(1)
+  // Fecha de creación
+  createdAt   DateTime  @default(now())
+
+  @@unique([promotionId, productId])
 }
