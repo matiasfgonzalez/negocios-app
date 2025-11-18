@@ -2,6 +2,7 @@
 
 import { useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +18,25 @@ import { User, Settings, LogOut, Shield } from "lucide-react";
 export default function CustomUserMenu() {
   const router = useRouter();
   const { signOut, user } = useClerk();
+  const [userRole, setUserRole] = useState<string>("usuario");
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const response = await fetch("/api/me");
+        if (response.ok) {
+          const data = await response.json();
+          setUserRole(data.role?.toLowerCase() || "usuario");
+        }
+      } catch (error) {
+        console.error("Error al obtener rol del usuario:", error);
+      }
+    };
+
+    if (user) {
+      fetchUserRole();
+    }
+  }, [user]);
 
   const handleSignOut = () => {
     signOut(() => router.push("/"));
@@ -26,10 +46,6 @@ export default function CustomUserMenu() {
     const firstName = user?.firstName || "";
     const lastName = user?.lastName || "";
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
-  };
-
-  const getUserRole = () => {
-    return (user?.publicMetadata?.role as string) || "usuario";
   };
 
   return (
@@ -64,7 +80,7 @@ export default function CustomUserMenu() {
               {user?.emailAddresses[0]?.emailAddress}
             </p>
             <p className="text-xs leading-none text-primary capitalize font-medium">
-              {getUserRole()}
+              {userRole}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -81,18 +97,10 @@ export default function CustomUserMenu() {
 
         <DropdownMenuItem
           className="cursor-pointer text-foreground hover:bg-accent hover:text-primary transition-colors"
-          onClick={() => router.push("/profile")}
+          onClick={() => router.push("/dashboard/perfil")}
         >
           <User className="mr-2 h-4 w-4" />
           <span>Mi Perfil</span>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem
-          className="cursor-pointer text-foreground hover:bg-accent hover:text-primary transition-colors"
-          onClick={() => router.push("/settings")}
-        >
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Configuración</span>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator className="bg-border" />
