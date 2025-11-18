@@ -180,6 +180,39 @@
     transition: background-color 0.2s ease;
   }
 
+  /* Ocultar scrollbar pero mantener funcionalidad */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Scrollbar personalizado para contenido */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.874 0.007 264.052) oklch(0.938 0.006 264.052);
+  }
+
+  .dark .custom-scrollbar {
+    scrollbar-color: oklch(0.335 0.02 264.542) oklch(0.249 0.022 264.542);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-muted/50 rounded-full;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-border/80 hover:bg-primary/40 rounded-full;
+    transition: background-color 0.2s ease;
+  }
+
   /* Focus visible mejorado */
   *:focus-visible {
     @apply outline-2 outline-offset-2 outline-primary;

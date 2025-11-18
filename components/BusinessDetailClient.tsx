@@ -141,31 +141,31 @@ export default function BusinessDetailClient({
       return {
         label: "Cerrado permanentemente",
         color:
-          "bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600",
-        dot: "bg-gray-500",
+          "bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800 border-gray-300 dark:from-gray-800 dark:to-gray-900 dark:text-gray-200 dark:border-gray-600 shadow-md",
+        dot: "bg-gradient-to-br from-gray-500 to-gray-600",
       };
     }
     if (business.status === "CERRADO_TEMPORAL") {
       return {
         label: "Cerrado temporalmente",
         color:
-          "bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700",
-        dot: "bg-orange-500",
+          "bg-gradient-to-r from-orange-100 to-amber-50 text-orange-800 border-orange-300 dark:from-orange-900/40 dark:to-amber-900/30 dark:text-orange-300 dark:border-orange-600 shadow-md",
+        dot: "bg-gradient-to-br from-orange-500 to-amber-500",
       };
     }
     if (businessIsOpen) {
       return {
         label: "Abierto",
         color:
-          "bg-green-100 text-green-700 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700",
-        dot: "bg-green-500 animate-pulse",
+          "bg-gradient-to-r from-green-100 to-emerald-50 text-green-800 border-green-400 dark:from-green-900/40 dark:to-emerald-900/30 dark:text-green-300 dark:border-green-500 shadow-md",
+        dot: "bg-gradient-to-br from-green-500 to-emerald-500 animate-pulse shadow-lg shadow-green-500/50",
       };
     }
     return {
       label: "Cerrado",
       color:
-        "bg-red-100 text-red-700 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700",
-      dot: "bg-red-500",
+        "bg-gradient-to-r from-red-100 to-rose-50 text-red-800 border-red-300 dark:from-red-900/40 dark:to-rose-900/30 dark:text-red-300 dark:border-red-600 shadow-md",
+      dot: "bg-gradient-to-br from-red-500 to-rose-500",
     };
   };
 
@@ -464,15 +464,15 @@ export default function BusinessDetailClient({
       {cart.length > 0 && (
         <button
           onClick={() => setShowCart(true)}
-          className="fixed bottom-6 right-6 z-50 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full p-4 shadow-2xl hover:shadow-primary/50 transition-all hover:scale-110 active:scale-95 group"
+          className="fixed bottom-6 right-6 z-50 bg-gradient-to-br from-primary via-primary to-secondary hover:from-primary/90 hover:via-primary/90 hover:to-secondary/90 text-white rounded-full p-4 shadow-2xl hover:shadow-primary/60 transition-all hover:scale-110 active:scale-95 group"
           aria-label="Ver carrito"
         >
           <ShoppingCart className="w-6 h-6" />
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-7 h-7 flex items-center justify-center font-bold animate-bounce shadow-lg ring-4 ring-red-500/20">
+          <span className="absolute -top-2 -right-2 bg-gradient-to-br from-red-500 to-red-600 text-white text-xs rounded-full w-7 h-7 flex items-center justify-center font-bold animate-bounce shadow-lg ring-4 ring-red-500/30">
             {cart.reduce((sum, item) => sum + item.quantity, 0)}
           </span>
           {/* Tooltip */}
-          <span className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-gradient-to-r from-gray-900 to-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl">
             Ver carrito ({cart.reduce((sum, item) => sum + item.quantity, 0)}{" "}
             productos)
           </span>
@@ -480,9 +480,11 @@ export default function BusinessDetailClient({
       )}
 
       {/* UI improved: Enhanced Business Header with Map */}
-      <div className="relative bg-gradient-to-br from-card via-card/95 to-card/90 backdrop-blur-xl border-b border-border shadow-2xl overflow-hidden">
+      <div className="relative bg-gradient-to-br from-card via-primary/5 to-secondary/5 backdrop-blur-xl border-b border-border/50 shadow-2xl overflow-hidden">
         {/* Decorative background pattern */}
         <div className="absolute inset-0 bg-grid-white/5 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-primary/10 to-transparent blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-secondary/10 to-transparent blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
@@ -491,7 +493,7 @@ export default function BusinessDetailClient({
               {/* Business Logo and Name */}
               <div className="flex items-start gap-4 sm:gap-6">
                 {business.img ? (
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0 bg-muted ring-4 ring-primary/20">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0 bg-muted ring-4 ring-primary/30 hover:ring-primary/50 transition-all">
                     <img
                       src={optimizeBusinessDetailImage(business.img)}
                       alt={`Logo de ${business.name}`}
@@ -499,7 +501,7 @@ export default function BusinessDetailClient({
                     />
                   </div>
                 ) : (
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary via-primary/90 to-primary/80 rounded-2xl flex items-center justify-center shadow-2xl ring-4 ring-primary/20">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary via-secondary to-primary/90 rounded-2xl flex items-center justify-center shadow-2xl ring-4 ring-primary/30">
                     <StoreIcon className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
                   </div>
                 )}
@@ -508,12 +510,12 @@ export default function BusinessDetailClient({
                     {business.name}
                   </h1>
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                    <Badge className="bg-primary/15 text-primary border-primary/30 text-sm px-3 py-1">
+                    <Badge className="bg-gradient-to-r from-primary/20 to-primary/15 text-primary border-primary/40 text-sm px-3 py-1 shadow-md hover:shadow-lg transition-all">
                       <StoreIcon className="w-3.5 h-3.5 mr-1.5" />
                       {business.rubro}
                     </Badge>
                     {business.hasShipping && (
-                      <Badge className="bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30 text-sm px-3 py-1">
+                      <Badge className="bg-gradient-to-r from-green-500/20 to-emerald-500/15 text-green-600 dark:text-green-400 border-green-500/40 text-sm px-3 py-1 shadow-md hover:shadow-lg transition-all">
                         <Truck className="w-3.5 h-3.5 mr-1.5" />
                         Envío disponible
                       </Badge>
@@ -524,15 +526,15 @@ export default function BusinessDetailClient({
 
               {/* Description */}
               {business.description && (
-                <div className="bg-muted/30 backdrop-blur-sm rounded-xl p-4 border border-border/50">
-                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                <div className="bg-gradient-to-br from-muted/40 to-muted/20 backdrop-blur-sm rounded-xl p-4 border border-border/60">
+                  <p className="text-sm sm:text-base text-foreground/80 leading-relaxed">
                     {business.description}
                   </p>
                 </div>
               )}
 
               {/* Status and Business Hours Section */}
-              <div className="bg-background/50 backdrop-blur-sm rounded-xl p-4 border border-border/50">
+              <div className="bg-gradient-to-br from-background/60 to-background/40 backdrop-blur-sm rounded-xl p-4 border border-border/60 shadow-lg">
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <div className="flex items-center gap-2">
                     <span
@@ -556,11 +558,13 @@ export default function BusinessDetailClient({
 
                 {/* Order availability message - when orders are NOT available */}
                 {!canOrderNow && (
-                  <div className="mt-3 flex items-start gap-2 text-sm text-amber-700 dark:text-amber-400 bg-amber-500/10 rounded-lg p-3 border border-amber-500/20">
-                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <div className="mt-3 flex items-start gap-2 text-sm bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-lg p-3 border-2 border-amber-400/60 dark:border-amber-600/60 shadow-md">
+                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-700 dark:text-amber-400" />
                     <div>
-                      <p className="font-medium">Pedidos no disponibles</p>
-                      <p className="text-xs mt-1">
+                      <p className="font-bold text-amber-800 dark:text-amber-300">
+                        Pedidos no disponibles
+                      </p>
+                      <p className="text-xs mt-1 text-amber-700 dark:text-amber-400">
                         {business.status === "CERRADO_PERMANENTE"
                           ? business.closedReason
                             ? `Cerrado permanentemente: ${business.closedReason}`
@@ -579,9 +583,9 @@ export default function BusinessDetailClient({
                 {canOrderNow &&
                   business.acceptOrdersOutsideHours &&
                   !businessIsOpen && (
-                    <div className="mt-3 flex items-start gap-2 text-sm text-blue-700 dark:text-blue-400 bg-blue-500/10 rounded-lg p-3 border border-blue-500/20">
-                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <p>
+                    <div className="mt-3 flex items-start gap-2 text-sm bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-lg p-3 border-2 border-blue-400/60 dark:border-blue-600/60 shadow-md">
+                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-700 dark:text-blue-400" />
+                      <p className="font-medium text-blue-800 dark:text-blue-300">
                         Este negocio acepta pedidos fuera del horario de
                         atención
                       </p>
@@ -592,16 +596,16 @@ export default function BusinessDetailClient({
               {/* Contact Information Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {business.addressText && (
-                  <div className="bg-background/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-primary/50 transition-colors group">
+                  <div className="bg-gradient-to-br from-background/60 to-background/40 backdrop-blur-sm rounded-xl p-4 border border-border/60 hover:border-blue-500/50 hover:shadow-lg transition-all group">
                     <div className="flex items-start gap-3">
-                      <div className="bg-primary/10 rounded-lg p-2 group-hover:bg-primary/20 transition-colors">
-                        <MapPin className="w-5 h-5 text-primary" />
+                      <div className="bg-gradient-to-br from-blue-500/15 to-blue-600/10 rounded-lg p-2 group-hover:from-blue-500/25 group-hover:to-blue-600/20 transition-all shadow-md">
+                        <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-muted-foreground mb-1">
+                        <p className="text-xs font-bold text-muted-foreground mb-1 uppercase tracking-wide">
                           Dirección
                         </p>
-                        <p className="text-sm text-foreground font-medium">
+                        <p className="text-sm text-foreground font-medium leading-relaxed">
                           {business.addressText}
                         </p>
                       </div>
@@ -614,14 +618,14 @@ export default function BusinessDetailClient({
                     href={`https://wa.me/${business.whatsappPhone}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-background/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-green-500/50 hover:bg-green-500/5 transition-all group"
+                    className="bg-gradient-to-br from-background/60 to-background/40 backdrop-blur-sm rounded-xl p-4 border border-border/60 hover:border-green-500/60 hover:shadow-lg hover:shadow-green-500/10 transition-all group"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="bg-green-500/10 rounded-lg p-2 group-hover:bg-green-500/20 transition-colors">
+                      <div className="bg-gradient-to-br from-green-500/15 to-emerald-500/10 rounded-lg p-2 group-hover:from-green-500/25 group-hover:to-emerald-500/20 transition-all shadow-md">
                         <Phone className="w-5 h-5 text-green-600 dark:text-green-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-muted-foreground mb-1">
+                        <p className="text-xs font-bold text-muted-foreground mb-1 uppercase tracking-wide">
                           WhatsApp
                         </p>
                         <p className="text-sm text-foreground font-medium">
@@ -633,13 +637,13 @@ export default function BusinessDetailClient({
                 )}
 
                 {business.aliasPago && (
-                  <div className="bg-background/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-amber-500/50 transition-colors group">
+                  <div className="bg-gradient-to-br from-background/60 to-background/40 backdrop-blur-sm rounded-xl p-4 border border-border/60 hover:border-amber-500/60 hover:shadow-lg transition-all group">
                     <div className="flex items-start gap-3">
-                      <div className="bg-amber-500/10 rounded-lg p-2 group-hover:bg-amber-500/20 transition-colors">
+                      <div className="bg-gradient-to-br from-amber-500/15 to-yellow-500/10 rounded-lg p-2 group-hover:from-amber-500/25 group-hover:to-yellow-500/20 transition-all shadow-md">
                         <DollarSign className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-muted-foreground mb-1">
+                        <p className="text-xs font-bold text-muted-foreground mb-1 uppercase tracking-wide">
                           Alias de Pago
                         </p>
                         <p className="text-sm text-foreground font-medium">
@@ -651,10 +655,10 @@ export default function BusinessDetailClient({
                 )}
 
                 {business.hasShipping && (
-                  <div className="bg-background/50 backdrop-blur-sm rounded-xl p-4 border border-border/50 hover:border-accent/50 transition-colors group">
+                  <div className="bg-gradient-to-br from-background/60 to-background/40 backdrop-blur-sm rounded-xl p-4 border border-border/60 hover:border-cyan-500/60 hover:shadow-lg transition-all group">
                     <div className="flex items-start gap-3">
-                      <div className="bg-accent/10 rounded-lg p-2 group-hover:bg-accent/20 transition-colors">
-                        <Truck className="w-5 h-5 text-accent" />
+                      <div className="bg-gradient-to-br from-cyan-500/15 to-blue-500/10 rounded-lg p-2 group-hover:from-cyan-500/25 group-hover:to-blue-500/20 transition-all shadow-md">
+                        <Truck className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-muted-foreground mb-1">
@@ -688,9 +692,9 @@ export default function BusinessDetailClient({
                 disabled={!canOrderNow}
                 className={`w-full relative ${
                   canOrderNow
-                    ? "bg-primary hover:bg-primary/90 hover:scale-[1.02]"
-                    : "bg-muted cursor-not-allowed opacity-50"
-                } text-primary-foreground shadow-xl hover:shadow-2xl transition-all py-6 text-lg font-bold`}
+                    ? "bg-gradient-to-r from-primary via-primary to-secondary hover:from-primary/90 hover:via-primary/90 hover:to-secondary/90 hover:scale-[1.02] shadow-xl hover:shadow-2xl hover:shadow-primary/30 dark:shadow-primary/20 dark:hover:shadow-primary/40"
+                    : "bg-gradient-to-r from-muted to-muted/80 dark:from-muted/70 dark:to-muted/50 cursor-not-allowed opacity-50"
+                } text-white dark:text-white transition-all py-6 text-lg font-bold disabled:text-muted-foreground border-2`}
                 size="lg"
               >
                 <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 mr-3" />
@@ -700,7 +704,7 @@ export default function BusinessDetailClient({
                     }`
                   : "Pedidos no disponibles"}
                 {canOrderNow && cart.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-7 h-7 flex items-center justify-center font-bold animate-bounce shadow-lg ring-4 ring-red-500/20">
+                  <span className="absolute -top-2 -right-2 bg-gradient-to-br from-red-500 to-red-600 dark:from-red-600 dark:to-red-700 text-white text-xs rounded-full w-7 h-7 flex items-center justify-center font-bold animate-bounce shadow-lg ring-4 ring-red-500/30 dark:ring-red-600/40">
                     {cart.reduce((sum, item) => sum + item.quantity, 0)}
                   </span>
                 )}
@@ -760,14 +764,14 @@ export default function BusinessDetailClient({
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-4 sm:mb-6">
                   <div className="flex items-center gap-2">
-                    <div className="bg-gradient-to-r from-fuchsia-500 to-pink-500 rounded-lg p-2">
+                    <div className="bg-gradient-to-br from-fuchsia-500 via-pink-500 to-rose-500 rounded-lg p-2 shadow-lg shadow-fuchsia-500/30">
                       <Sparkles className="w-5 h-5 text-white" />
                     </div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-foreground">
+                    <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-fuchsia-600 to-pink-600 bg-clip-text text-transparent">
                       Promociones Especiales
                     </h2>
                   </div>
-                  <Badge className="bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white border-0 shadow-md">
+                  <Badge className="bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white border-0 shadow-lg shadow-fuchsia-500/30">
                     {business.promotions.length}{" "}
                     {business.promotions.length === 1 ? "oferta" : "ofertas"}
                   </Badge>
@@ -794,15 +798,22 @@ export default function BusinessDetailClient({
               </div>
             )}
 
-            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">
-              Productos Disponibles
-            </h2>
+            <div className="flex items-center gap-2 mb-4 sm:mb-6">
+              <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-2">
+                <Package className="w-5 h-5 text-primary" />
+              </div>
+              <h2 className="text-lg sm:text-2xl font-bold text-foreground">
+                Productos Disponibles
+              </h2>
+            </div>
 
             {business.products.length === 0 ? (
-              <Card className="bg-card/50 border-border">
+              <Card className="bg-gradient-to-br from-card/60 to-card/40 backdrop-blur-sm border-border/60 shadow-lg">
                 <CardContent className="py-12 text-center">
-                  <Package className="w-14 h-14 sm:w-16 sm:h-16 text-muted-foreground/50 mx-auto mb-4" />
-                  <p className="text-sm sm:text-base text-muted-foreground">
+                  <div className="bg-gradient-to-br from-muted to-muted/50 rounded-2xl p-6 inline-block mb-4">
+                    <Package className="w-14 h-14 sm:w-16 sm:h-16 text-muted-foreground/60 mx-auto" />
+                  </div>
+                  <p className="text-sm sm:text-base text-foreground/70 font-medium">
                     No hay productos disponibles en este momento
                   </p>
                 </CardContent>
@@ -843,13 +854,17 @@ export default function BusinessDetailClient({
                   return (
                     <>
                       {/* Filtros de categoría */}
-                      <div className="flex flex-wrap gap-2 pb-4 border-b border-border">
+                      <div className="flex gap-2 pb-4 border-b border-border/60 overflow-x-auto scrollbar-hide">
                         <Badge
                           variant={
                             selectedCategory === "all" ? "default" : "outline"
                           }
                           onClick={() => setSelectedCategory("all")}
-                          className="cursor-pointer hover:scale-105 transition-transform text-xs sm:text-sm px-3 py-1.5"
+                          className={`cursor-pointer hover:scale-105 transition-all text-xs sm:text-sm px-3 py-1.5 whitespace-nowrap flex-shrink-0 ${
+                            selectedCategory === "all"
+                              ? "bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/30"
+                              : "hover:border-primary/50 hover:bg-primary/5"
+                          }`}
                         >
                           Todos ({totalProducts})
                         </Badge>
@@ -860,7 +875,11 @@ export default function BusinessDetailClient({
                               selectedCategory === key ? "default" : "outline"
                             }
                             onClick={() => setSelectedCategory(key)}
-                            className="cursor-pointer hover:scale-105 transition-transform text-xs sm:text-sm px-3 py-1.5"
+                            className={`cursor-pointer hover:scale-105 transition-all text-xs sm:text-sm px-3 py-1.5 whitespace-nowrap flex-shrink-0 ${
+                              selectedCategory === key
+                                ? "bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/30"
+                                : "hover:border-primary/50 hover:bg-primary/5"
+                            }`}
                           >
                             {data.icon && (
                               <span className="mr-1">{data.icon}</span>
@@ -881,16 +900,21 @@ export default function BusinessDetailClient({
                           .map(([categoryKey, categoryData]) => (
                             <div key={categoryKey} className="space-y-4">
                               {/* Título de categoría */}
-                              <h3 className="text-lg sm:text-xl font-semibold text-foreground flex items-center gap-2 border-b border-border pb-2">
+                              <h3 className="text-base sm:text-lg font-bold text-foreground flex items-center gap-2 border-b-2 border-primary/30 pb-2 px-1">
                                 {categoryData.icon && (
-                                  <span className="text-2xl">
+                                  <span className="text-xl sm:text-2xl">
                                     {categoryData.icon}
                                   </span>
                                 )}
-                                {categoryData.name}
-                                <span className="text-sm text-muted-foreground font-normal">
-                                  ({categoryData.products.length})
+                                <span className="flex-1">
+                                  {categoryData.name}
                                 </span>
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs bg-primary/10 text-primary border-primary/30"
+                                >
+                                  {categoryData.products.length}
+                                </Badge>
                               </h3>
 
                               {/* Productos de la categoría */}
@@ -901,16 +925,19 @@ export default function BusinessDetailClient({
                                   return (
                                     <Card
                                       key={product.id}
-                                      className="bg-card/50 backdrop-blur-sm hover:shadow-lg hover:border-primary/50 transition-all duration-300 border-border group"
+                                      className="bg-gradient-to-br from-card/60 to-card/40 backdrop-blur-sm hover:shadow-xl hover:border-primary/60 hover:scale-[1.01] transition-all duration-300 border-border/60 group overflow-hidden"
                                     >
-                                      <CardContent className="p-4">
-                                        <div className="flex items-center gap-4">
-                                          {/* Nombre y stock */}
-                                          <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-1">
-                                              <h4 className="text-sm sm:text-base font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                                      <CardContent className="p-3 sm:p-4">
+                                        {/* Layout móvil mejorado */}
+                                        <div className="space-y-3">
+                                          {/* Fila 1: Nombre, Stock y Ver detalles */}
+                                          <div className="flex items-start justify-between gap-2">
+                                            <div className="flex-1 min-w-0">
+                                              <h4 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
                                                 {product.name}
                                               </h4>
+                                            </div>
+                                            <div className="flex items-center gap-2 flex-shrink-0">
                                               <Badge
                                                 variant={
                                                   product.stock > 0
@@ -919,80 +946,85 @@ export default function BusinessDetailClient({
                                                 }
                                                 className={
                                                   product.stock > 0
-                                                    ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 text-xs"
-                                                    : "bg-muted text-muted-foreground border-border text-xs"
+                                                    ? "bg-gradient-to-r from-green-500/15 to-emerald-500/10 text-green-700 dark:text-green-300 border-green-500/30 text-xs font-bold shadow-md"
+                                                    : "bg-gradient-to-r from-muted to-muted/80 text-muted-foreground border-border text-xs"
                                                 }
                                               >
                                                 {product.stock}
                                               </Badge>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                              <span className="text-lg sm:text-xl font-bold text-primary">
-                                                ${product.price.toFixed(2)}
-                                              </span>
                                               <ProductDetailDialog
                                                 product={product}
                                               />
                                             </div>
                                           </div>
 
-                                          {/* Controles de cantidad */}
-                                          <div className="flex-shrink-0">
-                                            {cartQty > 0 ? (
-                                              <div className="flex items-center gap-2">
+                                          {/* Fila 2: Precio y Controles */}
+                                          <div className="flex items-center justify-between gap-3">
+                                            <div className="flex items-baseline gap-1">
+                                              <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                                                ${product.price.toFixed(2)}
+                                              </span>
+                                            </div>
+
+                                            {/* Controles de cantidad */}
+                                            <div className="flex-shrink-0">
+                                              {cartQty > 0 ? (
+                                                <div className="flex items-center gap-1.5 sm:gap-2">
+                                                  <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() =>
+                                                      updateQuantity(
+                                                        product.id,
+                                                        -1
+                                                      )
+                                                    }
+                                                    disabled={!canOrderNow}
+                                                    className="h-9 w-9 p-0 hover:bg-gradient-to-br hover:from-red-500/15 hover:to-red-600/10 hover:border-red-500/60 hover:text-red-600 dark:hover:text-red-400 transition-all disabled:opacity-50 border-border/60"
+                                                  >
+                                                    <Minus className="w-4 h-4" />
+                                                  </Button>
+                                                  <span className="text-lg sm:text-xl font-bold min-w-[2.5rem] text-center text-foreground">
+                                                    {cartQty}
+                                                  </span>
+                                                  <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() =>
+                                                      updateQuantity(
+                                                        product.id,
+                                                        1
+                                                      )
+                                                    }
+                                                    disabled={
+                                                      cartQty >=
+                                                        product.stock ||
+                                                      !canOrderNow
+                                                    }
+                                                    className="h-9 w-9 p-0 hover:bg-gradient-to-br hover:from-green-500/15 hover:to-emerald-500/10 hover:border-green-500/60 hover:text-green-600 dark:hover:text-green-400 transition-all disabled:opacity-50 border-border/60"
+                                                  >
+                                                    <Plus className="w-4 h-4" />
+                                                  </Button>
+                                                </div>
+                                              ) : (
                                                 <Button
-                                                  size="sm"
-                                                  variant="outline"
                                                   onClick={() =>
-                                                    updateQuantity(
-                                                      product.id,
-                                                      -1
-                                                    )
-                                                  }
-                                                  disabled={!canOrderNow}
-                                                  className="h-8 w-8 p-0 hover:bg-red-500/10 hover:border-red-500/50 hover:text-red-600 dark:hover:text-red-400 transition-colors disabled:opacity-50 border-border"
-                                                >
-                                                  <Minus className="w-4 h-4" />
-                                                </Button>
-                                                <span className="text-lg font-semibold min-w-[2rem] text-center text-foreground">
-                                                  {cartQty}
-                                                </span>
-                                                <Button
-                                                  size="sm"
-                                                  variant="outline"
-                                                  onClick={() =>
-                                                    updateQuantity(
-                                                      product.id,
-                                                      1
-                                                    )
+                                                    addToCart(product)
                                                   }
                                                   disabled={
-                                                    cartQty >= product.stock ||
+                                                    product.stock === 0 ||
                                                     !canOrderNow
                                                   }
-                                                  className="h-8 w-8 p-0 hover:bg-green-500/10 hover:border-green-500/50 hover:text-green-600 dark:hover:text-green-400 transition-colors disabled:opacity-50 border-border"
+                                                  size="sm"
+                                                  className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white shadow-lg hover:shadow-xl hover:shadow-primary/30 transition-all disabled:opacity-50 font-semibold px-4 h-9"
                                                 >
-                                                  <Plus className="w-4 h-4" />
+                                                  <Plus className="w-4 h-4 mr-1.5" />
+                                                  {canOrderNow
+                                                    ? "Agregar"
+                                                    : "No disponible"}
                                                 </Button>
-                                              </div>
-                                            ) : (
-                                              <Button
-                                                onClick={() =>
-                                                  addToCart(product)
-                                                }
-                                                disabled={
-                                                  product.stock === 0 ||
-                                                  !canOrderNow
-                                                }
-                                                size="sm"
-                                                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm hover:shadow-md transition-all disabled:opacity-50"
-                                              >
-                                                <Plus className="w-4 h-4 mr-1" />
-                                                {canOrderNow
-                                                  ? "Agregar"
-                                                  : "No disponible"}
-                                              </Button>
-                                            )}
+                                              )}
+                                            </div>
                                           </div>
                                         </div>
                                       </CardContent>
@@ -1014,10 +1046,10 @@ export default function BusinessDetailClient({
           <div className="lg:col-span-1">
             <div className="sticky top-20">
               <Card
-                className={`bg-card/50 backdrop-blur-sm transition-all duration-300 ${
+                className={`bg-gradient-to-br from-card/70 to-card/50 backdrop-blur-xl transition-all duration-300 ${
                   showCart
-                    ? "border-2 border-primary shadow-xl ring-4 ring-primary/10"
-                    : "border-border shadow-md"
+                    ? "border-2 border-primary shadow-2xl ring-4 ring-primary/20"
+                    : "border-border/60 shadow-xl"
                 }`}
               >
                 <CardHeader>
@@ -1029,15 +1061,17 @@ export default function BusinessDetailClient({
                 <CardContent className="space-y-4 sm:space-y-6">
                   {cart.length === 0 ? (
                     <div className="text-center py-8">
-                      <ShoppingCart className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground/50 mx-auto mb-3" />
-                      <p className="text-sm sm:text-base text-muted-foreground">
+                      <div className="bg-gradient-to-br from-muted to-muted/50 rounded-2xl p-6 inline-block mb-3">
+                        <ShoppingCart className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground/60 mx-auto" />
+                      </div>
+                      <p className="text-sm sm:text-base text-foreground/70 font-medium">
                         Tu carrito está vacío
                       </p>
                     </div>
                   ) : (
                     <>
                       {/* UI improved: Enhanced Cart Items */}
-                      <div className="space-y-2 sm:space-y-3 max-h-64 overflow-y-auto pr-1">
+                      <div className="space-y-2 sm:space-y-3 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
                         {cart.map((item) => (
                           <div
                             key={
@@ -1045,12 +1079,12 @@ export default function BusinessDetailClient({
                                 ? item.promotionId
                                 : item.productId
                             }
-                            className="flex items-center justify-between gap-3 p-2.5 sm:p-3 bg-accent/30 rounded-lg border border-border hover:bg-accent/50 hover:shadow-sm transition-all"
+                            className="flex items-center justify-between gap-3 p-2.5 sm:p-3 bg-gradient-to-br from-accent/40 to-accent/20 rounded-lg border border-border/60 hover:from-accent/50 hover:to-accent/30 hover:shadow-md hover:border-primary/30 transition-all"
                           >
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5 mb-0.5">
                                 {item.type === "promotion" && (
-                                  <Badge className="bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white border-0 text-[10px] px-1.5 py-0">
+                                  <Badge className="bg-gradient-to-r from-fuchsia-500 via-pink-500 to-rose-500 text-white border-0 text-[10px] px-1.5 py-0 shadow-md">
                                     PROMO
                                   </Badge>
                                 )}
@@ -1063,7 +1097,7 @@ export default function BusinessDetailClient({
                               </p>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="font-semibold text-sm sm:text-base text-primary">
+                              <span className="font-semibold text-sm sm:text-base bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                                 ${(item.price * item.quantity).toFixed(2)}
                               </span>
                               <Button
@@ -1076,7 +1110,7 @@ export default function BusinessDetailClient({
                                       : item.productId
                                   )
                                 }
-                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-500/10 transition-all hover:scale-110"
+                                className="h-7 w-7 sm:h-8 sm:w-8 p-0 text-red-600 hover:text-white hover:bg-gradient-to-br hover:from-red-500 hover:to-red-600 transition-all hover:scale-110 shadow-md"
                               >
                                 <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                               </Button>
@@ -1100,8 +1134,8 @@ export default function BusinessDetailClient({
                           <div
                             className={`flex items-center space-x-3 p-2.5 sm:p-3 border-2 rounded-lg transition-all cursor-pointer ${
                               deliveryType === "pickup"
-                                ? "border-primary bg-primary/10 shadow-sm"
-                                : "border-border hover:bg-accent/50"
+                                ? "border-primary bg-gradient-to-br from-primary/15 to-primary/5 shadow-md ring-2 ring-primary/20"
+                                : "border-border/60 hover:bg-gradient-to-br hover:from-accent/30 hover:to-accent/10"
                             }`}
                           >
                             <RadioGroupItem value="pickup" id="pickup" />
@@ -1120,8 +1154,8 @@ export default function BusinessDetailClient({
                             <div
                               className={`flex items-center space-x-3 p-2.5 sm:p-3 border-2 rounded-lg transition-all cursor-pointer ${
                                 deliveryType === "delivery"
-                                  ? "border-primary bg-primary/10 shadow-sm"
-                                  : "border-border hover:bg-accent/50"
+                                  ? "border-cyan-500 bg-gradient-to-br from-cyan-500/15 to-cyan-500/5 shadow-md ring-2 ring-cyan-500/20"
+                                  : "border-border/60 hover:bg-gradient-to-br hover:from-accent/30 hover:to-accent/10"
                               }`}
                             >
                               <RadioGroupItem value="delivery" id="delivery" />
@@ -1129,7 +1163,7 @@ export default function BusinessDetailClient({
                                 htmlFor="delivery"
                                 className="flex items-center gap-2 cursor-pointer flex-1"
                               >
-                                <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
+                                <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-600 dark:text-cyan-400" />
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
                                   <span className="text-xs sm:text-sm text-foreground font-medium">
                                     Envío a domicilio
@@ -1189,16 +1223,16 @@ export default function BusinessDetailClient({
                               }}
                             />
                             {deliveryLocation && deliveryDistance !== null && (
-                              <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                                <p className="text-xs text-green-700 dark:text-green-400 font-medium">
+                              <div className="mt-2 p-2 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/20 border-2 border-green-400/60 dark:border-green-600/60 rounded-lg shadow-md">
+                                <p className="text-xs text-green-800 dark:text-green-300 font-bold">
                                   ✓ Ubicación seleccionada
                                 </p>
                                 <div className="flex items-center justify-between mt-1 text-xs">
-                                  <span className="text-green-600 dark:text-green-500">
+                                  <span className="text-green-700 dark:text-green-400">
                                     Distancia: {deliveryDistance.toFixed(1)} km
                                   </span>
                                   {calculatedShippingCost !== null && (
-                                    <span className="font-semibold text-green-700 dark:text-green-400">
+                                    <span className="font-bold text-green-800 dark:text-green-300">
                                       Envío: $
                                       {calculatedShippingCost.toFixed(2)}
                                     </span>
@@ -1298,11 +1332,11 @@ export default function BusinessDetailClient({
                           )}
 
                         {/* Total Final */}
-                        <div className="flex justify-between items-center pt-2 border-t border-border">
+                        <div className="flex justify-between items-center pt-2 border-t-2 border-primary/30">
                           <span className="text-base sm:text-lg font-bold text-foreground">
                             Total:
                           </span>
-                          <span className="text-xl sm:text-2xl font-bold text-primary">
+                          <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
                             ${total.toFixed(2)}
                           </span>
                         </div>
@@ -1319,7 +1353,7 @@ export default function BusinessDetailClient({
                                   (!deliveryLocation ||
                                     !deliveryAddress.trim()))
                               }
-                              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2.5 sm:py-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                              className="w-full bg-gradient-to-r from-primary via-secondary to-primary hover:from-primary/90 hover:via-secondary/90 hover:to-primary/90 text-white font-bold py-2.5 sm:py-3 shadow-xl hover:shadow-2xl hover:shadow-primary/40 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
                               size="lg"
                             >
                               {isProcessingOrder ? (
@@ -1333,7 +1367,7 @@ export default function BusinessDetailClient({
                             </Button>
 
                             {!canOrderNow && (
-                              <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
+                              <p className="text-xs text-amber-800 dark:text-amber-300 text-center bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 p-2 rounded-lg border border-amber-400/50 dark:border-amber-600/50 font-medium">
                                 ⚠️ El negocio no acepta pedidos en este momento
                               </p>
                             )}
@@ -1342,7 +1376,7 @@ export default function BusinessDetailClient({
                               deliveryType === "delivery" &&
                               (!deliveryLocation ||
                                 !deliveryAddress.trim()) && (
-                                <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
+                                <p className="text-xs text-amber-800 dark:text-amber-300 text-center bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 p-2 rounded-lg border border-amber-400/50 dark:border-amber-600/50 font-medium">
                                   {deliveryLocation
                                     ? "⚠️ Completa la dirección de entrega"
                                     : "⚠️ Selecciona tu ubicación en el mapa"}
@@ -1363,7 +1397,7 @@ export default function BusinessDetailClient({
                                   (!deliveryLocation ||
                                     !deliveryAddress.trim()))
                               }
-                              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 sm:py-3 shadow-md hover:shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                              className="w-full bg-gradient-to-r from-green-600 via-green-600 to-emerald-600 hover:from-green-700 hover:via-green-700 hover:to-emerald-700 text-white font-bold py-2.5 sm:py-3 shadow-xl hover:shadow-2xl hover:shadow-green-600/40 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed"
                               size="lg"
                             >
                               <Phone className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
@@ -1371,7 +1405,7 @@ export default function BusinessDetailClient({
                             </Button>
 
                             {!canOrderNow && (
-                              <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
+                              <p className="text-xs text-amber-800 dark:text-amber-300 text-center bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 p-2 rounded-lg border border-amber-400/50 dark:border-amber-600/50 font-medium">
                                 ⚠️ El negocio no acepta pedidos en este momento
                               </p>
                             )}
@@ -1380,7 +1414,7 @@ export default function BusinessDetailClient({
                               deliveryType === "delivery" &&
                               (!deliveryLocation ||
                                 !deliveryAddress.trim()) && (
-                                <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
+                                <p className="text-xs text-amber-800 dark:text-amber-300 text-center bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 p-2 rounded-lg border border-amber-400/50 dark:border-amber-600/50 font-medium">
                                   {deliveryLocation
                                     ? "⚠️ Completa la dirección de entrega"
                                     : "⚠️ Selecciona tu ubicación en el mapa"}
@@ -1388,7 +1422,7 @@ export default function BusinessDetailClient({
                               )}
 
                             {!business.whatsappPhone && (
-                              <p className="text-xs text-red-600 dark:text-red-400 text-center">
+                              <p className="text-xs text-red-800 dark:text-red-300 text-center bg-gradient-to-r from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 p-2 rounded-lg border border-red-400/50 dark:border-red-600/50 font-medium">
                                 ⚠️ Este negocio no tiene WhatsApp configurado
                               </p>
                             )}
@@ -1406,25 +1440,31 @@ export default function BusinessDetailClient({
                             </div>
 
                             {/* Tarjeta de beneficios (colapsada) */}
-                            <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg space-y-2">
+                            <div className="p-3 bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/5 border-2 border-primary/30 rounded-lg space-y-2 shadow-lg">
                               <div className="flex items-center gap-2">
                                 <LogIn className="w-4 h-4 text-primary flex-shrink-0" />
-                                <h3 className="font-semibold text-xs text-foreground">
+                                <h3 className="font-bold text-xs bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                                   Regístrate y obtén:
                                 </h3>
                               </div>
-                              <ul className="space-y-1 text-xs text-muted-foreground pl-6">
+                              <ul className="space-y-1 text-xs text-foreground/80 pl-6">
                                 <li className="flex items-start gap-1.5">
                                   <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                                  <span>Historial de pedidos</span>
+                                  <span className="font-medium">
+                                    Historial de pedidos
+                                  </span>
                                 </li>
                                 <li className="flex items-start gap-1.5">
                                   <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                                  <span>Seguimiento en tiempo real</span>
+                                  <span className="font-medium">
+                                    Seguimiento en tiempo real
+                                  </span>
                                 </li>
                                 <li className="flex items-start gap-1.5">
                                   <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                                  <span>Ofertas exclusivas</span>
+                                  <span className="font-medium">
+                                    Ofertas exclusivas
+                                  </span>
                                 </li>
                               </ul>
                             </div>
@@ -1434,7 +1474,7 @@ export default function BusinessDetailClient({
                                 (globalThis.location.href = "/sign-in")
                               }
                               variant="outline"
-                              className="w-full border-primary/50 hover:bg-primary/10 font-semibold py-2.5 sm:py-3 transition-all"
+                              className="w-full border-2 border-primary/60 hover:bg-gradient-to-r hover:from-primary/15 hover:to-secondary/15 hover:border-primary font-semibold py-2.5 sm:py-3 transition-all shadow-md hover:shadow-lg"
                               size="lg"
                             >
                               <LogIn className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />

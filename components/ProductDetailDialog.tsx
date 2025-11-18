@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Eye } from "lucide-react";
+import { Eye, Package, Tag, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { optimizeProductImage } from "@/lib/cloudinary-utils";
 
-// Componente de Carrusel de Imágenes
+// Componente de Carrusel de Imágenes Mejorado
 type ImageCarouselProps = {
   images: string[];
   productName: string;
@@ -39,37 +39,48 @@ function ImageCarousel({ images, productName }: Readonly<ImageCarouselProps>) {
   };
 
   return (
-    <div className="relative w-full h-64 md:h-80 rounded-lg overflow-hidden group">
+    <div className="relative w-full aspect-square sm:aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-muted/50 to-muted/30 group">
       {/* Carousel wrapper */}
       <div className="relative h-full overflow-hidden">
         {images.map((url, index) => (
           <div
             key={`${productName}-${index}-${url.substring(url.length - 20)}`}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
+            className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+              index === currentIndex
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-95"
             }`}
           >
             <img
               src={optimizeProductImage(url)}
               alt={`${productName} - Imagen ${index + 1}`}
-              className="absolute block w-full h-full object-contain -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 bg-muted"
+              className="absolute block w-full h-full object-cover -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
             />
+            {/* Overlay gradient sutil */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
           </div>
         ))}
       </div>
 
-      {/* Slider indicators */}
+      {/* Contador de imágenes */}
       {images.length > 1 && (
-        <div className="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3">
+        <div className="absolute top-3 right-3 z-30 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full">
+          {currentIndex + 1} / {images.length}
+        </div>
+      )}
+
+      {/* Slider indicators (thumbnails) */}
+      {images.length > 1 && (
+        <div className="absolute z-30 flex gap-2 bottom-4 left-1/2 -translate-x-1/2 bg-black/40 backdrop-blur-md px-3 py-2 rounded-full">
           {images.map((url, idx) => (
             <button
               key={`${productName}-indicator-${idx}-${url.substring(
                 url.length - 10
               )}`}
               type="button"
-              className={`w-3 h-3 rounded-full transition-all ${
+              className={`w-2 h-2 rounded-full transition-all ${
                 idx === currentIndex
-                  ? "bg-white"
+                  ? "bg-white w-6"
                   : "bg-white/50 hover:bg-white/75"
               }`}
               aria-current={idx === currentIndex}
@@ -85,12 +96,12 @@ function ImageCarousel({ images, productName }: Readonly<ImageCarouselProps>) {
         <>
           <button
             type="button"
-            className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group/prev focus:outline-none"
+            className="absolute top-1/2 -translate-y-1/2 left-2 sm:left-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none"
             onClick={prevImage}
           >
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover/prev:bg-white/50 dark:group-hover/prev:bg-gray-800/60">
+            <span className="inline-flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800 shadow-lg transition-all hover:scale-110">
               <svg
-                className="w-4 h-4 text-white dark:text-gray-200"
+                className="w-5 h-5 text-gray-800 dark:text-gray-200"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -109,12 +120,12 @@ function ImageCarousel({ images, productName }: Readonly<ImageCarouselProps>) {
           </button>
           <button
             type="button"
-            className="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group/next focus:outline-none"
+            className="absolute top-1/2 -translate-y-1/2 right-2 sm:right-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none"
             onClick={nextImage}
           >
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover/next:bg-white/50 dark:group-hover/next:bg-gray-800/60">
+            <span className="inline-flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800 shadow-lg transition-all hover:scale-110">
               <svg
-                className="w-4 h-4 text-white dark:text-gray-200"
+                className="w-5 h-5 text-gray-800 dark:text-gray-200"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -170,92 +181,145 @@ export default function ProductDetailDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {triggerButton || (
-          <Button variant="ghost" size="sm" className="hover:bg-accent text-xs">
-            <Eye className="w-3.5 h-3.5 mr-1" />
+          <Button
+            variant="ghost"
+            size="sm"
+            className="bg-gradient-to-r from-primary/10 to-secondary/10 hover:from-primary/20 hover:to-secondary/20 text-primary dark:text-primary border border-primary/30 hover:border-primary/50 text-xs font-bold transition-all hover:scale-105 hover:shadow-md hover:shadow-primary/20"
+          >
+            <Eye className="w-3.5 h-3.5 mr-1.5" />
             Ver detalles
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl font-bold">
-            {product.name}
-          </DialogTitle>
-          <DialogDescription asChild>
-            <div className="space-y-4">
-              {/* Categoría y SKU */}
-              <div className="flex flex-wrap gap-2">
-                {product.category && (
-                  <Badge className="bg-primary/10 text-primary border-primary/30">
-                    {product.category.icon && (
-                      <span className="mr-1">{product.category.icon}</span>
+      <DialogContent className="max-w-3xl max-h-[95vh] overflow-hidden p-0 gap-0 bg-gradient-to-br from-card via-card to-card/95">
+        {/* Header con gradiente */}
+        <div className="relative bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border-b border-border/50">
+          <DialogHeader className="p-4 sm:p-6 space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1 space-y-2">
+                <DialogTitle className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground leading-tight pr-8">
+                  {product.name}
+                </DialogTitle>
+
+                {/* Badges de categoría y SKU */}
+                <DialogDescription asChild>
+                  <div className="flex flex-wrap gap-2">
+                    {product.category && (
+                      <Badge className="bg-primary/15 text-primary border-primary/30 hover:bg-primary/25 transition-colors text-xs sm:text-sm">
+                        {product.category.icon && (
+                          <span className="mr-1.5 text-base">
+                            {product.category.icon}
+                          </span>
+                        )}
+                        {product.category.name}
+                      </Badge>
                     )}
-                    {product.category.name}
-                  </Badge>
-                )}
-                {product.sku && (
-                  <Badge variant="outline" className="text-muted-foreground">
-                    SKU: {product.sku}
-                  </Badge>
-                )}
+                    {product.sku && (
+                      <Badge
+                        variant="outline"
+                        className="text-muted-foreground border-border/50 text-xs sm:text-sm"
+                      >
+                        <Tag className="w-3 h-3 mr-1" />
+                        {product.sku}
+                      </Badge>
+                    )}
+                  </div>
+                </DialogDescription>
               </div>
             </div>
-          </DialogDescription>
-        </DialogHeader>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-6">
-          {/* Imágenes del producto */}
-          {productImages.length > 0 && (
-            <div className="border border-border rounded-lg overflow-hidden">
-              <ImageCarousel
-                images={productImages}
-                productName={product.name}
-              />
-            </div>
-          )}
+        {/* Contenido scrolleable */}
+        <div className="overflow-y-auto max-h-[calc(95vh-120px)] custom-scrollbar">
+          <div className="p-4 sm:p-6 space-y-6">
+            {/* Imágenes del producto */}
+            {productImages.length > 0 ? (
+              <div className="relative">
+                <ImageCarousel
+                  images={productImages}
+                  productName={product.name}
+                />
+              </div>
+            ) : (
+              <div className="relative w-full aspect-square sm:aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-muted/50 to-muted/30 flex items-center justify-center border border-border/50">
+                <div className="text-center space-y-3">
+                  <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-muted rounded-full flex items-center justify-center">
+                    <Package className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground/50" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Sin imagen disponible
+                  </p>
+                </div>
+              </div>
+            )}
 
-          {/* Precio y Stock */}
-          <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Precio</p>
-              <p className="text-3xl font-bold text-primary">
-                ${product.price.toFixed(2)}
-              </p>
+            {/* Grid de Precio y Stock */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              {/* Card de Precio */}
+              <div className="relative overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-primary/5 to-primary/10 p-4 sm:p-5 transition-all hover:shadow-md">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
+                <div className="relative space-y-1.5">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    Precio
+                  </div>
+                  <p className="text-3xl sm:text-4xl font-bold text-primary">
+                    ${product.price.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Card de Stock */}
+              <div className="relative overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-accent/5 to-accent/10 p-4 sm:p-5 transition-all hover:shadow-md">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-accent/5 rounded-full blur-2xl" />
+                <div className="relative space-y-1.5">
+                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <Package className="w-4 h-4" />
+                    Stock Disponible
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-3xl sm:text-4xl font-bold text-foreground">
+                      {product.stock}
+                    </p>
+                    <Badge
+                      variant={product.stock > 0 ? "default" : "secondary"}
+                      className={
+                        product.stock > 0
+                          ? "bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30 font-semibold"
+                          : "bg-muted text-muted-foreground border-border"
+                      }
+                    >
+                      {product.stock > 0 ? "Disponible" : "Agotado"}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-sm text-muted-foreground mb-1">Stock</p>
-              <Badge
-                variant={product.stock > 0 ? "default" : "secondary"}
-                className={
-                  product.stock > 0
-                    ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20 text-lg px-3 py-1"
-                    : "bg-muted text-muted-foreground border-border text-lg px-3 py-1"
-                }
-              >
-                {product.stock} unidades
-              </Badge>
-            </div>
+
+            {/* Descripción */}
+            {product.description ? (
+              <div className="rounded-xl border border-border/50 bg-card/50 p-4 sm:p-5 space-y-3">
+                <h3 className="font-bold text-base sm:text-lg text-foreground flex items-center gap-2">
+                  <div className="w-1 h-5 bg-primary rounded-full" />
+                  Descripción del Producto
+                </h3>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {product.description}
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-border/50 bg-muted/20 p-6 sm:p-8 text-center">
+                <Package className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-sm sm:text-base text-muted-foreground font-medium">
+                  Este producto no tiene descripción
+                </p>
+                <p className="text-xs text-muted-foreground/70 mt-1">
+                  Agrega una descripción para dar más detalles a tus clientes
+                </p>
+              </div>
+            )}
           </div>
-
-          {/* Descripción */}
-          {product.description && (
-            <div>
-              <h3 className="font-semibold text-foreground mb-2">
-                Descripción
-              </h3>
-              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                {product.description}
-              </p>
-            </div>
-          )}
-
-          {!product.description && (
-            <div className="p-4 bg-muted/30 rounded-lg border border-border text-center">
-              <p className="text-sm text-muted-foreground">
-                Este producto no tiene descripción
-              </p>
-            </div>
-          )}
         </div>
       </DialogContent>
     </Dialog>

@@ -55,14 +55,16 @@ export default function BusinessPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
         <div className="text-center space-y-6">
           <div className="relative">
-            <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full animate-pulse"></div>
-            <Loader2 className="relative w-14 h-14 sm:w-16 sm:h-16 animate-spin text-primary mx-auto" />
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-secondary/30 to-primary/30 blur-3xl rounded-full animate-pulse"></div>
+            <div className="relative w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto shadow-2xl">
+              <Loader2 className="w-10 h-10 sm:w-12 sm:h-12 animate-spin text-white" />
+            </div>
           </div>
           <div className="space-y-2">
-            <p className="text-lg sm:text-xl font-semibold text-foreground">
+            <p className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Cargando negocio...
             </p>
             <p className="text-xs sm:text-sm text-muted-foreground">
@@ -76,12 +78,12 @@ export default function BusinessPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-muted/20">
         <div className="max-w-md w-full">
-          <div className="bg-card/50 backdrop-blur-xl rounded-2xl shadow-xl border-border p-6 sm:p-8 text-center space-y-6">
+          <div className="bg-card/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-border/50 p-6 sm:p-8 text-center space-y-6">
             <div className="relative inline-flex">
-              <div className="absolute inset-0 bg-red-500/20 blur-2xl rounded-full"></div>
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-red-500/10 to-red-600/10 rounded-2xl flex items-center justify-center mx-auto shadow-md border border-red-500/20">
+              <div className="absolute inset-0 bg-gradient-to-r from-red-500/30 to-orange-500/30 blur-3xl rounded-full animate-pulse"></div>
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-red-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center mx-auto shadow-xl border-2 border-red-500/30">
                 <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-red-600 dark:text-red-400" />
               </div>
             </div>
@@ -98,14 +100,14 @@ export default function BusinessPage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
               <Button
                 onClick={() => globalThis.location.reload()}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all"
+                className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105"
               >
                 Reintentar
               </Button>
               <Link href="/">
                 <Button
                   variant="outline"
-                  className="w-full border-border hover:bg-accent"
+                  className="w-full border-border/50 hover:bg-accent/50 hover:border-primary/30 transition-all"
                 >
                   Volver al inicio
                 </Button>
@@ -119,12 +121,12 @@ export default function BusinessPage() {
 
   if (!business) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background via-background to-muted/20">
         <div className="max-w-md w-full">
-          <div className="bg-card/50 backdrop-blur-xl rounded-2xl shadow-xl border-border p-6 sm:p-8 text-center space-y-6">
+          <div className="bg-card/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-border/50 p-6 sm:p-8 text-center space-y-6">
             <div className="relative inline-flex">
-              <div className="absolute inset-0 bg-muted-foreground/20 blur-2xl rounded-full"></div>
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-muted/50 rounded-2xl flex items-center justify-center mx-auto shadow-md border border-border">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 blur-3xl rounded-full"></div>
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center mx-auto shadow-xl border-2 border-border">
                 <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-muted-foreground" />
               </div>
             </div>
@@ -137,7 +139,7 @@ export default function BusinessPage() {
               </p>
             </div>
             <Link href="/">
-              <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-md hover:shadow-lg transition-all">
+              <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105">
                 Volver al inicio
               </Button>
             </Link>
