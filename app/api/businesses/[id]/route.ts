@@ -32,6 +32,9 @@ export async function GET(
         promotions: {
           where: {
             isActive: true,
+            endDate: {
+              gte: new Date(),
+            },
           },
           include: {
             products: {
