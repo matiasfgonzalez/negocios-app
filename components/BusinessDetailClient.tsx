@@ -929,101 +929,113 @@ export default function BusinessDetailClient({
                                     >
                                       <CardContent className="p-3 sm:p-4">
                                         {/* Layout móvil mejorado */}
-                                        <div className="space-y-3">
-                                          {/* Fila 1: Nombre, Stock y Ver detalles */}
-                                          <div className="flex items-start justify-between gap-2">
-                                            <div className="flex-1 min-w-0">
-                                              <h4 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
-                                                {product.name}
-                                              </h4>
-                                            </div>
-                                            <div className="flex items-center gap-2 flex-shrink-0">
-                                              <Badge
-                                                variant={
-                                                  product.stock > 0
-                                                    ? "default"
-                                                    : "secondary"
-                                                }
-                                                className={
-                                                  product.stock > 0
-                                                    ? "bg-gradient-to-r from-green-500/15 to-emerald-500/10 text-green-700 dark:text-green-300 border-green-500/30 text-xs font-bold shadow-md"
-                                                    : "bg-gradient-to-r from-muted to-muted/80 text-muted-foreground border-border text-xs"
-                                                }
-                                              >
-                                                {product.stock}
-                                              </Badge>
+                                        <div className="flex gap-3">
+                                          {/* Imagen pequeña del producto */}
+                                          {product.images &&
+                                            Array.isArray(product.images) &&
+                                            product.images.length > 0 && (
+                                              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-muted border border-border/50 shadow-md">
+                                                <img
+                                                  src={product.images[0]}
+                                                  alt={product.name}
+                                                  className="w-full h-full object-cover"
+                                                />
+                                              </div>
+                                            )}
+
+                                          {/* Contenido del producto */}
+                                          <div className="flex-1 min-w-0 space-y-2">
+                                            {/* Nombre y Stock */}
+                                            <div className="space-y-1">
+                                              <div className="flex items-start justify-between gap-2">
+                                                <h4 className="text-sm sm:text-base font-bold text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-2">
+                                                  {product.name}
+                                                </h4>
+                                                <Badge
+                                                  variant={
+                                                    product.stock > 0
+                                                      ? "default"
+                                                      : "secondary"
+                                                  }
+                                                  className={
+                                                    product.stock > 0
+                                                      ? "bg-gradient-to-r from-green-500/15 to-emerald-500/10 text-green-700 dark:text-green-300 border-green-500/30 text-[10px] sm:text-xs font-bold shadow-md whitespace-nowrap"
+                                                      : "bg-gradient-to-r from-muted to-muted/80 text-muted-foreground border-border text-[10px] sm:text-xs whitespace-nowrap"
+                                                  }
+                                                >
+                                                  {product.stock}
+                                                </Badge>
+                                              </div>
                                               <ProductDetailDialog
                                                 product={product}
                                               />
                                             </div>
-                                          </div>
 
-                                          {/* Fila 2: Precio y Controles */}
-                                          <div className="flex items-center justify-between gap-3">
-                                            <div className="flex items-baseline gap-1">
-                                              <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                                                ${product.price.toFixed(2)}
-                                              </span>
-                                            </div>
+                                            {/* Precio y Controles */}
+                                            <div className="flex items-end justify-between gap-2 pt-1">
+                                              <div className="flex items-baseline gap-1">
+                                                <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                                                  ${product.price.toFixed(2)}
+                                                </span>
+                                              </div>
 
-                                            {/* Controles de cantidad */}
-                                            <div className="flex-shrink-0">
-                                              {cartQty > 0 ? (
-                                                <div className="flex items-center gap-1.5 sm:gap-2">
+                                              {/* Controles de cantidad */}
+                                              <div className="flex-shrink-0">
+                                                {cartQty > 0 ? (
+                                                  <div className="flex items-center gap-1">
+                                                    <Button
+                                                      size="sm"
+                                                      variant="outline"
+                                                      onClick={() =>
+                                                        updateQuantity(
+                                                          product.id,
+                                                          -1
+                                                        )
+                                                      }
+                                                      disabled={!canOrderNow}
+                                                      className="h-8 w-8 p-0 hover:bg-gradient-to-br hover:from-red-500/15 hover:to-red-600/10 hover:border-red-500/60 hover:text-red-600 dark:hover:text-red-400 transition-all disabled:opacity-50 border-border/60"
+                                                    >
+                                                      <Minus className="w-3.5 h-3.5" />
+                                                    </Button>
+                                                    <span className="text-base sm:text-lg font-bold min-w-[2rem] text-center text-foreground">
+                                                      {cartQty}
+                                                    </span>
+                                                    <Button
+                                                      size="sm"
+                                                      variant="outline"
+                                                      onClick={() =>
+                                                        updateQuantity(
+                                                          product.id,
+                                                          1
+                                                        )
+                                                      }
+                                                      disabled={
+                                                        cartQty >=
+                                                          product.stock ||
+                                                        !canOrderNow
+                                                      }
+                                                      className="h-8 w-8 p-0 hover:bg-gradient-to-br hover:from-green-500/15 hover:to-emerald-500/10 hover:border-green-500/60 hover:text-green-600 dark:hover:text-green-400 transition-all disabled:opacity-50 border-border/60"
+                                                    >
+                                                      <Plus className="w-3.5 h-3.5" />
+                                                    </Button>
+                                                  </div>
+                                                ) : (
                                                   <Button
-                                                    size="sm"
-                                                    variant="outline"
                                                     onClick={() =>
-                                                      updateQuantity(
-                                                        product.id,
-                                                        -1
-                                                      )
-                                                    }
-                                                    disabled={!canOrderNow}
-                                                    className="h-9 w-9 p-0 hover:bg-gradient-to-br hover:from-red-500/15 hover:to-red-600/10 hover:border-red-500/60 hover:text-red-600 dark:hover:text-red-400 transition-all disabled:opacity-50 border-border/60"
-                                                  >
-                                                    <Minus className="w-4 h-4" />
-                                                  </Button>
-                                                  <span className="text-lg sm:text-xl font-bold min-w-[2.5rem] text-center text-foreground">
-                                                    {cartQty}
-                                                  </span>
-                                                  <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={() =>
-                                                      updateQuantity(
-                                                        product.id,
-                                                        1
-                                                      )
+                                                      addToCart(product)
                                                     }
                                                     disabled={
-                                                      cartQty >=
-                                                        product.stock ||
+                                                      product.stock === 0 ||
                                                       !canOrderNow
                                                     }
-                                                    className="h-9 w-9 p-0 hover:bg-gradient-to-br hover:from-green-500/15 hover:to-emerald-500/10 hover:border-green-500/60 hover:text-green-600 dark:hover:text-green-400 transition-all disabled:opacity-50 border-border/60"
+                                                    size="sm"
+                                                    className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white shadow-lg hover:shadow-xl hover:shadow-primary/30 transition-all disabled:opacity-50 font-semibold px-3 h-8 text-xs sm:text-sm"
                                                   >
-                                                    <Plus className="w-4 h-4" />
+                                                    <Plus className="w-3.5 h-3.5 mr-1" />
+                                                    Agregar
                                                   </Button>
-                                                </div>
-                                              ) : (
-                                                <Button
-                                                  onClick={() =>
-                                                    addToCart(product)
-                                                  }
-                                                  disabled={
-                                                    product.stock === 0 ||
-                                                    !canOrderNow
-                                                  }
-                                                  size="sm"
-                                                  className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white shadow-lg hover:shadow-xl hover:shadow-primary/30 transition-all disabled:opacity-50 font-semibold px-4 h-9"
-                                                >
-                                                  <Plus className="w-4 h-4 mr-1.5" />
-                                                  {canOrderNow
-                                                    ? "Agregar"
-                                                    : "No disponible"}
-                                                </Button>
-                                              )}
+                                                )}
+                                              </div>
                                             </div>
                                           </div>
                                         </div>
