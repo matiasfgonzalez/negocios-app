@@ -22,6 +22,14 @@ type OrderForWhatsApp = Pick<
       readonly name: string;
     };
   }>;
+  readonly promotions?: ReadonlyArray<{
+    readonly quantity: number;
+    readonly price?: number;
+    readonly unitPrice?: number;
+    readonly promotion: {
+      readonly name: string;
+    };
+  }>;
 };
 
 export function generateOrderWhatsAppMessage(
@@ -44,7 +52,7 @@ export function generateOrderWhatsAppMessage(
   const customerEmail = order.customer.email;
   const customerPhone = order.customer.phone || "Sin teléfono";
 
-  // Lista de productos
+  // Lista de productos y promociones
   let productsText = "";
   for (const item of order.items) {
     const itemPrice = item.price ?? item.unitPrice ?? 0;
@@ -52,6 +60,17 @@ export function generateOrderWhatsAppMessage(
     productsText += `\n• ${item.quantity}x ${
       item.product.name
     } - $${subtotal.toFixed(2)}`;
+  }
+
+  // Agregar promociones si existen
+  if (order.promotions) {
+    for (const promo of order.promotions) {
+      const promoPrice = promo.price ?? promo.unitPrice ?? 0;
+      const subtotal = promo.quantity * promoPrice;
+      productsText += `\n• 🎁 ${promo.quantity}x PROMO: ${
+        promo.promotion.name
+      } - $${subtotal.toFixed(2)}`;
+    }
   }
 
   // Tipo de entrega
@@ -72,9 +91,16 @@ export function generateOrderWhatsAppMessage(
     return sum + item.quantity * itemPrice;
   }, 0);
 
+  const promotionsTotal = order.promotions
+    ? order.promotions.reduce((sum, promo) => {
+        const promoPrice = promo.price ?? promo.unitPrice ?? 0;
+        return sum + promo.quantity * promoPrice;
+      }, 0)
+    : 0;
+
   const shippingCost = order.shipping
-    ? itemsTotal < order.total
-      ? order.total - itemsTotal
+    ? itemsTotal + promotionsTotal < order.total
+      ? order.total - (itemsTotal + promotionsTotal)
       : 0
     : 0;
 

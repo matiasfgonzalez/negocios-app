@@ -99,6 +99,9 @@ export type Order = {
   // Ítems incluidos en la orden (Relación)
   items?: OrderItem[];
 
+  // Promociones incluidas en la orden (Relación)
+  promotions?: OrderPromotion[];
+
   // Total de la orden
   total: number;
 
@@ -153,6 +156,29 @@ export type OrderItem = {
   quantity: number;
 
   // Precio unitario del producto en el ítem
+  unitPrice: number;
+};
+
+export type OrderPromotion = {
+  // Identificador único del ítem de promoción
+  id: string;
+
+  // ID de la orden a la que pertenece el ítem
+  orderId: string;
+
+  // Relación con la orden (opcional cuando solo se usa el ID)
+  order?: Order;
+
+  // ID de la promoción incluida en el ítem
+  promotionId: string;
+
+  // Relación con la promoción (opcional cuando solo se usa el ID)
+  promotion?: Promotion;
+
+  // Cantidad de promociones en el ítem
+  quantity: number;
+
+  // Precio unitario de la promoción en el ítem
   unitPrice: number;
 };
 
@@ -493,6 +519,9 @@ export type Promotion = {
 
   // Productos incluidos en la promoción (Relación)
   products?: PromotionProduct[];
+
+  // Órdenes que incluyen esta promoción (Relación)
+  orderPromotions?: OrderPromotion[];
 
   // Fecha de creación
   createdAt: Date | string;

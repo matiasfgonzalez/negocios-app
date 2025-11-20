@@ -27,7 +27,10 @@ import { Separator } from "@/components/ui/separator";
 import PaymentAliasDisplay from "@/components/PaymentAliasDisplay";
 import { Order } from "@/app/types/types";
 
-type OrderDetailsData = Omit<Order, "business" | "customer" | "items"> & {
+type OrderDetailsData = Omit<
+  Order,
+  "business" | "customer" | "items" | "promotions"
+> & {
   business: {
     name: string;
     rubro: string;
@@ -45,6 +48,14 @@ type OrderDetailsData = Omit<Order, "business" | "customer" | "items"> & {
     quantity: number;
     unitPrice: number;
     product: {
+      name: string;
+    };
+  }>;
+  promotions?: Array<{
+    id: string;
+    quantity: number;
+    unitPrice: number;
+    promotion: {
       name: string;
     };
   }>;
@@ -173,11 +184,11 @@ export default function OrderDetailsDialog({
 
           <Separator />
 
-          {/* Productos */}
+          {/* Productos y Promociones */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
               <Package className="w-4 h-4 text-primary" />
-              Productos ({order.items.length})
+              Productos ({order.items.length + (order.promotions?.length || 0)})
             </div>
             <div className="space-y-2">
               {order.items.map((item) => (
@@ -195,6 +206,29 @@ export default function OrderDetailsDialog({
                   </div>
                   <p className="font-semibold text-primary">
                     ${(item.unitPrice * item.quantity).toFixed(2)}
+                  </p>
+                </div>
+              ))}
+              {order.promotions?.map((promo) => (
+                <div
+                  key={promo.id}
+                  className="flex items-center justify-between bg-gradient-to-br from-fuchsia-500/10 to-pink-500/10 border-2 border-fuchsia-500/30 rounded-lg p-3"
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <Badge className="bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white border-0 text-[10px] px-1.5 py-0 shadow-md">
+                        PROMO
+                      </Badge>
+                      <p className="font-medium text-foreground">
+                        {promo.promotion.name}
+                      </p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      ${promo.unitPrice.toFixed(2)} × {promo.quantity}
+                    </p>
+                  </div>
+                  <p className="font-semibold bg-gradient-to-r from-fuchsia-600 to-pink-600 bg-clip-text text-transparent">
+                    ${(promo.unitPrice * promo.quantity).toFixed(2)}
                   </p>
                 </div>
               ))}
@@ -259,12 +293,16 @@ export default function OrderDetailsDialog({
                 <span className="text-muted-foreground">Subtotal:</span>
                 <span className="font-medium text-foreground">
                   $
-                  {order.items
-                    .reduce(
+                  {(
+                    order.items.reduce(
                       (sum, item) => sum + item.unitPrice * item.quantity,
                       0
-                    )
-                    .toFixed(2)}
+                    ) +
+                    (order.promotions?.reduce(
+                      (sum, promo) => sum + promo.unitPrice * promo.quantity,
+                      0
+                    ) || 0)
+                  ).toFixed(2)}
                 </span>
               </div>
               {order.shipping && (
@@ -277,7 +315,11 @@ export default function OrderDetailsDialog({
                       order.items.reduce(
                         (sum, item) => sum + item.unitPrice * item.quantity,
                         0
-                      )
+                      ) -
+                      (order.promotions?.reduce(
+                        (sum, promo) => sum + promo.unitPrice * promo.quantity,
+                        0
+                      ) || 0)
                     ).toFixed(2)}
                   </span>
                 </div>

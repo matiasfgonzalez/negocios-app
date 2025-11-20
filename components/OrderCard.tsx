@@ -86,6 +86,25 @@ type OrderWithRelations = {
       updatedAt: Date;
     };
   }>;
+  promotions?: Array<{
+    id: string;
+    orderId: string;
+    promotionId: string;
+    quantity: number;
+    unitPrice: number;
+    promotion: {
+      id: string;
+      businessId: string;
+      name: string;
+      description: string | null;
+      price: number;
+      image: string | null;
+      isActive: boolean;
+      stock: number | null;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+  }>;
   events: Array<{
     id: string;
     orderId: string;
@@ -191,7 +210,7 @@ export default function OrderCard({
               <div className="w-6 h-6 flex items-center justify-center rounded-lg bg-orange-500/10">
                 <Package className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
               </div>
-              Productos ({order.items.length})
+              Productos ({order.items.length + (order.promotions?.length || 0)})
             </div>
             <ul className="space-y-1.5">
               {order.items.slice(0, 3).map((item) => (
@@ -202,9 +221,24 @@ export default function OrderCard({
                   {item.quantity}x {item.product.name}
                 </li>
               ))}
-              {order.items.length > 3 && (
+              {order.promotions
+                ?.slice(0, Math.max(0, 3 - order.items.length))
+                .map((promo) => (
+                  <li
+                    key={promo.id}
+                    className="text-sm text-foreground pl-2 border-l-2 border-fuchsia-500/50 flex items-center gap-1"
+                  >
+                    {promo.quantity}x
+                    <Badge className="bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white border-0 text-[10px] px-1.5 py-0">
+                      PROMO
+                    </Badge>
+                    {promo.promotion.name}
+                  </li>
+                ))}
+              {order.items.length + (order.promotions?.length || 0) > 3 && (
                 <li className="text-xs text-muted-foreground pl-2">
-                  +{order.items.length - 3} más...
+                  +{order.items.length + (order.promotions?.length || 0) - 3}{" "}
+                  más...
                 </li>
               )}
             </ul>

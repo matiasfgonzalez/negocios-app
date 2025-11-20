@@ -16,7 +16,19 @@ const orderSchema = z.object({
         price: z.number(),
       })
     )
-    .min(1),
+    .optional()
+    .default([]),
+  promotions: z
+    .array(
+      z.object({
+        promotionId: z.string(),
+        quantity: z.number().int().min(1),
+        name: z.string(),
+        price: z.number(),
+      })
+    )
+    .optional()
+    .default([]),
   shipping: z.boolean(),
   lat: z.number().optional(),
   lng: z.number().optional(),
@@ -133,6 +145,24 @@ export async function GET(req: Request) {
             },
           },
         },
+        promotions: {
+          include: {
+            promotion: {
+              select: {
+                id: true,
+                businessId: true,
+                name: true,
+                description: true,
+                price: true,
+                image: true,
+                isActive: true,
+                stock: true,
+                createdAt: true,
+                updatedAt: true,
+              },
+            },
+          },
+        },
         events: {
           orderBy: {
             createdAt: "desc",
@@ -181,6 +211,14 @@ export async function POST(req: Request) {
         { status: 404 }
       );
 
+    // Validar que haya al menos productos o promociones
+    if (parsed.items.length === 0 && parsed.promotions.length === 0) {
+      return NextResponse.json(
+        { error: "El pedido debe contener al menos un producto o promoción" },
+        { status: 400 }
+      );
+    }
+
     // Validar campos de envío si es necesario
     if (parsed.shipping && !parsed.addressText) {
       return NextResponse.json(
@@ -213,10 +251,40 @@ export async function POST(req: Request) {
       }
     }
 
+    // Validar stock de promociones
+    const promotionIds = parsed.promotions.map((p) => p.promotionId);
+    const promotions = await prisma.promotion.findMany({
+      where: { id: { in: promotionIds } },
+    });
+
+    for (const item of parsed.promotions) {
+      const promotion = promotions.find((p) => p.id === item.promotionId);
+      if (!promotion) {
+        return NextResponse.json(
+          { error: `Promoción ${item.name} no encontrada` },
+          { status: 404 }
+        );
+      }
+      if (promotion.stock !== null && promotion.stock < item.quantity) {
+        return NextResponse.json(
+          {
+            error: `Stock insuficiente para ${promotion.name}. Disponible: ${promotion.stock}, Solicitado: ${item.quantity}`,
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     const orderItemsData = parsed.items.map((item) => ({
       productId: item.productId,
       quantity: item.quantity,
       unitPrice: item.price,
+    }));
+
+    const orderPromotionsData = parsed.promotions.map((promo) => ({
+      promotionId: promo.promotionId,
+      quantity: promo.quantity,
+      unitPrice: promo.price,
     }));
 
     // Crear la orden en una transacción
@@ -232,11 +300,17 @@ export async function POST(req: Request) {
           addressText: parsed.addressText,
           note: parsed.note,
           items: { create: orderItemsData },
+          promotions: { create: orderPromotionsData },
         },
         include: {
           items: {
             include: {
               product: true,
+            },
+          },
+          promotions: {
+            include: {
+              promotion: true,
             },
           },
           business: true,
@@ -266,15 +340,41 @@ export async function POST(req: Request) {
         });
       }
 
+      // Decrementar stock de promociones (solo si tienen stock definido)
+      for (const promo of parsed.promotions) {
+        // Obtener la promoción dentro de la transacción para verificar el stock
+        const promotion = await tx.promotion.findUnique({
+          where: { id: promo.promotionId },
+          select: { stock: true },
+        });
+
+        if (promotion && promotion.stock !== null) {
+          await tx.promotion.update({
+            where: { id: promo.promotionId },
+            data: {
+              stock: {
+                decrement: promo.quantity,
+              },
+            },
+          });
+        }
+      }
+
       return order;
     });
 
     // Construir mensaje detallado para WhatsApp
-    const itemsList = parsed.items
-      .map(
+    const itemsList = [
+      ...parsed.items.map(
         (item) => `• ${item.quantity}x ${item.name} - $${item.price.toFixed(2)}`
-      )
-      .join("\n");
+      ),
+      ...parsed.promotions.map(
+        (promo) =>
+          `• 🎁 ${promo.quantity}x PROMO: ${
+            promo.name
+          } - $${promo.price.toFixed(2)}`
+      ),
+    ].join("\n");
 
     const deliveryInfo = parsed.shipping
       ? `\n\n📍 *ENTREGA A DOMICILIO*\n` +

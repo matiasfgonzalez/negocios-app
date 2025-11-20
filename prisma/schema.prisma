@@ -30,117 +30,117 @@ model AppUser {
   // Teléfono del usuario
   phone      String?
   // Avatar o foto de perfil del usuario
-  avatar     String?
+  avatar                String?
   // Rol del usuario (ADMINISTRADOR, PROPIETARIO, CLIENTE)
-  role       Role      @default(CLIENTE)
+  role                  Role               @default(CLIENTE)
   // Dirección del usuario (para envíos frecuentes)
-  address    String?
+  address               String?
   // Latitud de la dirección del usuario
-  lat        Float?
+  lat                   Float?
   // Longitud de la dirección del usuario
-  lng        Float?
+  lng                   Float?
   // Ciudad del usuario
-  city       String?
+  city                  String?
   // Provincia/Estado del usuario
-  province   String?
+  province              String?
   // Código postal del usuario
-  postalCode String?
+  postalCode            String?
   // DNI o documento de identidad
-  documentId String?
+  documentId            String?
   // Fecha de nacimiento del usuario
-  birthDate  DateTime?
+  birthDate             DateTime?
   // Indica si el usuario está activo
-  isActive   Boolean   @default(true)
+  isActive              Boolean            @default(true)
   // Fecha de última sesión del usuario
-  lastLogin  DateTime?
+  lastLogin             DateTime?
   // Preferencias del usuario en formato JSON (tema, notificaciones, etc.)
-  preferences Json?
+  preferences           Json?
   // Notas internas del administrador sobre el usuario
-  adminNotes String?
+  adminNotes            String?
   // Negocios que posee el usuario
-  businesses Business[]
+  businesses            Business[]
   // Órdenes realizadas por el usuario
-  orders     Order[]
+  orders                Order[]
   // Imágenes subidas por el usuario
-  uploadedImages UploadedImage[]
+  uploadedImages        UploadedImage[]
   // Solicitudes de cambio de rol realizadas por el usuario
-  roleRequests RoleRequest[]
+  roleRequests          RoleRequest[]
   // Fecha en que se convirtió en propietario (para calcular período de prueba)
-  becameOwnerAt DateTime?
+  becameOwnerAt         DateTime?
   // Estado de la suscripción del propietario
-  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  subscriptionStatus    SubscriptionStatus @default(TRIAL)
   // Fecha hasta la cual la suscripción está paga
   subscriptionPaidUntil DateTime?
   // Pagos realizados por el usuario (como propietario)
-  payments Payment[]
+  payments              Payment[]
   // Fecha de creación del usuario
-  createdAt  DateTime  @default(now())
+  createdAt             DateTime           @default(now())
   // Fecha de última actualización del usuario
-  updatedAt  DateTime  @updatedAt
+  updatedAt             DateTime           @updatedAt
 }
 
 // Modelo que representa un negocio dentro de la aplicación
 model Business {
   // Identificador único del negocio
-  id            String    @id @default(cuid())
+  id                       String         @id @default(cuid())
   // ID del propietario del negocio
-  ownerId       String
+  ownerId                  String
   // Relación con el usuario propietario
-  owner         AppUser   @relation(fields: [ownerId], references: [id])
+  owner                    AppUser        @relation(fields: [ownerId], references: [id])
   // Nombre del negocio
-  name          String
+  name                     String
   // Slug único para el negocio
-  slug          String    @unique
+  slug                     String         @unique
   // Descripción del negocio
-  description   String?
+  description              String?
   // Rubro o categoría del negocio
-  rubro         String
+  rubro                    String
   // Teléfono de WhatsApp del negocio
-  whatsappPhone String?
+  whatsappPhone            String?
   // Alias para pagos del negocio
-  aliasPago     String?
+  aliasPago                String?
   // Dirección textual del negocio
-  addressText   String?
+  addressText              String?
   // Latitud de la ubicación del negocio
-  lat           Float?
+  lat                      Float?
   // Longitud de la ubicación del negocio
-  lng           Float?
+  lng                      Float?
   // URL de la imagen o logo del negocio
-  img           String?
+  img                      String?
   // Indica si el negocio ofrece servicio de envío a domicilio
-  hasShipping   Boolean  @default(false)
+  hasShipping              Boolean        @default(false)
   // Valor del envío del negocio (deprecado - usar shippingRanges)
-  shippingCost  Float?   @default(0)
+  shippingCost             Float?         @default(0)
   // Distancia máxima de envío en kilómetros (null = sin límite)
-  maxShippingDistance Float?
+  maxShippingDistance      Float?
   // Rangos de costos de envío por distancia en formato JSON
   // Estructura: [{ "fromKm": 0, "toKm": 1, "cost": 1000 }, { "fromKm": 1, "toKm": 2, "cost": 1500 }, ...]
   // Si toKm es null, representa "hasta infinito"
-  shippingRanges Json?
+  shippingRanges           Json?
   // Estado actual del negocio (abierto, cerrado temporalmente, cerrado permanentemente)
-  status        BusinessStatus @default(ABIERTO)
+  status                   BusinessStatus @default(ABIERTO)
   // Motivo por el cual el negocio está cerrado (vacaciones, día festivo, emergencia, etc.)
-  closedReason  String?
+  closedReason             String?
   // Horarios de atención del negocio en formato JSON
   // Estructura: { "lunes": { "enabled": true, "open": "09:00", "close": "18:00" }, ... }
-  schedule      Json?
+  schedule                 Json?
   // Días especiales de cierre (feriados, vacaciones) en formato JSON
   // Estructura: [{ "date": "2025-12-25", "reason": "Navidad" }, ...]
-  specialClosedDays Json?
+  specialClosedDays        Json?
   // Indica si el negocio acepta pedidos fuera del horario de atención
-  acceptOrdersOutsideHours Boolean @default(false)
+  acceptOrdersOutsideHours Boolean        @default(false)
   // Tiempo estimado de preparación de pedidos (en minutos)
-  preparationTime Int? @default(30)
+  preparationTime          Int?           @default(30)
   // Productos ofrecidos por el negocio
-  products      Product[]
+  products                 Product[]
   // Promociones del negocio
-  promotions    Promotion[]
+  promotions               Promotion[]
   // Órdenes asociadas al negocio
-  orders        Order[]
+  orders                   Order[]
   // Fecha de creación del negocio
-  createdAt     DateTime @default(now())
+  createdAt                DateTime       @default(now())
   // Fecha de última actualización del negocio
-  updatedAt     DateTime @updatedAt
+  updatedAt                DateTime       @updatedAt
 }
 
 // Modelo que representa una categoría de productos predefinida del sistema
@@ -166,57 +166,59 @@ model ProductCategory {
 // Modelo que representa un producto ofrecido por un negocio
 model Product {
   // Identificador único del producto
-  id         String   @id @default(cuid())
+  id                String             @id @default(cuid())
   // ID del negocio al que pertenece el producto
-  businessId String
+  businessId        String
   // Relación con el negocio
-  business   Business @relation(fields: [businessId], references: [id])
+  business          Business           @relation(fields: [businessId], references: [id])
   // ID de la categoría del producto (opcional)
-  categoryId String?
+  categoryId        String?
   // Relación con la categoría
-  category   ProductCategory? @relation(fields: [categoryId], references: [id])
+  category          ProductCategory?   @relation(fields: [categoryId], references: [id])
   // Nombre del producto
-  name       String
+  name              String
   // Descripción del producto
-  description String?
+  description       String?
   // Precio del producto
-  price      Float
+  price             Float
   // Stock disponible del producto
-  stock      Int      @default(0)
+  stock             Int                @default(0)
   // Código SKU del producto
-  sku        String?
+  sku               String?
   // Indica si el producto está disponible
-  available  Boolean  @default(true)
+  available         Boolean            @default(true)
   // Imágenes del producto
-  images     Json?
+  images            Json?
   // Ítems de orden que incluyen este producto
-  orderItems OrderItem[]
+  orderItems        OrderItem[]
   // Promociones que incluyen este producto
   promotionProducts PromotionProduct[]
   // Fecha de creación del producto
-  createdAt  DateTime @default(now())
+  createdAt         DateTime           @default(now())
   // Fecha de última actualización del producto
-  updatedAt  DateTime @updatedAt
+  updatedAt         DateTime           @updatedAt
 }
 
 // Modelo que representa una orden de compra realizada por un usuario
 model Order {
   // Identificador único de la orden
-  id           String       @id @default(cuid())
+  id           String           @id @default(cuid())
   // ID del negocio asociado a la orden
   businessId   String
   // Relación con el negocio
-  business     Business     @relation(fields: [businessId], references: [id])
+  business     Business         @relation(fields: [businessId], references: [id])
   // ID del cliente que realiza la orden
   customerId   String
   // Relación con el usuario cliente
-  customer     AppUser      @relation(fields: [customerId], references: [id])
+  customer     AppUser          @relation(fields: [customerId], references: [id])
   // Ítems incluidos en la orden
   items        OrderItem[]
+  // Promociones incluidas en la orden
+  promotions   OrderPromotion[]
   // Total de la orden
   total        Float
   // Indica si la orden requiere envío
-  shipping     Boolean      @default(false)
+  shipping     Boolean          @default(false)
   // Latitud de la dirección de envío
   lat          Float?
   // Longitud de la dirección de envío
@@ -224,7 +226,7 @@ model Order {
   // Dirección textual de envío
   addressText  String?
   // Estado actual de la orden
-  state        OrderState   @default(REGISTRADA)
+  state        OrderState       @default(REGISTRADA)
   // Comprobante de pago
   paymentProof String?
   // Nota adicional de la orden
@@ -232,9 +234,9 @@ model Order {
   // Eventos asociados a la orden
   events       OrderEvent[]
   // Fecha de creación de la orden
-  createdAt    DateTime     @default(now())
+  createdAt    DateTime         @default(now())
   // Fecha de última actualización de la orden
-  updatedAt    DateTime     @updatedAt
+  updatedAt    DateTime         @updatedAt
 }
 
 // Modelo que representa un ítem dentro de una orden de compra
@@ -253,6 +255,24 @@ model OrderItem {
   quantity  Int
   // Precio unitario del producto en el ítem
   unitPrice Float
+}
+
+// Modelo que representa una promoción dentro de una orden de compra
+model OrderPromotion {
+  // Identificador único del ítem de promoción
+  id          String    @id @default(cuid())
+  // ID de la orden a la que pertenece el ítem
+  orderId     String
+  // Relación con la orden
+  order       Order     @relation(fields: [orderId], references: [id])
+  // ID de la promoción incluida en el ítem
+  promotionId String
+  // Relación con la promoción
+  promotion   Promotion @relation(fields: [promotionId], references: [id])
+  // Cantidad de promociones en el ítem
+  quantity    Int
+  // Precio unitario de la promoción en el ítem
+  unitPrice   Float
 }
 
 // Modelo que representa un evento dentro del ciclo de vida de una orden
@@ -275,41 +295,41 @@ model OrderEvent {
 
 // Enum que representa los roles posibles de un usuario
 enum Role {
-  ADMINISTRADOR      // Administrador
-  PROPIETARIO        // Propietario de negocio
-  CLIENTE            // Cliente
+  ADMINISTRADOR // Administrador
+  PROPIETARIO // Propietario de negocio
+  CLIENTE // Cliente
 }
 
 // Enum que representa el estado de un negocio
 enum BusinessStatus {
-  ABIERTO            // Negocio abierto y operativo
-  CERRADO_TEMPORAL   // Cerrado temporalmente (vacaciones, día libre, etc.)
+  ABIERTO // Negocio abierto y operativo
+  CERRADO_TEMPORAL // Cerrado temporalmente (vacaciones, día libre, etc.)
   CERRADO_PERMANENTE // Cerrado permanentemente
 }
 
 // Enum que representa los estados posibles de una orden
 enum OrderState {
-  REGISTRADA         // Orden registrada
-  PENDIENTE_PAGO     // Pendiente de pago
-  PAGADA             // Pagada
-  PREPARANDO         // Preparando
-  ENVIADA            // Enviada
-  ENTREGADA          // Entregada
-  CANCELADA          // Cancelada
+  REGISTRADA // Orden registrada
+  PENDIENTE_PAGO // Pendiente de pago
+  PAGADA // Pagada
+  PREPARANDO // Preparando
+  ENVIADA // Enviada
+  ENTREGADA // Entregada
+  CANCELADA // Cancelada
 }
 
 // Modelo que va a guardar las imágenes subidas a Cloudinary por los usuarios
 model UploadedImage {
   // Identificador único de la imagen
-  id        String   @id @default(cuid())
+  id         String   @id @default(cuid())
   // ID del usuario que subió la imagen
   uploaderId String
   // Relación con el usuario
-  uploader   AppUser @relation(fields: [uploaderId], references: [id])
+  uploader   AppUser  @relation(fields: [uploaderId], references: [id])
   // URL de la imagen en Cloudinary
   url        String
   // ID que devuelve Cloudinary para poder borrarla luego
-  publicId  String
+  publicId   String
   // Fecha de creación de la imagen
   createdAt  DateTime @default(now())
 }
@@ -317,139 +337,141 @@ model UploadedImage {
 // Modelo que representa una solicitud de cambio de rol (CLIENTE -> PROPIETARIO)
 model RoleRequest {
   // Identificador único de la solicitud
-  id          String              @id @default(cuid())
+  id            String            @id @default(cuid())
   // ID del usuario que solicita el cambio de rol
-  userId      String
+  userId        String
   // Relación con el usuario
-  user        AppUser             @relation(fields: [userId], references: [id])
+  user          AppUser           @relation(fields: [userId], references: [id])
   // Rol solicitado (por ahora solo PROPIETARIO)
   requestedRole Role              @default(PROPIETARIO)
   // Descripción o motivo de la solicitud
-  description String
+  description   String
   // Estado de la solicitud
-  status      RoleRequestStatus   @default(PENDIENTE)
+  status        RoleRequestStatus @default(PENDIENTE)
   // ID del administrador que procesó la solicitud
-  reviewedBy  String?
+  reviewedBy    String?
   // Fecha en que fue revisada la solicitud
-  reviewedAt  DateTime?
+  reviewedAt    DateTime?
   // Motivo del rechazo o aprobación (opcional para aprobación, obligatorio para rechazo)
-  reviewNote  String?
+  reviewNote    String?
   // Fecha de creación de la solicitud
-  createdAt   DateTime            @default(now())
+  createdAt     DateTime          @default(now())
   // Fecha de última actualización de la solicitud
-  updatedAt   DateTime            @updatedAt
+  updatedAt     DateTime          @updatedAt
 }
 
 // Enum que representa el estado de una solicitud de cambio de rol
 enum RoleRequestStatus {
-  PENDIENTE   // Solicitud pendiente de revisión
-  APROBADA    // Solicitud aprobada
-  RECHAZADA   // Solicitud rechazada
+  PENDIENTE // Solicitud pendiente de revisión
+  APROBADA // Solicitud aprobada
+  RECHAZADA // Solicitud rechazada
 }
 
 // Enum que representa el estado de la suscripción de un propietario
 enum SubscriptionStatus {
-  TRIAL       // Período de prueba (primer mes gratis)
-  ACTIVE      // Suscripción activa y al día
-  OVERDUE     // Pago vencido (puede seguir accediendo temporalmente)
-  SUSPENDED   // Suspendido por falta de pago (sin acceso)
+  TRIAL // Período de prueba (primer mes gratis)
+  ACTIVE // Suscripción activa y al día
+  OVERDUE // Pago vencido (puede seguir accediendo temporalmente)
+  SUSPENDED // Suspendido por falta de pago (sin acceso)
 }
 
 // Enum que representa el estado de un pago
 enum PaymentStatus {
-  PENDING     // Pago pendiente de verificación
-  APPROVED    // Pago aprobado por el administrador
-  REJECTED    // Pago rechazado
+  PENDING // Pago pendiente de verificación
+  APPROVED // Pago aprobado por el administrador
+  REJECTED // Pago rechazado
 }
 
 // Modelo que representa un pago de suscripción mensual
 model Payment {
   // Identificador único del pago
-  id          String        @id @default(cuid())
+  id            String        @id @default(cuid())
   // ID del propietario que realizó el pago
-  ownerId     String
+  ownerId       String
   // Relación con el usuario propietario
-  owner       AppUser       @relation(fields: [ownerId], references: [id])
+  owner         AppUser       @relation(fields: [ownerId], references: [id])
   // Monto del pago
-  amount      Float
+  amount        Float
   // Mes y año al que corresponde el pago (ej: "2025-11" para noviembre 2025)
-  periodMonth String
+  periodMonth   String
   // Estado del pago
-  status      PaymentStatus @default(PENDING)
+  status        PaymentStatus @default(PENDING)
   // URL del comprobante de pago (imagen/PDF en Cloudinary)
-  proofUrl    String?
+  proofUrl      String?
   // ID público de Cloudinary del comprobante
   proofPublicId String?
   // Nota del propietario al enviar el pago
-  ownerNote   String?
+  ownerNote     String?
   // Nota del administrador al revisar el pago
-  adminNote   String?
+  adminNote     String?
   // ID del administrador que revisó el pago
-  reviewedBy  String?
+  reviewedBy    String?
   // Fecha en que fue revisado el pago
-  reviewedAt  DateTime?
+  reviewedAt    DateTime?
   // Fecha de creación del pago
-  createdAt   DateTime      @default(now())
+  createdAt     DateTime      @default(now())
   // Fecha de última actualización del pago
-  updatedAt   DateTime      @updatedAt
+  updatedAt     DateTime      @updatedAt
 }
 
 // Modelo que representa la configuración de pagos y suscripciones
 model PaymentConfig {
   // Identificador único (siempre habrá solo un registro)
-  id              String   @id @default("payment_config")
+  id            String   @id @default("payment_config")
   // Monto mensual de la suscripción
-  monthlyFee      Float    @default(5000)
+  monthlyFee    Float    @default(5000)
   // Banco receptor
-  bankName        String   @default("Banco Nación")
+  bankName      String   @default("Banco Nación")
   // Alias bancario para transferencias
-  bankAlias       String   @default("BARRIOMARKET.PAGOS")
+  bankAlias     String   @default("BARRIOMARKET.PAGOS")
   // CBU/CVU para transferencias
-  bankCbu         String   @default("0110599520000012345678")
+  bankCbu       String   @default("0110599520000012345678")
   // Titular de la cuenta
-  accountHolder   String   @default("BarrioMarket S.A.")
+  accountHolder String   @default("BarrioMarket S.A.")
   // Tipo de cuenta (Cuenta Corriente, Caja de Ahorro, etc.)
-  accountType     String?  @default("Cuenta Corriente")
+  accountType   String?  @default("Cuenta Corriente")
   // Email de contacto para pagos
-  supportEmail    String   @default("pagos@barriomarket.com")
+  supportEmail  String   @default("pagos@barriomarket.com")
   // Teléfono de WhatsApp para consultas
-  supportPhone    String   @default("5491123456789")
+  supportPhone  String   @default("5491123456789")
   // Fecha de creación de la configuración
-  createdAt       DateTime @default(now())
+  createdAt     DateTime @default(now())
   // Fecha de última actualización
-  updatedAt       DateTime @updatedAt
+  updatedAt     DateTime @updatedAt
 }
 
 // Modelo que representa una promoción u oferta de un negocio
 model Promotion {
   // Identificador único de la promoción
-  id          String             @id @default(cuid())
+  id              String             @id @default(cuid())
   // ID del negocio al que pertenece la promoción
-  businessId  String
+  businessId      String
   // Relación con el negocio
-  business    Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  business        Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
   // Nombre de la promoción
-  name        String
+  name            String
   // Descripción de la promoción
-  description String?
+  description     String?
   // Precio de la promoción (menor a la suma de los productos individuales)
-  price       Float
+  price           Float
   // URL de la imagen de la promoción
-  image       String?
+  image           String?
   // Indica si la promoción está activa
-  isActive    Boolean            @default(true)
+  isActive        Boolean            @default(true)
   // Fecha de inicio de la promoción
-  startDate   DateTime?
+  startDate       DateTime?
   // Fecha de fin de la promoción
-  endDate     DateTime?
+  endDate         DateTime?
   // Stock disponible de la promoción (null = ilimitado)
-  stock       Int?
+  stock           Int?
   // Productos incluidos en la promoción
-  products    PromotionProduct[]
+  products        PromotionProduct[]
+  // Órdenes que incluyen esta promoción
+  orderPromotions OrderPromotion[]
   // Fecha de creación de la promoción
-  createdAt   DateTime           @default(now())
+  createdAt       DateTime           @default(now())
   // Fecha de última actualización de la promoción
-  updatedAt   DateTime           @updatedAt
+  updatedAt       DateTime           @updatedAt
 }
 
 // Modelo que representa la relación entre promociones y productos
