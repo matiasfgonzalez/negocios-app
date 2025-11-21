@@ -13,6 +13,12 @@ async function main() {
     const deletedOrderEvents = await prisma.orderEvent.deleteMany({});
     console.log(`   ✓ OrderEvents eliminados: ${deletedOrderEvents.count}`);
 
+    // Eliminar promociones de órdenes
+    const deletedOrderPromotions = await prisma.orderPromotion.deleteMany({});
+    console.log(
+      `   ✓ OrderPromotions eliminados: ${deletedOrderPromotions.count}`
+    );
+
     // Eliminar items de órdenes
     const deletedOrderItems = await prisma.orderItem.deleteMany({});
     console.log(`   ✓ OrderItems eliminados: ${deletedOrderItems.count}`);
@@ -20,6 +26,18 @@ async function main() {
     // Eliminar órdenes
     const deletedOrders = await prisma.order.deleteMany({});
     console.log(`   ✓ Orders eliminadas: ${deletedOrders.count}`);
+
+    // Eliminar productos de promociones
+    const deletedPromotionProducts = await prisma.promotionProduct.deleteMany(
+      {}
+    );
+    console.log(
+      `   ✓ PromotionProducts eliminados: ${deletedPromotionProducts.count}`
+    );
+
+    // Eliminar promociones
+    const deletedPromotions = await prisma.promotion.deleteMany({});
+    console.log(`   ✓ Promotions eliminadas: ${deletedPromotions.count}`);
 
     // Eliminar productos
     const deletedProducts = await prisma.product.deleteMany({});
@@ -229,58 +247,88 @@ async function main() {
           order: 28,
         },
         {
+          name: "Papas Fritas",
+          description: "Papas fritas y guarniciones",
+          icon: "🍟",
+          order: 29,
+        },
+        {
+          name: "Tartas",
+          description: "Tartas saladas y dulces",
+          icon: "🥧",
+          order: 30,
+        },
+        {
+          name: "Canelones",
+          description: "Canelones de diferentes rellenos",
+          icon: "🫔",
+          order: 31,
+        },
+        {
+          name: "Tortillas",
+          description: "Tortillas de papas, verduras y más",
+          icon: "🥚",
+          order: 32,
+        },
+        {
+          name: "Picadas",
+          description: "Tablas de fiambres, quesos y picadas",
+          icon: "🧀",
+          order: 33,
+        },
+        {
           name: "Frutos Secos",
           description: "Almendras, nueces y frutos secos",
           icon: "🥜",
-          order: 29,
+          order: 34,
         },
         {
           name: "Snacks",
           description: "Papas fritas, palitos y snacks",
           icon: "🍿",
-          order: 30,
+          order: 35,
         },
         {
           name: "Productos de Almacén",
           description: "Productos de almacén y despensa",
           icon: "🛒",
-          order: 31,
+          order: 36,
         },
         {
           name: "Frutas y Verduras",
           description: "Frutas y verduras frescas",
           icon: "🍎",
-          order: 32,
+          order: 37,
         },
         {
           name: "Lácteos",
           description: "Leche, quesos y lácteos",
           icon: "🥛",
-          order: 33,
+          order: 38,
         },
         {
           name: "Fiambrería",
           description: "Jamón, queso, salame y fiambres",
-          icon: "�",
-          order: 34,
+          icon: "🧀",
+          order: 39,
         },
         {
           name: "Congelados",
           description: "Productos congelados",
           icon: "❄️",
-          order: 35,
+          order: 40,
         },
         {
           name: "Artículos de Limpieza",
           description: "Productos de limpieza para el hogar",
           icon: "🧹",
-          order: 36,
+          order: 41,
         },
         {
           name: "Artículos de Higiene",
           description: "Productos de higiene personal",
           icon: "🧴",
-          order: 37,
+          order: 42,
         },
         {
           name: "Otros",
