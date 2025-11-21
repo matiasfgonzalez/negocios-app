@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { XCircle, Loader2, AlertTriangle } from "lucide-react";
 import {
   AlertDialog,
@@ -23,6 +24,7 @@ interface CancelOrderDialogProps {
   orderNumber: string;
   businessName: string;
   isOwner?: boolean;
+  onOrderCancelled?: () => void | Promise<void>;
 }
 
 export default function CancelOrderDialog({
@@ -30,6 +32,7 @@ export default function CancelOrderDialog({
   orderNumber,
   businessName,
   isOwner = false,
+  onOrderCancelled,
 }: CancelOrderDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
@@ -67,6 +70,7 @@ export default function CancelOrderDialog({
 
       if (!response.ok) {
         const data = await response.json();
+        toast.error(data.error || "Error al cancelar el pedido");
         throw new Error(data.error || "Error al cancelar el pedido");
       }
 
@@ -74,8 +78,11 @@ export default function CancelOrderDialog({
       setIsOpen(false);
       setCancellationReason("");
 
-      // Refrescar la página para mostrar los cambios
-      router.refresh();
+      // Llamar al callback para actualizar la lista de pedidos
+      if (onOrderCancelled) {
+        await onOrderCancelled();
+      }
+      toast.success("Pedido cancelado correctamente");
     } catch (err) {
       console.error("Error al cancelar pedido:", err);
       setError(

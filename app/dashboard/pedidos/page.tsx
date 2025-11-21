@@ -85,64 +85,63 @@ export default function PedidosPage() {
       return;
     }
 
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-
-        // Obtener el rol del usuario desde la base de datos
-        const userResponse = await fetch("/api/me");
-        if (!userResponse.ok) {
-          throw new Error("Error al obtener información del usuario");
-        }
-        const appUser = await userResponse.json();
-        setUserRole(appUser.role);
-        setCurrentAppUserId(appUser.id);
-
-        const response = await fetch("/api/orders");
-
-        if (!response.ok) {
-          throw new Error("Error al cargar los pedidos");
-        }
-
-        const data = await response.json();
-
-        // Convertir fechas de string a Date
-        const ordersWithDates = data.map((order: Order) => {
-          const events = order.events.map((event) => ({
-            ...event,
-            createdAt: new Date(event.createdAt),
-          }));
-
-          const items = order.items.map((item) => ({
-            ...item,
-            product: {
-              ...item.product,
-              createdAt: new Date(item.product.createdAt),
-              updatedAt: new Date(item.product.updatedAt),
-            },
-          }));
-
-          return {
-            ...order,
-            createdAt: new Date(order.createdAt),
-            updatedAt: new Date(order.updatedAt),
-            events,
-            items,
-          };
-        });
-
-        setOrders(ordersWithDates);
-      } catch (err) {
-        console.error("Error fetching orders:", err);
-        setError(err instanceof Error ? err.message : "Error desconocido");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchOrders();
   }, [user, isLoaded, router]);
 
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+
+      // Obtener el rol del usuario desde la base de datos
+      const userResponse = await fetch("/api/me");
+      if (!userResponse.ok) {
+        throw new Error("Error al obtener información del usuario");
+      }
+      const appUser = await userResponse.json();
+      setUserRole(appUser.role);
+      setCurrentAppUserId(appUser.id);
+
+      const response = await fetch("/api/orders");
+
+      if (!response.ok) {
+        throw new Error("Error al cargar los pedidos");
+      }
+
+      const data = await response.json();
+
+      // Convertir fechas de string a Date
+      const ordersWithDates = data.map((order: Order) => {
+        const events = order.events.map((event) => ({
+          ...event,
+          createdAt: new Date(event.createdAt),
+        }));
+
+        const items = order.items.map((item) => ({
+          ...item,
+          product: {
+            ...item.product,
+            createdAt: new Date(item.product.createdAt),
+            updatedAt: new Date(item.product.updatedAt),
+          },
+        }));
+
+        return {
+          ...order,
+          createdAt: new Date(order.createdAt),
+          updatedAt: new Date(order.updatedAt),
+          events,
+          items,
+        };
+      });
+
+      setOrders(ordersWithDates);
+    } catch (err) {
+      console.error("Error fetching orders:", err);
+      setError(err instanceof Error ? err.message : "Error desconocido");
+    } finally {
+      setLoading(false);
+    }
+  };
   if (!isLoaded || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -214,6 +213,7 @@ export default function PedidosPage() {
               order={order}
               userRole={userRole}
               currentUserId={currentAppUserId}
+              onOrderUpdated={fetchOrders}
             />
           ))}
         </div>

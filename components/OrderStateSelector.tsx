@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   Select,
   SelectContent,
@@ -36,11 +37,13 @@ const ORDER_STATES: Array<{ value: OrderState; label: string }> = [
 interface OrderStateSelectorProps {
   orderId: string;
   currentState: OrderState;
+  onStateChanged?: () => void | Promise<void>;
 }
 
 export default function OrderStateSelector({
   orderId,
   currentState,
+  onStateChanged,
 }: Readonly<OrderStateSelectorProps>) {
   const router = useRouter();
   const [isUpdating, setIsUpdating] = useState(false);
@@ -82,6 +85,7 @@ export default function OrderStateSelector({
 
       if (!response.ok) {
         const errorData = await response.json();
+        toast.error(errorData.error || "Error al actualizar el estado");
         throw new Error(errorData.error || "Error al actualizar el estado");
       }
 
@@ -89,8 +93,11 @@ export default function OrderStateSelector({
       setShowCancelDialog(false);
       setCancellationReason("");
 
-      // Revalidar la página para mostrar los cambios
-      router.refresh();
+      // Llamar al callback para actualizar la lista de pedidos
+      if (onStateChanged) {
+        await onStateChanged();
+      }
+      toast.success("Estado del pedido actualizado correctamente");
     } catch (error) {
       console.error("Error al actualizar estado:", error);
       setError(error instanceof Error ? error.message : "Error desconocido");

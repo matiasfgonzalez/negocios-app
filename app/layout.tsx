@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/Navbar";
 import UserSync from "@/components/UserSync";
 import NextTopLoader from "nextjs-toploader";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -41,6 +42,7 @@ export default function RootLayout({
           <ThemeProvider>
             {/* Sincronización automática de usuario con la base de datos */}
             <UserSync />
+            <Toaster position="top-center" richColors closeButton />
 
             {/* UI improved: Added gradient background overlay */}
             <div className="fixed inset-0 -z-10 bg-gradient-to-br from-background via-background to-muted/20 dark:from-background dark:via-background dark:to-muted/10" />

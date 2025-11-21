@@ -124,12 +124,14 @@ interface OrderCardProps {
   order: OrderWithRelations;
   userRole: string;
   currentUserId: string;
+  onOrderUpdated?: () => void | Promise<void>;
 }
 
 export default function OrderCard({
   order,
   userRole,
   currentUserId,
+  onOrderUpdated,
 }: Readonly<OrderCardProps>) {
   const getStateColor = (state: string) => {
     switch (state) {
@@ -194,6 +196,7 @@ export default function OrderCard({
                     | "ENTREGADA"
                     | "CANCELADA"
                 }
+                onStateChanged={onOrderUpdated}
               />
             ) : (
               <Badge className={getStateColor(order.state)}>
@@ -406,6 +409,7 @@ export default function OrderCard({
                 orderNumber={order.id.substring(0, 8).toUpperCase()}
                 businessName={order.business.name}
                 isOwner={false}
+                onOrderCancelled={onOrderUpdated}
               />
             )}
 

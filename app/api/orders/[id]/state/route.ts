@@ -65,6 +65,19 @@ export async function PATCH(
       );
     }
 
+    // Verificar que el pedido no esté en un estado final
+    if (
+      existingOrder.state === "ENTREGADA" ||
+      existingOrder.state === "CANCELADA"
+    ) {
+      return NextResponse.json(
+        {
+          error: `No se puede modificar un pedido en estado ${existingOrder.state}. Este es un estado final.`,
+        },
+        { status: 400 }
+      );
+    }
+
     // Obtener usuario de la base de datos para verificar permisos
     const appUser = await prisma.appUser.findUnique({
       where: { clerkId: user.id },
