@@ -944,7 +944,7 @@ export default function BusinessDetailClient({
                                             product.images.length > 0 && (
                                               <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-muted border border-border/50 shadow-md">
                                                 <img
-                                                  src={product.images[0]}
+                                                  src={product.images[0].url}
                                                   alt={product.name}
                                                   className="w-full h-full object-cover"
                                                 />

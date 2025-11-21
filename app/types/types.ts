@@ -25,6 +25,26 @@ export type BusinessStatus =
   | "CERRADO_TEMPORAL"
   | "CERRADO_PERMANENTE";
 
+export type UploadedImage = {
+  // Identificador único de la imagen
+  id: string;
+
+  // ID del usuario que subió la imagen
+  uploaderId: string;
+
+  // Relación con el usuario (opcional)
+  uploader?: AppUser;
+
+  // URL de la imagen en Cloudinary
+  url: string;
+
+  // ID público de Cloudinary para poder borrarla
+  publicId: string;
+
+  // Fecha de creación de la imagen
+  createdAt: Date | string;
+};
+
 export type AppUser = {
   // Identificador único del usuario
   id: string;
@@ -84,7 +104,7 @@ export type AppUser = {
   lastLogin: Date | string | null;
 
   // Preferencias en JSON
-  preferences: any;
+  preferences: Record<string, unknown> | null;
 
   // Notas del administrador
   adminNotes: string | null;
@@ -105,7 +125,7 @@ export type AppUser = {
   orders?: Order[];
 
   // Imágenes subidas (Relación)
-  uploadedImages?: any[];
+  uploadedImages?: UploadedImage[];
 
   // Solicitudes de rol (Relación)
   roleRequests?: RoleRequest[];
@@ -283,8 +303,7 @@ export type Product = {
   available: boolean;
 
   // Imágenes del producto (JSON)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  images: any;
+  images: { url: string; publicId?: string }[] | null;
 
   // Ítems de orden que incluyen este producto (Relación)
   orderItems?: OrderItem[];
@@ -372,8 +391,9 @@ export type Business = {
   maxShippingDistance: number | null;
 
   // Rangos de costos de envío por distancia (JSON)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  shippingRanges: any;
+  shippingRanges:
+    | { fromKm: number; toKm: number | null; cost: number }[]
+    | null;
 
   // Estado actual del negocio
   status: BusinessStatus;
@@ -382,12 +402,13 @@ export type Business = {
   closedReason: string | null;
 
   // Horarios de atención del negocio (JSON)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  schedule: any;
+  schedule: Record<
+    string,
+    { open: string; close: string; isOpen: boolean }
+  > | null;
 
   // Días especiales de cierre (JSON)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  specialClosedDays: any;
+  specialClosedDays: { date: string; reason?: string }[] | null;
 
   // Indica si el negocio acepta pedidos fuera del horario de atención
   acceptOrdersOutsideHours: boolean;

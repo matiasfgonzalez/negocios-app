@@ -26,7 +26,7 @@ type OrderForWhatsApp = Pick<
     readonly quantity: number;
     readonly price?: number;
     readonly unitPrice?: number;
-    readonly promotion: {
+    readonly promotion?: {
       readonly name: string;
     };
   }>;
@@ -67,9 +67,10 @@ export function generateOrderWhatsAppMessage(
     for (const promo of order.promotions) {
       const promoPrice = promo.price ?? promo.unitPrice ?? 0;
       const subtotal = promo.quantity * promoPrice;
-      productsText += `\n• 🎁 ${promo.quantity}x PROMO: ${
-        promo.promotion.name
-      } - $${subtotal.toFixed(2)}`;
+      const promoName = promo.promotion?.name || "Promoción sin nombre";
+      productsText += `\n• 🎁 ${
+        promo.quantity
+      }x PROMO: ${promoName} - $${subtotal.toFixed(2)}`;
     }
   }
 
