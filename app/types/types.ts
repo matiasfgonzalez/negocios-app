@@ -38,11 +38,65 @@ export type AppUser = {
   // Nombre del usuario
   name: string | null;
 
+  // Apellido del usuario
+  lastName: string | null;
+
+  // Nombre completo
+  fullName: string | null;
+
   // Teléfono del usuario
   phone: string | null;
 
+  // Avatar o foto de perfil
+  avatar: string | null;
+
   // Rol del usuario (ADMINISTRADOR, PROPIETARIO, CLIENTE)
   role: Role;
+
+  // Dirección del usuario
+  address: string | null;
+
+  // Latitud de la dirección
+  lat: number | null;
+
+  // Longitud de la dirección
+  lng: number | null;
+
+  // Ciudad del usuario
+  city: string | null;
+
+  // Provincia/Estado del usuario
+  province: string | null;
+
+  // Código postal
+  postalCode: string | null;
+
+  // DNI o documento de identidad
+  documentId: string | null;
+
+  // Fecha de nacimiento
+  birthDate: Date | string | null;
+
+  // Indica si está activo
+  isActive: boolean;
+
+  // Fecha de última sesión
+  lastLogin: Date | string | null;
+
+  // Preferencias en JSON
+  preferences: any;
+
+  // Notas del administrador
+  adminNotes: string | null;
+
+  // Fecha en que se convirtió en propietario
+  becameOwnerAt: Date | string | null;
+
+  // Estado de suscripción
+  subscriptionStatus: SubscriptionStatus;
+
+  // Fecha hasta la cual está paga la suscripción
+  subscriptionPaidUntil: Date | string | null;
 
   // Negocios que posee el usuario (Relación)
   businesses?: Business[];
@@ -50,11 +104,20 @@ export type AppUser = {
   // Órdenes realizadas por el usuario (Relación)
   orders?: Order[];
 
+  // Imágenes subidas (Relación)
+  uploadedImages?: any[];
+
+  // Solicitudes de rol (Relación)
+  roleRequests?: RoleRequest[];
+
+  // Pagos realizados (Relación)
+  payments?: Payment[];
+
   // Fecha de creación del usuario
-  createdAt: Date;
+  createdAt: Date | string;
 
   // Fecha de última actualización del usuario
-  updatedAt: Date;
+  updatedAt: Date | string;
 };
 
 export type OrderEvent = {
