@@ -187,7 +187,6 @@ export async function POST(request: NextRequest) {
       description,
       price,
       stock,
-      sku,
       available,
       images,
       businessId,
@@ -219,6 +218,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Generar SKU automático: PROD-{businessId-primeros4}-{timestamp}
+    const timestamp = Date.now().toString().slice(-6);
+    const businessPrefix = businessId.slice(0, 4).toUpperCase();
+    const sku = `PROD-${businessPrefix}-${timestamp}`;
+
     // Crear el producto
     const product = await prisma.product.create({
       data: {
@@ -226,7 +230,7 @@ export async function POST(request: NextRequest) {
         description: description || null,
         price: Number.parseFloat(price),
         stock: Number.parseInt(stock),
-        sku: sku || null,
+        sku,
         available: available !== false,
         images: images || null,
         businessId,

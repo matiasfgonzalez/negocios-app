@@ -118,7 +118,6 @@ export async function PUT(
       description,
       price,
       stock,
-      sku,
       available,
       images,
       businessId,
@@ -154,6 +153,16 @@ export async function PUT(
       }
     }
 
+    // Generar SKU automático solo si no existe
+    let sku = existingProduct.sku;
+    if (!sku) {
+      const timestamp = Date.now().toString().slice(-6);
+      const businessPrefix = existingProduct.businessId
+        .slice(0, 4)
+        .toUpperCase();
+      sku = `PROD-${businessPrefix}-${timestamp}`;
+    }
+
     // Actualizar el producto
     const updatedProduct = await prisma.product.update({
       where: { id: productId },
@@ -162,7 +171,7 @@ export async function PUT(
         description: description || null,
         price: Number.parseFloat(price),
         stock: Number.parseInt(stock),
-        sku: sku || null,
+        sku,
         available: available !== false,
         images: images !== undefined ? images : existingProduct.images,
         categoryId:

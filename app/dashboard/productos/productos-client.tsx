@@ -262,7 +262,6 @@ export default function ProductosClient({
     description: "",
     price: "",
     stock: "",
-    sku: "",
     available: "true",
     images: "",
     businessId: negocioIdFromUrl || "",
@@ -278,7 +277,6 @@ export default function ProductosClient({
         description: product.description || "",
         price: product.price.toString(),
         stock: product.stock.toString(),
-        sku: product.sku || "",
         available: product.available.toString(),
         images: product.images ? product.images.join(", ") : "",
         businessId: product.businessId,
@@ -292,7 +290,6 @@ export default function ProductosClient({
         description: "",
         price: "",
         stock: "",
-        sku: "",
         available: "true",
         images: "",
         businessId: negocioIdFromUrl || "",
@@ -563,48 +560,28 @@ export default function ProductosClient({
                   </div>
                 </div>
 
-                {/* SKU y Disponibilidad */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="sku"
-                      className="text-sm font-medium text-foreground"
-                    >
-                      SKU (Código)
-                    </Label>
-                    <Input
-                      id="sku"
-                      value={formData.sku}
-                      onChange={(e) =>
-                        setFormData({ ...formData, sku: e.target.value })
-                      }
-                      placeholder="Ej: PROD-001"
-                      className="bg-background border-border text-foreground"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="available"
-                      className="text-sm font-medium text-foreground"
-                    >
-                      Disponibilidad *
-                    </Label>
-                    <Select
-                      value={formData.available}
-                      onValueChange={(value: string) =>
-                        setFormData({ ...formData, available: value })
-                      }
-                    >
-                      <SelectTrigger className="bg-background border-border text-foreground">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="true">Disponible</SelectItem>
-                        <SelectItem value="false">No disponible</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                {/* Disponibilidad */}
+                <div className="space-y-2">
+                  <Label
+                    htmlFor="available"
+                    className="text-sm font-medium text-foreground"
+                  >
+                    Disponibilidad *
+                  </Label>
+                  <Select
+                    value={formData.available}
+                    onValueChange={(value: string) =>
+                      setFormData({ ...formData, available: value })
+                    }
+                  >
+                    <SelectTrigger className="bg-background border-border text-foreground">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="true">Disponible</SelectItem>
+                      <SelectItem value="false">No disponible</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Imágenes */}
