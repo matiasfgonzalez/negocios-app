@@ -237,6 +237,24 @@ export default function OrderDetailsDialog({
 
           <Separator />
 
+          {/* Motivo de Cancelación (si el pedido está cancelado) */}
+          {order.state === "CANCELADA" && order.cancellationReason && (
+            <>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                  <FileText className="w-4 h-4 text-red-600 dark:text-red-400" />
+                  Motivo de Cancelación
+                </div>
+                <div className="bg-red-500/10 border-2 border-red-500/30 rounded-lg p-4">
+                  <p className="text-sm text-foreground whitespace-pre-wrap">
+                    {order.cancellationReason}
+                  </p>
+                </div>
+              </div>
+              <Separator />
+            </>
+          )}
+
           {/* Tipo de Entrega */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-foreground">

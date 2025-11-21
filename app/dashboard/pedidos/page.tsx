@@ -21,6 +21,7 @@ type Order = {
   state: string;
   paymentProof: string | null;
   note: string | null;
+  cancellationReason: string | null;
   createdAt: Date;
   updatedAt: Date;
   business: {
@@ -75,6 +76,7 @@ export default function PedidosPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string>("");
+  const [currentAppUserId, setCurrentAppUserId] = useState<string>("");
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -94,6 +96,7 @@ export default function PedidosPage() {
         }
         const appUser = await userResponse.json();
         setUserRole(appUser.role);
+        setCurrentAppUserId(appUser.id);
 
         const response = await fetch("/api/orders");
 
@@ -210,7 +213,7 @@ export default function PedidosPage() {
               key={order.id}
               order={order}
               userRole={userRole}
-              currentUserId={user.id}
+              currentUserId={currentAppUserId}
             />
           ))}
         </div>

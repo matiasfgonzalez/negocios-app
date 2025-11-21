@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import OrderStateSelector from "@/components/OrderStateSelector";
 import OrderDetailsDialog from "@/components/OrderDetailsDialog";
 import DeleteOrderDialog from "@/components/DeleteOrderDialog";
+import CancelOrderDialog from "@/components/CancelOrderDialog";
 import ContactBusinessButton from "@/components/ContactBusinessButton";
 import PaymentAliasDisplay from "@/components/PaymentAliasDisplay";
 import OrderTimeline from "@/components/OrderTimeline";
@@ -50,6 +51,7 @@ type OrderWithRelations = {
   state: string;
   paymentProof: string | null;
   note: string | null;
+  cancellationReason: string | null;
   createdAt: Date;
   updatedAt: Date;
   business: {
@@ -395,10 +397,21 @@ export default function OrderCard({
                 </Button>
               </Link>
             )}
-          {/* Botón de eliminar - solo para REGISTRADA o PENDIENTE_PAGO */}
+          {/* Botón de cancelar - para clientes en estados REGISTRADA o PENDIENTE_PAGO */}
           {(order.state === "REGISTRADA" || order.state === "PENDIENTE_PAGO") &&
-            (userRole === "ADMINISTRADOR" ||
-              order.customerId === currentUserId) && (
+            userRole === "CLIENTE" &&
+            order.customerId === currentUserId && (
+              <CancelOrderDialog
+                orderId={order.id}
+                orderNumber={order.id.substring(0, 8).toUpperCase()}
+                businessName={order.business.name}
+                isOwner={false}
+              />
+            )}
+
+          {/* Botón de eliminar - solo para ADMINISTRADOR */}
+          {(order.state === "REGISTRADA" || order.state === "PENDIENTE_PAGO") &&
+            userRole === "ADMINISTRADOR" && (
               <DeleteOrderDialog
                 orderId={order.id}
                 orderNumber={order.id.substring(0, 8).toUpperCase()}

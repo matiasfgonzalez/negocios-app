@@ -189,6 +189,9 @@ export type Order = {
   // Nota adicional de la orden
   note: string | null;
 
+  // Motivo de cancelación (solo si state = CANCELADA)
+  cancellationReason: string | null;
+
   // Eventos asociados a la orden (Relación)
   events?: OrderEvent[];
 

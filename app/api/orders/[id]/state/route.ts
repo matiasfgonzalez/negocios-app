@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
+import { OrderState } from "@prisma/client";
 
 // PATCH - Actualizar el estado de una orden
 export async function PATCH(
@@ -15,7 +16,7 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const { state } = body;
+    const { state, cancellationReason } = body;
 
     // Validar que el estado sea válido
     const validStates = [
@@ -30,6 +31,19 @@ export async function PATCH(
 
     if (!state || !validStates.includes(state)) {
       return NextResponse.json({ error: "Estado inválido" }, { status: 400 });
+    }
+
+    // Si el estado es CANCELADA, validar que se proporcione un motivo
+    if (state === "CANCELADA") {
+      if (!cancellationReason || cancellationReason.trim().length < 10) {
+        return NextResponse.json(
+          {
+            error:
+              "Debes proporcionar un motivo de cancelación de al menos 10 caracteres",
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // Verificar que la orden existe
@@ -63,11 +77,34 @@ export async function PATCH(
       );
     }
 
-    // Solo el propietario del negocio o un administrador pueden cambiar el estado
-    if (
-      appUser.role !== "ADMINISTRADOR" &&
-      existingOrder.business.ownerId !== appUser.id
-    ) {
+    // Verificar permisos según el estado que se quiere cambiar
+    const isOwner = existingOrder.business.ownerId === appUser.id;
+    const isAdmin = appUser.role === "ADMINISTRADOR";
+    const isCustomer = existingOrder.customerId === appUser.id;
+
+    // Si es el cliente, solo puede cancelar su pedido en estados REGISTRADA o PENDIENTE_PAGO
+    if (isCustomer && !isOwner && !isAdmin) {
+      if (state !== "CANCELADA") {
+        return NextResponse.json(
+          { error: "Los clientes solo pueden cancelar sus pedidos" },
+          { status: 403 }
+        );
+      }
+      if (
+        existingOrder.state !== "REGISTRADA" &&
+        existingOrder.state !== "PENDIENTE_PAGO"
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              "Solo puedes cancelar pedidos en estado REGISTRADA o PENDIENTE_PAGO",
+          },
+          { status: 403 }
+        );
+      }
+    }
+    // Si no es el propietario del negocio, ni administrador, ni el cliente
+    else if (!isAdmin && !isOwner && !isCustomer) {
       return NextResponse.json(
         { error: "No tienes permisos para actualizar esta orden" },
         { status: 403 }
@@ -78,7 +115,12 @@ export async function PATCH(
     const updatedOrder = await prisma.$transaction(async (tx) => {
       const order = await tx.order.update({
         where: { id },
-        data: { state },
+        data: {
+          state: state as OrderState,
+          ...(state === "CANCELADA" && cancellationReason
+            ? { cancellationReason: cancellationReason.trim() }
+            : {}),
+        },
         include: {
           business: true,
           customer: true,
@@ -91,12 +133,17 @@ export async function PATCH(
       });
 
       // Crear evento de cambio de estado
+      const eventNote =
+        state === "CANCELADA"
+          ? `Pedido cancelado. Motivo: ${cancellationReason}`
+          : `Estado cambiado de ${existingOrder.state} a ${state}`;
+
       await tx.orderEvent.create({
         data: {
           orderId: id,
           actorId: appUser.id,
-          type: "CAMBIO_ESTADO",
-          note: `Estado cambiado de ${existingOrder.state} a ${state}`,
+          type: state === "CANCELADA" ? "CANCELACION" : "CAMBIO_ESTADO",
+          note: eventNote,
         },
       });
 

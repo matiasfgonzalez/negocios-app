@@ -226,13 +226,15 @@ model Order {
   // Dirección textual de envío
   addressText  String?
   // Estado actual de la orden
-  state        OrderState       @default(REGISTRADA)
+  state              OrderState @default(REGISTRADA)
   // Comprobante de pago
-  paymentProof String?
+  paymentProof       String?
   // Nota adicional de la orden
-  note         String?
+  note               String?
+  // Motivo de cancelación (solo si state = CANCELADA)
+  cancellationReason String?
   // Eventos asociados a la orden
-  events       OrderEvent[]
+  events             OrderEvent[]
   // Fecha de creación de la orden
   createdAt    DateTime         @default(now())
   // Fecha de última actualización de la orden
