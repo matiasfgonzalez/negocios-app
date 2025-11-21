@@ -458,12 +458,20 @@ export default function BusinessDetailClient({
     }
   };
 
+  const scrollToCart = () => {
+    const cartElement = document.getElementById("cart-panel");
+    if (cartElement) {
+      cartElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      setShowCart(true);
+    }
+  };
+
   return (
     <div className="min-h-screen">
       {/* Floating Cart Button */}
       {cart.length > 0 && (
         <button
-          onClick={() => setShowCart(true)}
+          onClick={scrollToCart}
           className="fixed bottom-6 right-6 z-50 bg-gradient-to-br from-primary via-primary to-secondary hover:from-primary/90 hover:via-primary/90 hover:to-secondary/90 text-white rounded-full p-4 shadow-2xl hover:shadow-primary/60 transition-all hover:scale-110 active:scale-95 group"
           aria-label="Ver carrito"
         >
@@ -688,7 +696,7 @@ export default function BusinessDetailClient({
 
               {/* Cart Button */}
               <Button
-                onClick={() => setShowCart(!showCart)}
+                onClick={scrollToCart}
                 disabled={!canOrderNow}
                 className={`w-full relative ${
                   canOrderNow
@@ -1056,7 +1064,7 @@ export default function BusinessDetailClient({
 
           {/* UI improved: Enhanced Cart Panel */}
           <div className="lg:col-span-1">
-            <div className="sticky top-20">
+            <div id="cart-panel" className="sticky top-20">
               <Card
                 className={`bg-gradient-to-br from-card/70 to-card/50 backdrop-blur-xl transition-all duration-300 ${
                   showCart
