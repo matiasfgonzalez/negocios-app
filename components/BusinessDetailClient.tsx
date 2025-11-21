@@ -939,17 +939,43 @@ export default function BusinessDetailClient({
                                         {/* Layout móvil mejorado */}
                                         <div className="flex gap-3">
                                           {/* Imagen pequeña del producto */}
-                                          {product.images &&
-                                            Array.isArray(product.images) &&
-                                            product.images.length > 0 && (
+                                          {(() => {
+                                            // Manejar diferentes formatos de images
+                                            let imageUrl: string | null = null;
+
+                                            if (
+                                              product.images &&
+                                              Array.isArray(product.images) &&
+                                              product.images.length > 0
+                                            ) {
+                                              // Formato nuevo: array de objetos { url, publicId }
+                                              if (
+                                                typeof product.images[0] ===
+                                                  "object" &&
+                                                product.images[0]?.url
+                                              ) {
+                                                imageUrl =
+                                                  product.images[0].url;
+                                              }
+                                              // Formato antiguo: array de strings
+                                              else if (
+                                                typeof product.images[0] ===
+                                                "string"
+                                              ) {
+                                                imageUrl = product.images[0];
+                                              }
+                                            }
+
+                                            return imageUrl ? (
                                               <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-muted border border-border/50 shadow-md">
                                                 <img
-                                                  src={product.images[0].url}
+                                                  src={imageUrl}
                                                   alt={product.name}
                                                   className="w-full h-full object-cover"
                                                 />
                                               </div>
-                                            )}
+                                            ) : null;
+                                          })()}
 
                                           {/* Contenido del producto */}
                                           <div className="flex-1 min-w-0 space-y-2">
