@@ -42,7 +42,6 @@ export default function OrderSuccessDialog({
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          router.push("/dashboard/pedidos");
           return 0;
         }
         return prev - 1;
@@ -50,7 +49,13 @@ export default function OrderSuccessDialog({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isOpen, autoRedirect, router]);
+  }, [isOpen, autoRedirect]);
+
+  useEffect(() => {
+    if (countdown === 0 && autoRedirect && isOpen) {
+      router.push("/dashboard/pedidos");
+    }
+  }, [countdown, autoRedirect, isOpen, router]);
 
   const handleWhatsAppRedirect = () => {
     if (whatsappLink) {
@@ -81,49 +86,51 @@ export default function OrderSuccessDialog({
             ¡Pedido Realizado con Éxito!
           </DialogTitle>
 
-          <DialogDescription className="text-center space-y-4">
-            <div className="bg-accent/20 border border-accent/30 rounded-lg p-4 space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Pedido ID:</span>
-                <span className="font-mono font-semibold text-foreground">
-                  #{orderId.substring(0, 8).toUpperCase()}
-                </span>
+          <DialogDescription asChild>
+            <div className="text-center space-y-4">
+              <div className="bg-accent/20 border border-accent/30 rounded-lg p-4 space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Pedido ID:</span>
+                  <span className="font-mono font-semibold text-foreground">
+                    #{orderId.substring(0, 8).toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Negocio:</span>
+                  <span className="font-semibold text-foreground">
+                    {businessName}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Tipo:</span>
+                  <span className="font-semibold text-foreground flex items-center gap-1">
+                    <Package className="w-3.5 h-3.5" />
+                    {deliveryType === "delivery"
+                      ? "Envío a domicilio"
+                      : "Retiro en local"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between pt-2 border-t border-border">
+                  <span className="text-muted-foreground font-semibold">
+                    Total:
+                  </span>
+                  <span className="text-xl font-bold text-primary">
+                    ${total.toFixed(2)}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Negocio:</span>
-                <span className="font-semibold text-foreground">
-                  {businessName}
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Tipo:</span>
-                <span className="font-semibold text-foreground flex items-center gap-1">
-                  <Package className="w-3.5 h-3.5" />
-                  {deliveryType === "delivery"
-                    ? "Envío a domicilio"
-                    : "Retiro en local"}
-                </span>
-              </div>
-              <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="text-muted-foreground font-semibold">
-                  Total:
-                </span>
-                <span className="text-xl font-bold text-primary">
-                  ${total.toFixed(2)}
-                </span>
-              </div>
-            </div>
 
-            <div className="text-sm text-muted-foreground space-y-2 pt-2">
-              <p>
-                <span>
-                  Tu pedido ha sido registrado y está siendo procesado por{" "}
-                </span>
-                <span className="font-semibold text-foreground">
-                  {businessName}
-                </span>
-                <span>.</span>
-              </p>
+              <div className="text-sm text-muted-foreground space-y-2 pt-2">
+                <p>
+                  <span>
+                    Tu pedido ha sido registrado y está siendo procesado por{" "}
+                  </span>
+                  <span className="font-semibold text-foreground">
+                    {businessName}
+                  </span>
+                  <span>.</span>
+                </p>
+              </div>
             </div>
           </DialogDescription>
         </DialogHeader>

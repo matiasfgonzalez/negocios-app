@@ -37,15 +37,17 @@ export default function OrderErrorDialog({
             Error al Procesar el Pedido
           </AlertDialogTitle>
 
-          <AlertDialogDescription className="text-center space-y-3">
-            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
-              <p className="text-sm text-foreground">{error}</p>
-            </div>
+          <AlertDialogDescription asChild>
+            <div className="text-center space-y-3">
+              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                <p className="text-sm text-foreground">{error}</p>
+              </div>
 
-            <p className="text-xs text-muted-foreground">
-              Por favor, verifica los datos e intenta nuevamente. Si el problema
-              persiste, contacta con el negocio directamente.
-            </p>
+              <p className="text-xs text-muted-foreground">
+                Por favor, verifica los datos e intenta nuevamente. Si el
+                problema persiste, contacta con el negocio directamente.
+              </p>
+            </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
 

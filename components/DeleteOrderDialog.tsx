@@ -78,22 +78,24 @@ export default function DeleteOrderDialog({
               ¿Eliminar pedido?
             </AlertDialogTitle>
           </div>
-          <div className="space-y-3">
-            <AlertDialogDescription className="text-base">
-              Estás a punto de eliminar el pedido{" "}
-              <span className="font-semibold text-foreground">
-                #{orderNumber}
-              </span>{" "}
-              del negocio{" "}
-              <span className="font-semibold text-foreground">
-                {businessName}
-              </span>
-              .
-            </AlertDialogDescription>
-            <p className="text-destructive font-medium text-sm">
-              Esta acción no se puede deshacer.
-            </p>
-          </div>
+          <AlertDialogDescription asChild>
+            <div className="space-y-3">
+              <p className="text-base text-muted-foreground">
+                Estás a punto de eliminar el pedido{" "}
+                <span className="font-semibold text-foreground">
+                  #{orderNumber}
+                </span>{" "}
+                del negocio{" "}
+                <span className="font-semibold text-foreground">
+                  {businessName}
+                </span>
+                .
+              </p>
+              <p className="text-destructive font-medium text-sm">
+                Esta acción no se puede deshacer.
+              </p>
+            </div>
+          </AlertDialogDescription>
         </AlertDialogHeader>
 
         {error && (
