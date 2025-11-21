@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Product } from "@/app/types/types";
+import ImageSelector from "@/components/ImageSelector";
 
 interface NuevaPromocionDialogProps {
   businessId: string;
@@ -280,17 +281,12 @@ export default function NuevaPromocionDialog({
               </div>
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="image">URL de Imagen</Label>
-              <Input
-                id="image"
-                value={formData.image}
-                onChange={(e) =>
-                  setFormData({ ...formData, image: e.target.value })
-                }
-                placeholder="https://..."
-              />
-            </div>
+            <ImageSelector
+              value={formData.image}
+              onChange={(url) => setFormData({ ...formData, image: url })}
+              label="Imagen de la Promoción"
+              placeholder="https://ejemplo.com/imagen-promocion.jpg"
+            />
 
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
