@@ -6,6 +6,54 @@ const prisma = new PrismaClient();
 
 type tParams = Promise<{ id: string }>;
 
+// GET - Obtener un producto específico por ID
+export async function GET(
+  request: NextRequest,
+  { params }: { params: tParams }
+) {
+  try {
+    const { id: productId } = await params;
+
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      include: {
+        business: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            img: true,
+            whatsappPhone: true,
+            aliasPago: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            icon: true,
+          },
+        },
+      },
+    });
+
+    if (!product) {
+      return NextResponse.json(
+        { error: "Producto no encontrado" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(product);
+  } catch (error) {
+    console.error("Error al obtener producto:", error);
+    return NextResponse.json(
+      { error: "Error interno del servidor" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: tParams }
@@ -112,8 +160,8 @@ export async function PUT(
       data: {
         name,
         description: description || null,
-        price: parseFloat(price),
-        stock: parseInt(stock),
+        price: Number.parseFloat(price),
+        stock: Number.parseInt(stock),
         sku: sku || null,
         available: available !== false,
         images: images !== undefined ? images : existingProduct.images,
