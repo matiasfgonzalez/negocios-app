@@ -23,11 +23,13 @@ export default function ShippingRangesEditor({
   maxDistance,
 }: Readonly<ShippingRangesEditorProps>) {
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
-  // Determinar si es costo único
+  // Determinar si es costo único - ignorar si está editando ese campo
   const isFlatRate =
     ranges.length === 1 &&
-    (ranges[0].toKm === null || ranges[0].toKm === maxDistance);
+    editingIndex !== 0 &&
+    ranges[0].toKm === null;
 
   const handleAddRange = () => {
     const lastRange = ranges.at(-1);
@@ -215,7 +217,7 @@ export default function ShippingRangesEditor({
         <>
           <div className="space-y-3">
             {ranges.map((range, index) => {
-              const rangeKey = `range-${range.fromKm}-${range.toKm}-${index}`;
+              const rangeKey = `range-${index}`;
               return (
                 <div
                   key={rangeKey}
@@ -245,17 +247,19 @@ export default function ShippingRangesEditor({
                       max={maxDistance || undefined}
                       step="0.1"
                       value={range.toKm ?? ""}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        setEditingIndex(index);
                         handleRangeChange(
                           index,
                           "toKm",
                           e.target.value === ""
                             ? null
                             : Number.parseFloat(e.target.value)
-                        )
-                      }
+                        );
+                      }}
+                      onBlur={() => setEditingIndex(null)}
                       placeholder={maxDistance ? maxDistance.toString() : ""}
-                      disabled={isFlatRate}
+                      disabled={isFlatRate && range.toKm === maxDistance}
                       required={!isFlatRate && !isLastRange(index)}
                       className="mt-1"
                     />
