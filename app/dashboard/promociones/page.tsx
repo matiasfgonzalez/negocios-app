@@ -1,17 +1,13 @@
-"use client";
-
-import { useEffect, useState, useCallback } from "react";
-import { useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
+import { auth } from "@clerk/nextjs/server";
+import { Suspense } from "react";
 import {
   Tag,
-  Loader2,
   Calendar,
   Package,
   CheckCircle,
   XCircle,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -24,92 +20,49 @@ import BackButton from "@/components/BackButton";
 import NuevaPromocionDialog from "@/components/NuevaPromocionDialog";
 import EditarPromocionDialog from "@/components/EditarPromocionDialog";
 import EliminarPromocionDialog from "@/components/EliminarPromocionDialog";
-import { PromotionWithProducts } from "@/app/types/types";
 import { optimizeProductImage } from "@/lib/cloudinary-utils";
+import { BusinessSelector } from "../../../components/business-selector";
+import { getMe } from "@/app/actions/user";
+import { getPromotions } from "@/app/actions/promotions";
+import { getOwnerBusinesses } from "@/app/actions/businesses";
+import { PromotionWithProductsAndBusiness } from "@/app/types/types";
+import { getAllBusinesses } from "@/app/actions/businesses/businesses";
+import NuevaPromocionDialogServer from "@/components/server/NuevaPromocionDialogServer";
 
-export default function PromocionesPage() {
-  const { user, isLoaded } = useUser();
-  const router = useRouter();
-  const [promociones, setPromociones] = useState<PromotionWithProducts[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userRole, setUserRole] = useState<string>("");
-  const [selectedBusiness, setSelectedBusiness] = useState<string>("");
-  const [businesses, setBusinesses] = useState<
-    Array<{ id: string; name: string }>
-  >([]);
+interface PromocionesPageProps {
+  searchParams: Promise<{ businessId?: string }>;
+}
 
-  const fetchUserRole = useCallback(async () => {
-    try {
-      const response = await fetch("/api/me");
-      if (response.ok) {
-        const data = await response.json();
-        setUserRole(data.role);
+export default async function PromocionesPage({
+  searchParams,
+}: PromocionesPageProps) {
+  const { userId } = await auth();
+    // Obtener parámetros
+  const params = await searchParams;
+  let selectedBusinessId = params.businessId;
+  let businesses: Array<{ id: string; name: string }> = [];
+  
+  let promociones: PromotionWithProductsAndBusiness[] = [];
+  let user;
 
-        // Si es propietario, obtener sus negocios
-        if (data.role === "PROPIETARIO") {
-          const businessRes = await fetch("/api/businesses");
-          if (businessRes.ok) {
-            const businessData = await businessRes.json();
-            setBusinesses(businessData);
-            if (businessData.length > 0) {
-              setSelectedBusiness(businessData[0].id);
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error("Error al obtener rol:", error);
-    }
-  }, []);
+  if (!userId) {
+    redirect("/sign-in");
+  }
 
-  const fetchPromociones = useCallback(async () => {
-    if (!selectedBusiness) return;
+  // Obtener usuario y su rol usando la action
+ 
+  try {
+    user = await getMe();
+  } catch {
+    redirect("/sign-in");
+  }
 
-    try {
-      setIsLoading(true);
-      const url = `/api/promotions?businessId=${selectedBusiness}`;
-      const response = await fetch(url);
-
-      if (!response.ok) {
-        throw new Error("Error al obtener promociones");
-      }
-
-      const data = await response.json();
-      setPromociones(data);
-    } catch (error) {
-      console.error("Error al obtener promociones:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [selectedBusiness]);
-
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    if (!user) {
-      router.push("/sign-in");
-      return;
-    }
-
-    fetchUserRole();
-  }, [isLoaded, user, router, fetchUserRole]);
-
-  useEffect(() => {
-    if (userRole && selectedBusiness) {
-      fetchPromociones();
-    }
-  }, [userRole, selectedBusiness, fetchPromociones]);
-
-  if (!isLoaded || isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+  if (!user) {
+    redirect("/sign-in");
   }
 
   // Validar acceso
-  if (userRole !== "ADMINISTRADOR" && userRole !== "PROPIETARIO") {
+  if (user.role !== "ADMINISTRADOR" && user.role !== "PROPIETARIO") {
     return (
       <div className="container mx-auto px-4 py-8">
         <Card className="max-w-md mx-auto">
@@ -120,22 +73,59 @@ export default function PromocionesPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button
-              onClick={() => router.push("/dashboard")}
-              className="w-full"
-            >
-              Volver al Dashboard
-            </Button>
+            <BackButton href="/dashboard" label="Volver al Dashboard" />
           </CardContent>
         </Card>
       </div>
     );
   }
 
+
+
+  // Si es propietario, obtener sus negocios
+  if (user.role === "PROPIETARIO") {
+    try {
+      businesses = await getOwnerBusinesses();
+      console.log(businesses);
+    } catch (error) {
+      console.error("Error al obtener negocios:", error);
+      businesses = [];
+    }
+
+    // Si no hay businessId en params, usar el primero
+    if (!selectedBusinessId && businesses.length > 0) {
+      selectedBusinessId = businesses[0].id;
+    }
+  }
+  // Si es ADMINISTRADOR, obtener todos los negocios
+  if (user.role === "ADMINISTRADOR") {
+    try {
+      console.log("Administrador obteniendo negocios");
+      businesses = await getAllBusinesses();
+    } catch (error) {
+      console.error("Error al obtener negocios:", error);
+      businesses = [];
+    }
+  }
+
+  // Obtener promociones y productos usando las actions
+   
+  
+  if (selectedBusinessId) {
+    try {
+      const [promosData] = await Promise.all([
+        getPromotions(selectedBusinessId),
+      ]);
+      promociones = promosData;
+    } catch (error) {
+      console.error("Error al obtener datos:", error);
+      promociones = [];
+    }
+  }
+
   const formatDate = (date: Date | string | null) => {
     if (!date) return "Sin límite";
     const d = new Date(date);
-    // Usar UTC para evitar desfase de zona horaria
     const day = d.getUTCDate().toString().padStart(2, "0");
     const month = (d.getUTCMonth() + 1).toString().padStart(2, "0");
     const year = d.getUTCFullYear();
@@ -157,36 +147,19 @@ export default function PromocionesPage() {
           </p>
         </div>
 
-        {selectedBusiness && (
+        {selectedBusinessId && (
           <NuevaPromocionDialog
-            businessId={selectedBusiness}
-            onSuccess={fetchPromociones}
-          />
+              businessId={selectedBusinessId}
+            />
         )}
       </div>
 
       {/* Selector de negocio (solo para propietarios) */}
-      {userRole === "PROPIETARIO" && businesses.length > 0 && (
-        <div className="mb-6">
-          <label
-            htmlFor="business-selector"
-            className="block text-sm font-medium mb-2"
-          >
-            Negocio:
-          </label>
-          <select
-            id="business-selector"
-            value={selectedBusiness}
-            onChange={(e) => setSelectedBusiness(e.target.value)}
-            className="w-full max-w-md px-4 py-2 border rounded-lg bg-background"
-          >
-            {businesses.map((business) => (
-              <option key={business.id} value={business.id}>
-                {business.name}
-              </option>
-            ))}
-          </select>
-        </div>
+      {user.role === "PROPIETARIO" && businesses.length > 0 && (
+        <BusinessSelector
+          businesses={businesses}
+          selectedBusinessId={selectedBusinessId || ""}
+        />
       )}
 
       {/* Lista de promociones */}
@@ -202,8 +175,11 @@ export default function PromocionesPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {promociones.map((promo) => {
+             
             const totalIndividual = promo.products.reduce(
-              (sum, p) => sum + (p.product?.price ?? 0) * p.quantity,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (sum: number, p: any) =>
+                sum + (p.product?.price ?? 0) * p.quantity,
               0
             );
             const discount = totalIndividual - promo.price;
@@ -213,6 +189,7 @@ export default function PromocionesPage() {
               <Card key={promo.id} className="overflow-hidden">
                 {promo.image && (
                   <div className="h-48 overflow-hidden bg-muted">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={optimizeProductImage(promo.image)}
                       alt={promo.name}
@@ -226,12 +203,10 @@ export default function PromocionesPage() {
                     <div className="flex gap-1">
                       <EditarPromocionDialog
                         promotion={promo}
-                        onSuccess={fetchPromociones}
                       />
                       <EliminarPromocionDialog
                         promotionId={promo.id}
                         promotionName={promo.name}
-                        onSuccess={fetchPromociones}
                       />
                     </div>
                   </div>
@@ -283,7 +258,8 @@ export default function PromocionesPage() {
                   <div>
                     <p className="text-sm font-medium mb-2">Incluye:</p>
                     <div className="space-y-1">
-                      {promo.products.map((p) => (
+                      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                      {promo.products.map((p: any) => (
                         <div
                           key={p.id}
                           className="text-sm text-muted-foreground flex items-center gap-2"
