@@ -27,7 +27,6 @@ import { getPromotions } from "@/app/actions/promotions";
 import { getOwnerBusinesses } from "@/app/actions/businesses";
 import { PromotionWithProductsAndBusiness } from "@/app/types/types";
 import { getAllBusinesses } from "@/app/actions/businesses/businesses";
-import NuevaPromocionDialogServer from "@/components/server/NuevaPromocionDialogServer";
 
 interface PromocionesPageProps {
   searchParams: Promise<{ businessId?: string }>;
