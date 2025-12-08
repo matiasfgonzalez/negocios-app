@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { startTransition, useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ import ImageSelector from "@/components/ImageSelector";
 import { createPromotion, type CreatePromotionState } from "@/app/actions/promotions";
 import { Product } from "@/app/types/types";
 import { useState, useEffect } from "react";
+import { createPromotionSchema } from "@/lib/schemas/promotion";
 
 interface NuevaPromocionFormClientProps {
   businessId: string;
@@ -46,6 +47,7 @@ export function NuevaPromocionFormClient({
 }: Readonly<NuevaPromocionFormClientProps>) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(createPromotion, initialState);
+  const [clientError, setClientError] = useState<string | null>(null);
 
   const [selectedProducts, setSelectedProducts] = useState<ProductSelection[]>([]);
   const [formData, setFormData] = useState({
@@ -87,10 +89,11 @@ export function NuevaPromocionFormClient({
     if (!product) return;
 
     if (selectedProducts.find((p) => p.productId === productId)) {
-      alert("Este producto ya está agregado");
+      setClientError("Este producto ya está agregado");
       return;
     }
 
+    setClientError(null);
     setSelectedProducts([
       ...selectedProducts,
       { productId, quantity: 1, product },
@@ -120,43 +123,66 @@ export function NuevaPromocionFormClient({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setClientError(null);
 
-    if (selectedProducts.length === 0) {
-      alert("Debe agregar al menos un producto a la promoción");
+    // Preparar datos para validación
+    const dataToValidate = {
+      businessId,
+      name: formData.name,
+      description: formData.description || null,
+      price: parseFloat(formData.price),
+      image: formData.image || null,
+      isActive: formData.isActive,
+      startDate: formData.startDate || null,
+      endDate: formData.endDate || null,
+      stock: formData.stock ? parseInt(formData.stock) : null,
+      products: selectedProducts,
+    };
+
+    // Validar con Zod en el cliente
+    const validation = createPromotionSchema.safeParse(dataToValidate);
+
+    if (!validation.success) {
+      const firstError = validation.error.issues[0];
+      setClientError(firstError.message);
       return;
     }
 
-    const promotionPrice = parseFloat(formData.price);
-    const totalIndividual = getTotalIndividualPrice();
+    // Validación adicional: precio debe ser menor al total individual
+    if (selectedProducts.length > 0) {
+      const promotionPrice = parseFloat(formData.price);
+      const totalIndividual = getTotalIndividualPrice();
 
-    if (promotionPrice >= totalIndividual) {
-      alert(
-        `El precio de la promoción ($${promotionPrice}) debe ser menor al total individual ($${totalIndividual.toFixed(
-          2
-        )})`
-      );
-      return;
+      if (promotionPrice >= totalIndividual) {
+        setClientError(
+          `El precio de la promoción ($${promotionPrice}) debe ser menor al total individual ($${totalIndividual.toFixed(
+            2
+          )})`
+        );
+        return;
+      }
     }
 
+    // Crear FormData y enviar
     const formDataToSubmit = new FormData(e.currentTarget);
-    formDataToSubmit.set("businessId", businessId);
-    formDataToSubmit.set("products", JSON.stringify(selectedProducts));
 
-    formAction(formDataToSubmit);
-  };
-
+    startTransition(() => {
+      formAction(formDataToSubmit);
+    });
+  };  
+  
   const availableProducts = products.filter(
     (p) => !selectedProducts.find((sp) => sp.productId === p.id)
   );
 
   return (
-    <form action={formAction}>
+    <form onSubmit={handleSubmit}>
       <input type="hidden" name="businessId" value={businessId} />
       <input type="hidden" name="products" value={JSON.stringify(selectedProducts)} />
       <div className="grid gap-4 py-4">
-        {state.error && (
+        {(state.error || clientError) && (
           <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg">
-            {state.error}
+            {clientError || state.error}
           </div>
         )}
 
