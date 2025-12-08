@@ -3,6 +3,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { PromotionWithProductsAndBusiness } from "@/app/types/types";
+import { createPromotionSchema } from "@/lib/schemas/promotion";
+import { promotionRepository } from "@/lib/repositories/promotion.repository";
 
 export interface CreatePromotionState {
   success?: boolean;
@@ -17,24 +19,7 @@ export interface CreatePromotionState {
 
 export async function getPromotions(businessId?: string): Promise<PromotionWithProductsAndBusiness[]> {
   try {
-    const where = businessId ? { businessId } : {};
-
-    const promotions = await prisma.promotion.findMany({
-      where,
-      include: {
-        business: true,
-        products: {
-          include: {
-            product: true,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    return promotions as PromotionWithProductsAndBusiness[];
+    return await promotionRepository.findMany(businessId);
   } catch (error) {
     console.error("Error al obtener promociones:", error);
     throw new Error("Error al obtener promociones");
@@ -77,33 +62,34 @@ export async function createPromotion(
     }
 
     // Extraer datos del FormData
-    const businessId = formData.get("businessId") as string;
-    const name = formData.get("name") as string;
-    const description = formData.get("description") as string;
-    const price = parseFloat(formData.get("price") as string);
-    const image = formData.get("image") as string;
-    const isActive = formData.get("isActive") === "true";
-    const startDate = formData.get("startDate") as string;
-    const endDate = formData.get("endDate") as string;
-    const stock = formData.get("stock")
-      ? parseInt(formData.get("stock") as string)
-      : null;
     const productsJson = formData.get("products") as string;
-    const products = JSON.parse(productsJson || "[]");
+    const rawData = {
+      businessId: formData.get("businessId") as string,
+      name: formData.get("name") as string,
+      description: formData.get("description") as string || null,
+      price: parseFloat(formData.get("price") as string),
+      image: formData.get("image") as string || null,
+      isActive: formData.get("isActive") === "true",
+      startDate: formData.get("startDate") as string || null,
+      endDate: formData.get("endDate") as string || null,
+      stock: formData.get("stock")
+        ? parseInt(formData.get("stock") as string)
+        : null,
+      products: JSON.parse(productsJson || "[]"),
+    };
 
-    // Validar campos requeridos
-    if (
-      !businessId ||
-      !name ||
-      isNaN(price) ||
-      !products ||
-      products.length === 0
-    ) {
+    // Validar datos con Zod
+    const validation = createPromotionSchema.safeParse(rawData);
+
+    if (!validation.success) {
+      const firstError = validation.error.issues[0];
       return {
         success: false,
-        error: "Campos requeridos: businessId, name, price, products",
+        error: firstError.message,
       };
     }
+
+    const { businessId, name, description, price, image, isActive, startDate, endDate, stock, products } = validation.data;
 
     // Verificar que el negocio existe
     const business = await prisma.business.findUnique({
@@ -154,33 +140,17 @@ export async function createPromotion(
     }
 
     // Crear la promoción con sus productos
-    const promotion = await prisma.promotion.create({
-      data: {
-        businessId,
-        name,
-        description: description || null,
-        price,
-        image: image || null,
-        isActive,
-        startDate: startDate ? new Date(startDate) : null,
-        endDate: endDate ? new Date(endDate) : null,
-        stock,
-        products: {
-          create: products.map(
-            (p: { productId: string; quantity: number }) => ({
-              productId: p.productId,
-              quantity: p.quantity || 1,
-            })
-          ),
-        },
-      },
-      include: {
-        products: {
-          include: {
-            product: true,
-          },
-        },
-      },
+    const promotion = await promotionRepository.create({
+      businessId,
+      name,
+      description,
+      price,
+      image,
+      isActive,
+      startDate,
+      endDate,
+      stock,
+      products,
     });
 
     return {

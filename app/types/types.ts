@@ -656,4 +656,10 @@ export type PromotionWithProductsAndBusiness = Omit<Promotion, 'business'> & {
   })[];
 };
 
+// Tipo para producto con negocio y categoría incluidos
+export type ProductWithBusinessAndCategory = Product & {
+  business: Business;
+  category: ProductCategory | null;
+};
+
 

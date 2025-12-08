@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
+import { Suspense } from "react";
 import {
   Tag,
   Calendar,
@@ -26,6 +27,7 @@ import { getPromotions } from "@/app/actions/promotions";
 import { getOwnerBusinesses } from "@/app/actions/businesses";
 import { PromotionWithProductsAndBusiness } from "@/app/types/types";
 import { getAllBusinesses } from "@/app/actions/businesses/businesses";
+import NuevaPromocionDialogServer from "@/components/server/NuevaPromocionDialogServer";
 
 interface PromocionesPageProps {
   searchParams: Promise<{ businessId?: string }>;
@@ -84,6 +86,7 @@ export default async function PromocionesPage({
   if (user.role === "PROPIETARIO") {
     try {
       businesses = await getOwnerBusinesses();
+      console.log(businesses);
     } catch (error) {
       console.error("Error al obtener negocios:", error);
       businesses = [];
@@ -97,6 +100,7 @@ export default async function PromocionesPage({
   // Si es ADMINISTRADOR, obtener todos los negocios
   if (user.role === "ADMINISTRADOR") {
     try {
+      console.log("Administrador obteniendo negocios");
       businesses = await getAllBusinesses();
     } catch (error) {
       console.error("Error al obtener negocios:", error);
@@ -104,13 +108,17 @@ export default async function PromocionesPage({
     }
   }
 
-  // Obtener promociones usando la action
+  // Obtener promociones y productos usando las actions
+   
   
   if (selectedBusinessId) {
     try {
-      promociones = await getPromotions(selectedBusinessId);
+      const [promosData] = await Promise.all([
+        getPromotions(selectedBusinessId),
+      ]);
+      promociones = promosData;
     } catch (error) {
-      console.error("Error al obtener promociones:", error);
+      console.error("Error al obtener datos:", error);
       promociones = [];
     }
   }
@@ -141,9 +149,8 @@ export default async function PromocionesPage({
 
         {selectedBusinessId && (
           <NuevaPromocionDialog
-            businessId={selectedBusinessId}
-           
-          />
+              businessId={selectedBusinessId}
+            />
         )}
       </div>
 
