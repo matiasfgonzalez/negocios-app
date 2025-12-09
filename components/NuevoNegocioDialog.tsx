@@ -33,6 +33,7 @@ import {
 } from "@/lib/business-hours";
 import { ShippingRange, createFlatShippingRate } from "@/lib/shipping-utils";
 import { BusinessStatus } from "@/app/types/types";
+import { reverseGeocode } from "@/lib/geocoding";
 
 // Importar el mapa de forma dinámica para evitar problemas con SSR
 const MapSelector = dynamic<{
@@ -85,12 +86,31 @@ export default function NuevoNegocioDialog({
     createFlatShippingRate(0)
   );
 
-  const handleLocationSelect = (location: { lat: number; lng: number }) => {
+  const handleLocationSelect = async (location: {
+    lat: number;
+    lng: number;
+  }) => {
     setFormData({
       ...formData,
       lat: location.lat.toString(),
       lng: location.lng.toString(),
     });
+
+    // Obtener dirección automáticamente usando geocodificación inversa
+    try {
+      const addressData = await reverseGeocode(location.lat, location.lng);
+      if (addressData.fullAddress) {
+        setFormData((prev) => ({
+          ...prev,
+          lat: location.lat.toString(),
+          lng: location.lng.toString(),
+          addressText: addressData.fullAddress,
+        }));
+      }
+    } catch (error) {
+      console.error("Error al obtener dirección:", error);
+      // Si falla, solo actualizar las coordenadas
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
