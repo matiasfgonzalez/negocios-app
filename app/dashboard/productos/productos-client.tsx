@@ -43,6 +43,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CategoryCombobox } from "@/components/ui/category-combobox";
+import { CategoryFilterCombobox } from "@/components/ui/category-filter-combobox";
 import { Business } from "@/app/types/types";
 
 type ProductCategory = {
@@ -455,23 +457,17 @@ export default function ProductosClient({
                   >
                     Categoría
                   </Label>
-                  <Select
-                    value={formData.categoryId || undefined}
-                    onValueChange={(value: string) =>
-                      setFormData({ ...formData, categoryId: value })
+                  <CategoryCombobox
+                    categories={categorias}
+                    value={formData.categoryId || null}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, categoryId: value || "" })
                     }
-                  >
-                    <SelectTrigger className="bg-background border-border text-foreground">
-                      <SelectValue placeholder="Sin categoría" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-[300px]">
-                      {categorias.map((categoria) => (
-                        <SelectItem key={categoria.id} value={categoria.id}>
-                          {categoria.icon} {categoria.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Sin categoría"
+                    searchPlaceholder="Buscar categoría..."
+                    emptyMessage="No se encontraron categorías."
+                    clearLabel="Sin categoría"
+                  />
                 </div>
 
                 {/* Nombre */}
@@ -666,48 +662,18 @@ export default function ProductosClient({
           </div>
 
           {/* Filtro de Categorías */}
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            <Button
-              variant={selectedCategory === "all" ? "default" : "outline"}
-              size="sm"
-              onClick={() => {
-                setSelectedCategory("all");
-                setCurrentPage(1);
-              }}
-              className="whitespace-nowrap"
-            >
-              Todas
-            </Button>
-            <Button
-              variant={
-                selectedCategory === "sin-categoria" ? "default" : "outline"
-              }
-              size="sm"
-              onClick={() => {
-                setSelectedCategory("sin-categoria");
-                setCurrentPage(1);
-              }}
-              className="whitespace-nowrap"
-            >
-              Sin categoría
-            </Button>
-            {categorias.map((categoria) => (
-              <Button
-                key={categoria.id}
-                variant={
-                  selectedCategory === categoria.id ? "default" : "outline"
-                }
-                size="sm"
-                onClick={() => {
-                  setSelectedCategory(categoria.id);
-                  setCurrentPage(1);
-                }}
-                className="whitespace-nowrap"
-              >
-                {categoria.icon} {categoria.name}
-              </Button>
-            ))}
-          </div>
+          <CategoryFilterCombobox
+            categories={categorias}
+            value={selectedCategory}
+            onValueChange={(value) => {
+              setSelectedCategory(value);
+              setCurrentPage(1);
+            }}
+            placeholder="Filtrar por categoría..."
+            searchPlaceholder="Buscar categoría..."
+            allLabel="Todas las categorías"
+            noCategoryLabel="Sin categoría"
+          />
         </div>
 
         {/* Results Count */}
