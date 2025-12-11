@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { Resend } from "resend";
 import { generateEmailContent } from "@/lib/notification-utils";
+import { error } from "console";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM_EMAIL =
@@ -139,10 +140,16 @@ export async function POST(request: NextRequest) {
       text: textContent,
     });
 
+    
+
     return NextResponse.json({
       success: true,
       message: "Email de prueba enviado correctamente",
       emailId: result.data?.id,
+      from: FROM_EMAIL,
+      to: email,
+      subject,
+      error: result.error,
     });
   } catch (error) {
     console.error("Error en /api/notifications/test:", error);
