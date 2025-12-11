@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { sendWelcomeEmail } from "@/lib/welcome-email";
 
 export async function GET() {
   const { userId } = await auth();
@@ -43,11 +44,13 @@ export async function POST(request: Request) {
       // Continuar sin avatar si hay error
     }
 
-    // Verificar si el usuario ya existe
+    // Verificar si el usuario ya existe (para saber si es registro nuevo)
     const existingUser = await prisma.appUser.findUnique({
       where: { clerkId },
-      select: { avatar: true },
+      select: { id: true, avatar: true },
     });
+
+    const isNewUser = !existingUser;
 
     // Preparar datos de actualización
     const updateData: {
@@ -78,6 +81,17 @@ export async function POST(request: Request) {
         avatar: avatarUrl,
       },
     });
+
+    // Enviar email de bienvenida solo si es un usuario nuevo
+    if (isNewUser && email) {
+      // Enviar en background para no bloquear la respuesta
+      sendWelcomeEmail({
+        email,
+        name: fullName || null,
+      }).catch((err) => {
+        console.error("Error enviando email de bienvenida:", err);
+      });
+    }
 
     return NextResponse.json(user);
   } catch (error) {
