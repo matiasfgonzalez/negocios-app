@@ -89,7 +89,7 @@ export function generateWelcomeEmailContent(user: WelcomeEmailData) {
                 Podés solicitar ser <strong>Propietario</strong> para mostrar tu comercio, 
                 subir tus productos, crear promociones y recibir pedidos de clientes de tu barrio.
               </p>
-              <a href="${appUrl}" 
+              <a href="${appUrl}/dashboard" 
                  style="display: inline-block; background-color: #f59e0b; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 📝 Solicitar ser Propietario
               </a>
@@ -100,7 +100,7 @@ export function generateWelcomeEmailContent(user: WelcomeEmailData) {
             
             <!-- Explore CTA -->
             <div style="text-align: center; margin: 35px 0;">
-              <a href="${appUrl}/businesses" 
+              <a href="${appUrl}" 
                  style="display: inline-block; background-color: #16a34a; color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(22,163,74,0.3);">
                 🛍️ Explorar Negocios
               </a>
