@@ -14,7 +14,8 @@ export type WelcomeEmailData = {
 // Generar contenido del email de bienvenida
 export function generateWelcomeEmailContent(user: WelcomeEmailData) {
   const userName = user.name || "Vecino/a";
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://barriomarket.com";
+  const appUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "https://barriomarket.com.ar";
   const currentYear = new Date().getFullYear();
 
   return {
@@ -88,7 +89,7 @@ export function generateWelcomeEmailContent(user: WelcomeEmailData) {
                 Podés solicitar ser <strong>Propietario</strong> para mostrar tu comercio, 
                 subir tus productos, crear promociones y recibir pedidos de clientes de tu barrio.
               </p>
-              <a href="${appUrl}/dashboard" 
+              <a href="${appUrl}" 
                  style="display: inline-block; background-color: #f59e0b; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 📝 Solicitar ser Propietario
               </a>
@@ -112,8 +113,8 @@ export function generateWelcomeEmailContent(user: WelcomeEmailData) {
             <div style="text-align: center; padding: 10px 0;">
               <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0;">
                 ¿Tenés preguntas? Escribinos a 
-                <a href="mailto:soporte@barriomarket.com" style="color: #16a34a; text-decoration: none; font-weight: 500;">
-                  soporte@barriomarket.com
+                <a href="mailto:info.barriomarket@gmail.com" style="color: #16a34a; text-decoration: none; font-weight: 500;">
+                  info.barriomarket@gmail.com
                 </a>
                 <br>o contactanos por nuestras redes sociales.
               </p>
@@ -156,9 +157,9 @@ Somos una plataforma que conecta a los comercios locales con los vecinos del bar
 👉 Solicitá ser Propietario: ${appUrl}/dashboard
 ¡Probá gratis durante 30 días!
 
-👉 Explorar negocios: ${appUrl}/businesses
+👉 Explorar negocios: ${appUrl}
 
-¿Tenés preguntas? Escribinos a soporte@barriomarket.com
+¿Tenés preguntas? Escribinos a info.barriomarket@gmail.com
 
 ---
 © ${new Date().getFullYear()} BarrioMarket - Todos los derechos reservados
