@@ -34,6 +34,7 @@ import BusinessHoursDialog from "@/components/BusinessHoursDialog";
 import ShippingRangesDisplay from "@/components/ShippingRangesDisplay";
 import ProductDetailDialog from "@/components/ProductDetailDialog";
 import PromotionCard from "@/components/PromotionCard";
+import { SmartProductImage } from "@/components/ui/smart-product-image";
 import {
   BusinessSchedule,
   SpecialClosedDay,
@@ -968,10 +969,10 @@ export default function BusinessDetailClient({
 
                                             return imageUrl ? (
                                               <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 bg-muted border border-border/50 shadow-md">
-                                                <img
+                                                <SmartProductImage
                                                   src={imageUrl}
                                                   alt={product.name}
-                                                  className="w-full h-full object-cover"
+                                                  containerClassName="rounded-xl"
                                                 />
                                               </div>
                                             ) : null;

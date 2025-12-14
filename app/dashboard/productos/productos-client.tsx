@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/select";
 import { CategoryCombobox } from "@/components/ui/category-combobox";
 import { CategoryFilterCombobox } from "@/components/ui/category-filter-combobox";
+import { SmartProductImage } from "@/components/ui/smart-product-image";
 import { Business } from "@/app/types/types";
 
 type ProductCategory = {
@@ -127,10 +128,10 @@ function ImageCarousel({ images, productName }: Readonly<ImageCarouselProps>) {
               index === currentIndex ? "opacity-100" : "opacity-0"
             }`}
           >
-            <img
+            <SmartProductImage
               src={url}
               alt={`${productName} - Imagen ${index + 1}`}
-              className="absolute block w-full h-full object-cover -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
+              containerClassName="rounded-t-lg"
             />
           </div>
         ))}
