@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, Package, Tag, X } from "lucide-react";
+import { Eye, Package, Tag, X, ZoomIn } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SmartProductImage } from "@/components/ui/smart-product-image";
+import { ImageViewer } from "@/components/ui/image-viewer";
 import { optimizeProductImage } from "@/lib/cloudinary-utils";
 
 // Componente de Carrusel de Imágenes Mejorado
@@ -23,6 +24,7 @@ type ImageCarouselProps = {
 
 function ImageCarousel({ images, productName }: Readonly<ImageCarouselProps>) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -39,111 +41,141 @@ function ImageCarousel({ images, productName }: Readonly<ImageCarouselProps>) {
     setCurrentIndex(index);
   };
 
+  const handleOpenViewer = () => {
+    setIsViewerOpen(true);
+  };
+
   return (
-    <div className="relative w-full aspect-square sm:aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-muted/50 to-muted/30 group">
-      {/* Carousel wrapper */}
-      <div className="relative h-full overflow-hidden">
-        {images.map((url, index) => (
-          <div
-            key={`${productName}-${index}-${url.substring(url.length - 20)}`}
-            className={`absolute inset-0 transition-all duration-700 ease-in-out ${
-              index === currentIndex
-                ? "opacity-100 scale-100"
-                : "opacity-0 scale-95"
-            }`}
-          >
-            <SmartProductImage
-              src={optimizeProductImage(url)}
-              alt={`${productName} - Imagen ${index + 1}`}
-              containerClassName="rounded-xl"
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Contador de imágenes */}
-      {images.length > 1 && (
-        <div className="absolute top-3 right-3 z-30 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full">
-          {currentIndex + 1} / {images.length}
-        </div>
-      )}
-
-      {/* Slider indicators (thumbnails) */}
-      {images.length > 1 && (
-        <div className="absolute z-30 flex gap-2 bottom-4 left-1/2 -translate-x-1/2 bg-black/40 backdrop-blur-md px-3 py-2 rounded-full">
-          {images.map((url, idx) => (
-            <button
-              key={`${productName}-indicator-${idx}-${url.substring(
-                url.length - 10
-              )}`}
-              type="button"
-              className={`w-2 h-2 rounded-full transition-all ${
-                idx === currentIndex
-                  ? "bg-white w-6"
-                  : "bg-white/50 hover:bg-white/75"
+    <>
+      <div
+        className="relative w-full aspect-square sm:aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-muted/50 to-muted/30 group cursor-pointer"
+        onClick={handleOpenViewer}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && handleOpenViewer()}
+      >
+        {/* Carousel wrapper */}
+        <div className="relative h-full overflow-hidden">
+          {images.map((url, index) => (
+            <div
+              key={`${productName}-${index}-${url.substring(url.length - 20)}`}
+              className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+                index === currentIndex
+                  ? "opacity-100 scale-100"
+                  : "opacity-0 scale-95 pointer-events-none"
               }`}
-              aria-current={idx === currentIndex}
-              aria-label={`Slide ${idx + 1}`}
-              onClick={(e) => goToImage(idx, e)}
-            />
+            >
+              <SmartProductImage
+                src={optimizeProductImage(url)}
+                alt={`${productName} - Imagen ${index + 1}`}
+                containerClassName="rounded-xl"
+                enableZoom={false}
+              />
+            </div>
           ))}
         </div>
-      )}
 
-      {/* Slider controls */}
-      {images.length > 1 && (
-        <>
-          <button
-            type="button"
-            className="absolute top-1/2 -translate-y-1/2 left-2 sm:left-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none"
-            onClick={prevImage}
-          >
-            <span className="inline-flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800 shadow-lg transition-all hover:scale-110">
-              <svg
-                className="w-5 h-5 text-gray-800 dark:text-gray-200"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 6 10"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 1 1 5l4 4"
-                />
-              </svg>
-              <span className="sr-only">Previous</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            className="absolute top-1/2 -translate-y-1/2 right-2 sm:right-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none"
-            onClick={nextImage}
-          >
-            <span className="inline-flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800 shadow-lg transition-all hover:scale-110">
-              <svg
-                className="w-5 h-5 text-gray-800 dark:text-gray-200"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 6 10"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m1 9 4-4-4-4"
-                />
-              </svg>
-              <span className="sr-only">Next</span>
-            </span>
-          </button>
-        </>
-      )}
-    </div>
+        {/* Zoom indicator */}
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-all duration-300 pointer-events-none">
+          <div className="opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full p-3 shadow-lg">
+              <ZoomIn className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+            </div>
+          </div>
+        </div>
+
+        {/* Contador de imágenes */}
+        {images.length > 1 && (
+          <div className="absolute top-3 right-3 z-30 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full">
+            {currentIndex + 1} / {images.length}
+          </div>
+        )}
+
+        {/* Slider indicators (thumbnails) */}
+        {images.length > 1 && (
+          <div className="absolute z-30 flex gap-2 bottom-4 left-1/2 -translate-x-1/2 bg-black/40 backdrop-blur-md px-3 py-2 rounded-full">
+            {images.map((url, idx) => (
+              <button
+                key={`${productName}-indicator-${idx}-${url.substring(
+                  url.length - 10
+                )}`}
+                type="button"
+                className={`w-2 h-2 rounded-full transition-all ${
+                  idx === currentIndex
+                    ? "bg-white w-6"
+                    : "bg-white/50 hover:bg-white/75"
+                }`}
+                aria-current={idx === currentIndex}
+                aria-label={`Slide ${idx + 1}`}
+                onClick={(e) => goToImage(idx, e)}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Slider controls */}
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              className="absolute top-1/2 -translate-y-1/2 left-2 sm:left-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none"
+              onClick={prevImage}
+            >
+              <span className="inline-flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800 shadow-lg transition-all hover:scale-110">
+                <svg
+                  className="w-5 h-5 text-gray-800 dark:text-gray-200"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 6 10"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 1 1 5l4 4"
+                  />
+                </svg>
+                <span className="sr-only">Previous</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              className="absolute top-1/2 -translate-y-1/2 right-2 sm:right-4 z-30 opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none"
+              onClick={nextImage}
+            >
+              <span className="inline-flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:bg-white dark:hover:bg-gray-800 shadow-lg transition-all hover:scale-110">
+                <svg
+                  className="w-5 h-5 text-gray-800 dark:text-gray-200"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 6 10"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m1 9 4-4-4-4"
+                  />
+                </svg>
+                <span className="sr-only">Next</span>
+              </span>
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Image Viewer Modal - muestra la imagen actualmente seleccionada */}
+      <ImageViewer
+        src={optimizeProductImage(images[currentIndex])}
+        alt={`${productName} - Imagen ${currentIndex + 1}`}
+        isOpen={isViewerOpen}
+        onClose={() => setIsViewerOpen(false)}
+      />
+    </>
   );
 }
 

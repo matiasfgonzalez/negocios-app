@@ -13,6 +13,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  ZoomIn,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +47,7 @@ import {
 import { CategoryCombobox } from "@/components/ui/category-combobox";
 import { CategoryFilterCombobox } from "@/components/ui/category-filter-combobox";
 import { SmartProductImage } from "@/components/ui/smart-product-image";
+import { ImageViewer } from "@/components/ui/image-viewer";
 import { Business } from "@/app/types/types";
 
 type ProductCategory = {
@@ -101,6 +103,7 @@ type ImageCarouselProps = {
 
 function ImageCarousel({ images, productName }: Readonly<ImageCarouselProps>) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
 
   const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -117,105 +120,137 @@ function ImageCarousel({ images, productName }: Readonly<ImageCarouselProps>) {
     setCurrentIndex(index);
   };
 
+  const handleOpenViewer = () => {
+    setIsViewerOpen(true);
+  };
+
   return (
-    <div className="relative w-full h-48 md:h-56 overflow-hidden group">
-      {/* Carousel wrapper */}
-      <div className="relative h-full overflow-hidden rounded-t-lg">
-        {images.map((url, index) => (
-          <div
-            key={`${productName}-${index}-${url.substring(url.length - 20)}`}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === currentIndex ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <SmartProductImage
-              src={url}
-              alt={`${productName} - Imagen ${index + 1}`}
-              containerClassName="rounded-t-lg"
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* Overlay Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
-
-      {/* Slider indicators */}
-      {images.length > 1 && (
-        <div className="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3">
-          {images.map((url, idx) => (
-            <button
-              key={`${productName}-indicator-${idx}-${url.substring(
-                url.length - 10
-              )}`}
-              type="button"
-              className={`w-3 h-3 rounded-full transition-all ${
-                idx === currentIndex
-                  ? "bg-white"
-                  : "bg-white/50 hover:bg-white/75"
+    <>
+      <div
+        className="relative w-full h-48 md:h-56 overflow-hidden group cursor-pointer"
+        onClick={handleOpenViewer}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && handleOpenViewer()}
+      >
+        {/* Carousel wrapper */}
+        <div className="relative h-full overflow-hidden rounded-t-lg">
+          {images.map((url, index) => (
+            <div
+              key={`${productName}-${index}-${url.substring(url.length - 20)}`}
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                index === currentIndex
+                  ? "opacity-100"
+                  : "opacity-0 pointer-events-none"
               }`}
-              aria-current={idx === currentIndex}
-              aria-label={`Slide ${idx + 1}`}
-              onClick={(e) => goToImage(idx, e)}
-            />
+            >
+              <SmartProductImage
+                src={url}
+                alt={`${productName} - Imagen ${index + 1}`}
+                containerClassName="rounded-t-lg"
+                enableZoom={false}
+              />
+            </div>
           ))}
         </div>
-      )}
 
-      {/* Slider controls */}
-      {images.length > 1 && (
-        <>
-          <button
-            type="button"
-            className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group/prev focus:outline-none"
-            onClick={prevImage}
-          >
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover/prev:bg-white/50 dark:group-hover/prev:bg-gray-800/60 group-focus/prev:ring-4 group-focus/prev:ring-white dark:group-focus/prev:ring-gray-800/70 group-focus/prev:outline-none">
-              <svg
-                className="w-4 h-4 text-white dark:text-gray-200"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 6 10"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 1 1 5l4 4"
-                />
-              </svg>
-              <span className="sr-only">Previous</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            className="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group/next focus:outline-none"
-            onClick={nextImage}
-          >
-            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover/next:bg-white/50 dark:group-hover/next:bg-gray-800/60 group-focus/next:ring-4 group-focus/next:ring-white dark:group-focus/next:ring-gray-800/70 group-focus/next:outline-none">
-              <svg
-                className="w-4 h-4 text-white dark:text-gray-200"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 6 10"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="m1 9 4-4-4-4"
-                />
-              </svg>
-              <span className="sr-only">Next</span>
-            </span>
-          </button>
-        </>
-      )}
-    </div>
+        {/* Zoom indicator */}
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition-all duration-300 pointer-events-none">
+          <div className="opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300">
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full p-3 shadow-lg">
+              <ZoomIn className="w-6 h-6 text-gray-700 dark:text-gray-200" />
+            </div>
+          </div>
+        </div>
+
+        {/* Overlay Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+
+        {/* Slider indicators */}
+        {images.length > 1 && (
+          <div className="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3">
+            {images.map((url, idx) => (
+              <button
+                key={`${productName}-indicator-${idx}-${url.substring(
+                  url.length - 10
+                )}`}
+                type="button"
+                className={`w-3 h-3 rounded-full transition-all ${
+                  idx === currentIndex
+                    ? "bg-white"
+                    : "bg-white/50 hover:bg-white/75"
+                }`}
+                aria-current={idx === currentIndex}
+                aria-label={`Slide ${idx + 1}`}
+                onClick={(e) => goToImage(idx, e)}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Slider controls */}
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              className="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group/prev focus:outline-none"
+              onClick={prevImage}
+            >
+              <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover/prev:bg-white/50 dark:group-hover/prev:bg-gray-800/60 group-focus/prev:ring-4 group-focus/prev:ring-white dark:group-focus/prev:ring-gray-800/70 group-focus/prev:outline-none">
+                <svg
+                  className="w-4 h-4 text-white dark:text-gray-200"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 6 10"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 1 1 5l4 4"
+                  />
+                </svg>
+                <span className="sr-only">Previous</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              className="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4 cursor-pointer group/next focus:outline-none"
+              onClick={nextImage}
+            >
+              <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/30 dark:bg-gray-800/30 group-hover/next:bg-white/50 dark:group-hover/next:bg-gray-800/60 group-focus/next:ring-4 group-focus/next:ring-white dark:group-focus/next:ring-gray-800/70 group-focus/next:outline-none">
+                <svg
+                  className="w-4 h-4 text-white dark:text-gray-200"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 6 10"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m1 9 4-4-4-4"
+                  />
+                </svg>
+                <span className="sr-only">Next</span>
+              </span>
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Image Viewer Modal - muestra la imagen actualmente seleccionada */}
+      <ImageViewer
+        src={images[currentIndex]}
+        alt={`${productName} - Imagen ${currentIndex + 1}`}
+        isOpen={isViewerOpen}
+        onClose={() => setIsViewerOpen(false)}
+      />
+    </>
   );
 }
 
