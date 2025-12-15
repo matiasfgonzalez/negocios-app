@@ -191,6 +191,7 @@ export function ImageViewer({ src, alt, isOpen, onClose }: ImageViewerProps) {
       <DialogContent
         className="max-w-[95vw] max-h-[95vh] w-full h-full p-0 bg-black/95 border-none overflow-hidden"
         onPointerDownOutside={(e) => e.preventDefault()}
+        showCloseButton={false}
       >
         <VisuallyHidden>
           <DialogTitle>Visor de imagen: {alt}</DialogTitle>
