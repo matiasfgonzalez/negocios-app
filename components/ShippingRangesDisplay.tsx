@@ -2,6 +2,7 @@
 
 import { Truck, MapPin } from "lucide-react";
 import { ShippingRange } from "@/lib/shipping-utils";
+import { formatPrice } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -76,7 +77,7 @@ export default function ShippingRangesDisplay({
               <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border border-green-200 dark:border-green-800 rounded-lg">
                 <div className="text-center">
                   <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    ${ranges[0].cost.toFixed(2)}
+                    {formatPrice(ranges[0].cost)}
                   </p>
                   <p className="text-xs text-green-700 dark:text-green-400 mt-1">
                     Para todas las distancias
@@ -112,7 +113,7 @@ export default function ShippingRangesDisplay({
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-bold text-primary">
-                          ${range.cost.toFixed(2)}
+                          {formatPrice(range.cost)}
                         </p>
                       </div>
                     </div>

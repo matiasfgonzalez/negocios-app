@@ -17,6 +17,7 @@ import {
   calculateShippingCost,
   isWithinShippingRange,
 } from "@/lib/shipping-utils";
+import { formatPrice } from "@/lib/utils";
 
 // Fix para los iconos de Leaflet (solo en el cliente)
 let businessIcon: L.Icon | undefined;
@@ -300,7 +301,7 @@ export default function OrderMapSelector({
                 <span className="text-lg font-bold text-green-600 dark:text-green-400">
                   {shippingCost === null
                     ? "Calculando..."
-                    : `$${shippingCost.toFixed(2)}`}
+                    : formatPrice(shippingCost)}
                 </span>
               </div>
               <p className="text-xs text-green-700 dark:text-green-400 mt-1">

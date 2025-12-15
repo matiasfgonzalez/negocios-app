@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { Product } from "@/app/types/types";
+import { formatPrice } from "@/lib/utils";
 
 export default function ProductCard({
   product,
@@ -19,7 +20,7 @@ export default function ProductCard({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-xl sm:text-2xl font-bold text-primary">
-          ${product.price}
+          {formatPrice(product.price)}
         </p>
         <Button
           onClick={() =>

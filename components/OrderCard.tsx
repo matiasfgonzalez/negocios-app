@@ -28,6 +28,7 @@ import CancelOrderDialog from "@/components/CancelOrderDialog";
 import ContactBusinessButton from "@/components/ContactBusinessButton";
 import PaymentAliasDisplay from "@/components/PaymentAliasDisplay";
 import OrderTimeline from "@/components/OrderTimeline";
+import { formatPrice } from "@/lib/utils";
 
 // Importar UserLocationMap dinámicamente
 const UserLocationMap = dynamic(() => import("@/components/UserLocationMap"), {
@@ -310,7 +311,7 @@ export default function OrderCard({
               Total
             </p>
             <p className="text-2xl sm:text-3xl font-bold text-primary">
-              ${order.total.toFixed(2)}
+              {formatPrice(order.total)}
             </p>
           </div>
         </div>

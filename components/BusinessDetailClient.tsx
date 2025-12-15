@@ -42,6 +42,7 @@ import {
 } from "@/lib/business-hours";
 import { ShippingRange, isWithinShippingRange } from "@/lib/shipping-utils";
 import { optimizeBusinessDetailImage } from "@/lib/cloudinary-utils";
+import { formatPrice } from "@/lib/utils";
 import dynamic from "next/dynamic";
 
 const OrderMapSelector = dynamic(
@@ -301,24 +302,24 @@ export default function BusinessDetailClient({
     for (const item of cart) {
       const itemLabel =
         item.type === "promotion" ? `🎁 PROMO: ${item.name}` : item.name;
-      message += `• ${item.quantity}x ${itemLabel} - $${(
+      message += `• ${item.quantity}x ${itemLabel} - ${formatPrice(
         item.price * item.quantity
-      ).toFixed(2)}\n`;
+      )}\n`;
     }
 
     message += `\n💰 *Resumen:*\n`;
-    message += `Subtotal: $${subtotal.toFixed(2)}\n`;
+    message += `Subtotal: ${formatPrice(subtotal)}\n`;
 
     if (deliveryType === "delivery") {
-      message += `Envío: $${shippingCost.toFixed(2)}\n`;
-      message += `*Total: $${total.toFixed(2)}*\n\n`;
+      message += `Envío: ${formatPrice(shippingCost)}\n`;
+      message += `*Total: ${formatPrice(total)}*\n\n`;
       message += `🚚 *Envío a domicilio*\n`;
       message += `📍 Dirección: ${deliveryAddress}\n`;
       if (deliveryNote) {
         message += `📝 Nota: ${deliveryNote}\n`;
       }
     } else {
-      message += `*Total: $${total.toFixed(2)}*\n\n`;
+      message += `*Total: ${formatPrice(total)}*\n\n`;
       message += `📦 *Retiro en local*\n`;
     }
 
@@ -1010,7 +1011,7 @@ export default function BusinessDetailClient({
                                             <div className="flex items-end justify-between gap-2 pt-1">
                                               <div className="flex items-baseline gap-1">
                                                 <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                                                  ${product.price.toFixed(2)}
+                                                  {formatPrice(product.price)}
                                                 </span>
                                               </div>
 
@@ -1140,12 +1141,12 @@ export default function BusinessDetailClient({
                                 </p>
                               </div>
                               <p className="text-xs text-muted-foreground">
-                                ${item.price.toFixed(2)} x {item.quantity}
+                                {formatPrice(item.price)} x {item.quantity}
                               </p>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="font-semibold text-sm sm:text-base bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                                ${(item.price * item.quantity).toFixed(2)}
+                                {formatPrice(item.price * item.quantity)}
                               </span>
                               <Button
                                 size="sm"
@@ -1223,10 +1224,8 @@ export default function BusinessDetailClient({
                                     </span>
                                   ) : (
                                     <span className="text-xs text-accent font-semibold">
-                                      (+$
-                                      {business.shippingCost?.toFixed(2) ||
-                                        "0.00"}
-                                      )
+                                      (+
+                                      {formatPrice(business.shippingCost || 0)})
                                     </span>
                                   )}
                                 </div>
@@ -1280,8 +1279,8 @@ export default function BusinessDetailClient({
                                   </span>
                                   {calculatedShippingCost !== null && (
                                     <span className="font-bold text-green-800 dark:text-green-300">
-                                      Envío: $
-                                      {calculatedShippingCost.toFixed(2)}
+                                      Envío:{" "}
+                                      {formatPrice(calculatedShippingCost)}
                                     </span>
                                   )}
                                 </div>
@@ -1347,7 +1346,7 @@ export default function BusinessDetailClient({
                             Subtotal:
                           </span>
                           <span className="font-semibold text-foreground">
-                            ${subtotal.toFixed(2)}
+                            {formatPrice(subtotal)}
                           </span>
                         </div>
 
@@ -1362,7 +1361,7 @@ export default function BusinessDetailClient({
                               {deliveryLocation &&
                               calculatedShippingCost !== null ? (
                                 <span className="font-semibold text-accent">
-                                  +${shippingCost.toFixed(2)}
+                                  +{formatPrice(shippingCost)}
                                 </span>
                               ) : business.shippingRanges &&
                                 Array.isArray(business.shippingRanges) &&
@@ -1372,7 +1371,7 @@ export default function BusinessDetailClient({
                                 </span>
                               ) : (
                                 <span className="font-semibold text-accent">
-                                  +${shippingCost.toFixed(2)}
+                                  +{formatPrice(shippingCost)}
                                 </span>
                               )}
                             </div>
@@ -1384,7 +1383,7 @@ export default function BusinessDetailClient({
                             Total:
                           </span>
                           <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
-                            ${total.toFixed(2)}
+                            {formatPrice(total)}
                           </span>
                         </div>
 

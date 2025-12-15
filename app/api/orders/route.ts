@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { Prisma } from "@prisma/client";
+import { formatPrice } from "@/lib/utils";
 
 const orderSchema = z.object({
   businessId: z.string(),
@@ -366,13 +367,14 @@ export async function POST(req: Request) {
     // Construir mensaje detallado para WhatsApp
     const itemsList = [
       ...parsed.items.map(
-        (item) => `• ${item.quantity}x ${item.name} - $${item.price.toFixed(2)}`
+        (item) =>
+          `• ${item.quantity}x ${item.name} - ${formatPrice(item.price)}`
       ),
       ...parsed.promotions.map(
         (promo) =>
-          `• 🎁 ${promo.quantity}x PROMO: ${
-            promo.name
-          } - $${promo.price.toFixed(2)}`
+          `• 🎁 ${promo.quantity}x PROMO: ${promo.name} - ${formatPrice(
+            promo.price
+          )}`
       ),
     ].join("\n");
 
@@ -380,7 +382,7 @@ export async function POST(req: Request) {
       ? `\n\n📍 *ENTREGA A DOMICILIO*\n` +
         `Dirección: ${parsed.addressText}\n` +
         (parsed.note ? `Indicaciones: ${parsed.note}\n` : "") +
-        `Costo de envío: $${parsed.shippingCost.toFixed(2)}`
+        `Costo de envío: ${formatPrice(parsed.shippingCost)}`
       : `\n\n📦 *RETIRO EN LOCAL*`;
 
     const whatsappMessage =
@@ -389,9 +391,9 @@ export async function POST(req: Request) {
       `📱 Teléfono: ${appUser.phone || "No especificado"}\n\n` +
       `📋 *PRODUCTOS:*\n${itemsList}\n\n` +
       `💰 *RESUMEN:*\n` +
-      `Subtotal: $${parsed.subtotal.toFixed(2)}\n` +
-      (parsed.shipping ? `Envío: $${parsed.shippingCost.toFixed(2)}\n` : "") +
-      `*Total: $${parsed.total.toFixed(2)}*` +
+      `Subtotal: ${formatPrice(parsed.subtotal)}\n` +
+      (parsed.shipping ? `Envío: ${formatPrice(parsed.shippingCost)}\n` : "") +
+      `*Total: ${formatPrice(parsed.total)}*` +
       deliveryInfo +
       `\n\n📅 Fecha: ${new Date().toLocaleString("es-AR")}\n` +
       `\n_Pedido ID: ${created.id}_`;

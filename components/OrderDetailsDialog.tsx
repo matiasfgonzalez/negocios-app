@@ -26,6 +26,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import PaymentAliasDisplay from "@/components/PaymentAliasDisplay";
 import { Order } from "@/app/types/types";
+import { formatPrice } from "@/lib/utils";
 
 type OrderDetailsData = Omit<
   Order,
@@ -201,11 +202,11 @@ export default function OrderDetailsDialog({
                       {item.product.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      ${item.unitPrice.toFixed(2)} × {item.quantity}
+                      {formatPrice(item.unitPrice)} × {item.quantity}
                     </p>
                   </div>
                   <p className="font-semibold text-primary">
-                    ${(item.unitPrice * item.quantity).toFixed(2)}
+                    {formatPrice(item.unitPrice * item.quantity)}
                   </p>
                 </div>
               ))}
@@ -224,11 +225,11 @@ export default function OrderDetailsDialog({
                       </p>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      ${promo.unitPrice.toFixed(2)} × {promo.quantity}
+                      {formatPrice(promo.unitPrice)} × {promo.quantity}
                     </p>
                   </div>
                   <p className="font-semibold bg-gradient-to-r from-fuchsia-600 to-pink-600 bg-clip-text text-transparent">
-                    ${(promo.unitPrice * promo.quantity).toFixed(2)}
+                    {formatPrice(promo.unitPrice * promo.quantity)}
                   </p>
                 </div>
               ))}
@@ -310,35 +311,34 @@ export default function OrderDetailsDialog({
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal:</span>
                 <span className="font-medium text-foreground">
-                  $
-                  {(
+                  {formatPrice(
                     order.items.reduce(
                       (sum, item) => sum + item.unitPrice * item.quantity,
                       0
                     ) +
-                    (order.promotions?.reduce(
-                      (sum, promo) => sum + promo.unitPrice * promo.quantity,
-                      0
-                    ) || 0)
-                  ).toFixed(2)}
+                      (order.promotions?.reduce(
+                        (sum, promo) => sum + promo.unitPrice * promo.quantity,
+                        0
+                      ) || 0)
+                  )}
                 </span>
               </div>
               {order.shipping && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Envío:</span>
                   <span className="font-medium text-accent">
-                    $
-                    {(
+                    {formatPrice(
                       order.total -
-                      order.items.reduce(
-                        (sum, item) => sum + item.unitPrice * item.quantity,
-                        0
-                      ) -
-                      (order.promotions?.reduce(
-                        (sum, promo) => sum + promo.unitPrice * promo.quantity,
-                        0
-                      ) || 0)
-                    ).toFixed(2)}
+                        order.items.reduce(
+                          (sum, item) => sum + item.unitPrice * item.quantity,
+                          0
+                        ) -
+                        (order.promotions?.reduce(
+                          (sum, promo) =>
+                            sum + promo.unitPrice * promo.quantity,
+                          0
+                        ) || 0)
+                    )}
                   </span>
                 </div>
               )}
@@ -346,7 +346,7 @@ export default function OrderDetailsDialog({
               <div className="flex justify-between pt-2">
                 <span className="font-bold text-foreground">Total:</span>
                 <span className="text-xl font-bold text-primary">
-                  ${order.total.toFixed(2)}
+                  {formatPrice(order.total)}
                 </span>
               </div>
             </div>

@@ -16,8 +16,12 @@ import {
 } from "@/components/ui/select";
 import { DialogFooter } from "@/components/ui/dialog";
 import ImageSelector from "@/components/ImageSelector";
-import { createPromotion, type CreatePromotionState } from "@/app/actions/promotions";
+import {
+  createPromotion,
+  type CreatePromotionState,
+} from "@/app/actions/promotions";
 import { Product } from "@/app/types/types";
+import { formatPrice } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { createPromotionSchema } from "@/lib/schemas/promotion";
 
@@ -46,10 +50,15 @@ export function NuevaPromocionFormClient({
   onSuccess,
 }: Readonly<NuevaPromocionFormClientProps>) {
   const router = useRouter();
-  const [state, formAction, isPending] = useActionState(createPromotion, initialState);
+  const [state, formAction, isPending] = useActionState(
+    createPromotion,
+    initialState
+  );
   const [clientError, setClientError] = useState<string | null>(null);
 
-  const [selectedProducts, setSelectedProducts] = useState<ProductSelection[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<ProductSelection[]>(
+    []
+  );
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -169,8 +178,8 @@ export function NuevaPromocionFormClient({
     startTransition(() => {
       formAction(formDataToSubmit);
     });
-  };  
-  
+  };
+
   const availableProducts = products.filter(
     (p) => !selectedProducts.find((sp) => sp.productId === p.id)
   );
@@ -178,7 +187,11 @@ export function NuevaPromocionFormClient({
   return (
     <form onSubmit={handleSubmit}>
       <input type="hidden" name="businessId" value={businessId} />
-      <input type="hidden" name="products" value={JSON.stringify(selectedProducts)} />
+      <input
+        type="hidden"
+        name="products"
+        value={JSON.stringify(selectedProducts)}
+      />
       <div className="grid gap-4 py-4">
         {(state.error || clientError) && (
           <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg">
@@ -192,9 +205,7 @@ export function NuevaPromocionFormClient({
             id="name"
             name="name"
             value={formData.name}
-            onChange={(e) =>
-              setFormData({ ...formData, name: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="Ej: Promo noche de sábado"
             required
             disabled={isPending}
@@ -235,12 +246,12 @@ export function NuevaPromocionFormClient({
             />
             {selectedProducts.length > 0 && formData.price && (
               <p className="text-xs text-muted-foreground">
-                Total individual: ${getTotalIndividualPrice().toFixed(2)}
+                Total individual: {formatPrice(getTotalIndividualPrice())}
                 <br />
-                Ahorro: $
-                {(
+                Ahorro:{" "}
+                {formatPrice(
                   getTotalIndividualPrice() - parseFloat(formData.price)
-                ).toFixed(2)}
+                )}
               </p>
             )}
           </div>
@@ -336,11 +347,9 @@ export function NuevaPromocionFormClient({
                   className="flex items-center gap-2 bg-background p-2 rounded"
                 >
                   <div className="flex-1">
-                    <p className="font-medium text-sm">
-                      {item.product?.name}
-                    </p>
+                    <p className="font-medium text-sm">{item.product?.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      ${item.product?.price.toFixed(2)} c/u
+                      {formatPrice(item.product?.price || 0)} c/u
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -374,25 +383,26 @@ export function NuevaPromocionFormClient({
           )}
 
           {/* Selector para agregar productos */}
-             {loadingProducts ? (
-          <div className="text-sm text-muted-foreground">
-            Cargando productos...
-          </div>
-        ) : (
-          availableProducts.length > 0 && (
-            <Select onValueChange={handleAddProduct} disabled={isPending}>
-              <SelectTrigger>
-                <SelectValue placeholder="Agregar producto..." />
-              </SelectTrigger>
-              <SelectContent>
-                {availableProducts.map((product) => (
-                  <SelectItem key={product.id} value={product.id}>
-                    {product.name} - ${product.price.toFixed(2)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ))}
+          {loadingProducts ? (
+            <div className="text-sm text-muted-foreground">
+              Cargando productos...
+            </div>
+          ) : (
+            availableProducts.length > 0 && (
+              <Select onValueChange={handleAddProduct} disabled={isPending}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Agregar producto..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableProducts.map((product) => (
+                    <SelectItem key={product.id} value={product.id}>
+                      {product.name} - {formatPrice(product.price)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )
+          )}
 
           {selectedProducts.length === 0 && (
             <p className="text-sm text-muted-foreground">

@@ -1,13 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { Suspense } from "react";
-import {
-  Tag,
-  Calendar,
-  Package,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
+import { Tag, Calendar, Package, CheckCircle, XCircle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -27,6 +21,7 @@ import { getPromotions } from "@/app/actions/promotions";
 import { getOwnerBusinesses } from "@/app/actions/businesses";
 import { PromotionWithProductsAndBusiness } from "@/app/types/types";
 import { getAllBusinesses } from "@/app/actions/businesses/businesses";
+import { formatPrice } from "@/lib/utils";
 
 interface PromocionesPageProps {
   searchParams: Promise<{ businessId?: string }>;
@@ -36,11 +31,11 @@ export default async function PromocionesPage({
   searchParams,
 }: PromocionesPageProps) {
   const { userId } = await auth();
-    // Obtener parámetros
+  // Obtener parámetros
   const params = await searchParams;
   let selectedBusinessId = params.businessId;
   let businesses: Array<{ id: string; name: string }> = [];
-  
+
   let promociones: PromotionWithProductsAndBusiness[] = [];
   let user;
 
@@ -49,7 +44,7 @@ export default async function PromocionesPage({
   }
 
   // Obtener usuario y su rol usando la action
- 
+
   try {
     user = await getMe();
   } catch {
@@ -79,8 +74,6 @@ export default async function PromocionesPage({
     );
   }
 
-
-
   // Si es propietario, obtener sus negocios
   if (user.role === "PROPIETARIO") {
     try {
@@ -108,8 +101,7 @@ export default async function PromocionesPage({
   }
 
   // Obtener promociones y productos usando las actions
-   
-  
+
   if (selectedBusinessId) {
     try {
       const [promosData] = await Promise.all([
@@ -147,9 +139,7 @@ export default async function PromocionesPage({
         </div>
 
         {selectedBusinessId && (
-          <NuevaPromocionDialog
-              businessId={selectedBusinessId}
-            />
+          <NuevaPromocionDialog businessId={selectedBusinessId} />
         )}
       </div>
 
@@ -174,7 +164,6 @@ export default async function PromocionesPage({
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {promociones.map((promo) => {
-             
             const totalIndividual = promo.products.reduce(
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (sum: number, p: any) =>
@@ -200,9 +189,7 @@ export default async function PromocionesPage({
                   <div className="flex items-start justify-between gap-2">
                     <CardTitle className="text-lg">{promo.name}</CardTitle>
                     <div className="flex gap-1">
-                      <EditarPromocionDialog
-                        promotion={promo}
-                      />
+                      <EditarPromocionDialog promotion={promo} />
                       <EliminarPromocionDialog
                         promotionId={promo.id}
                         promotionName={promo.name}
@@ -241,14 +228,14 @@ export default async function PromocionesPage({
                   <div className="space-y-1">
                     <div className="flex items-baseline gap-2">
                       <span className="text-2xl font-bold text-primary">
-                        ${promo.price.toFixed(2)}
+                        {formatPrice(promo.price)}
                       </span>
                       <span className="text-sm text-muted-foreground line-through">
-                        ${totalIndividual.toFixed(2)}
+                        {formatPrice(totalIndividual)}
                       </span>
                     </div>
                     <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                      Ahorrás ${discount.toFixed(2)} (
+                      Ahorrás {formatPrice(discount)} (
                       {discountPercent.toFixed(0)}% OFF)
                     </p>
                   </div>

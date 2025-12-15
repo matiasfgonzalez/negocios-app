@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PromotionWithProducts } from "@/app/types/types";
 import { optimizeProductImage } from "@/lib/cloudinary-utils";
+import { formatPrice } from "@/lib/utils";
 
 interface PromotionCardProps {
   promotion: PromotionWithProducts;
@@ -114,17 +115,17 @@ export default function PromotionCard({
             <div className="flex flex-wrap items-end gap-3 ml-7">
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold text-primary">
-                  ${promotion.price.toFixed(2)}
+                  {formatPrice(promotion.price)}
                 </span>
                 {individualPrice > promotion.price && (
                   <span className="text-base text-muted-foreground line-through">
-                    ${individualPrice.toFixed(2)}
+                    {formatPrice(individualPrice)}
                   </span>
                 )}
               </div>
               {savings > 0 && (
                 <Badge className="bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30 text-sm font-semibold">
-                  Ahorrás ${savings.toFixed(2)}
+                  Ahorrás {formatPrice(savings)}
                 </Badge>
               )}
             </div>
@@ -255,7 +256,7 @@ export default function PromotionCard({
                       </span>
                     </div>
                     <span className="text-muted-foreground">
-                      ${((p.product?.price ?? 0) * p.quantity).toFixed(2)}
+                      {formatPrice((p.product?.price ?? 0) * p.quantity)}
                     </span>
                   </div>
                 ))}
@@ -268,7 +269,7 @@ export default function PromotionCard({
                     Precio individual:
                   </span>
                   <span className="font-semibold text-muted-foreground line-through">
-                    ${individualPrice.toFixed(2)}
+                    {formatPrice(individualPrice)}
                   </span>
                 </div>
                 <div className="flex justify-between text-base">
@@ -276,7 +277,7 @@ export default function PromotionCard({
                     Precio promoción:
                   </span>
                   <span className="font-bold text-primary text-lg">
-                    ${promotion.price.toFixed(2)}
+                    {formatPrice(promotion.price)}
                   </span>
                 </div>
               </div>

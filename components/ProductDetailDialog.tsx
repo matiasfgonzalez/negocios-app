@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { SmartProductImage } from "@/components/ui/smart-product-image";
 import { ImageViewer } from "@/components/ui/image-viewer";
 import { optimizeProductImage } from "@/lib/cloudinary-utils";
+import { formatPrice } from "@/lib/utils";
 
 // Componente de Carrusel de Imágenes Mejorado
 type ImageCarouselProps = {
@@ -296,7 +297,7 @@ export default function ProductDetailDialog({
                     Precio
                   </div>
                   <p className="text-3xl sm:text-4xl font-bold text-primary">
-                    ${product.price.toFixed(2)}
+                    {formatPrice(product.price)}
                   </p>
                 </div>
               </div>

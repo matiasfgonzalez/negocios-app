@@ -1,5 +1,6 @@
 // Utilidades para generar mensajes de WhatsApp
 import { Order } from "@/app/types/types";
+import { formatPrice } from "@/lib/utils";
 
 // Tipo específico para el mensaje de WhatsApp (con las relaciones necesarias)
 type OrderForWhatsApp = Pick<
@@ -57,9 +58,9 @@ export function generateOrderWhatsAppMessage(
   for (const item of order.items) {
     const itemPrice = item.price ?? item.unitPrice ?? 0;
     const subtotal = item.quantity * itemPrice;
-    productsText += `\n• ${item.quantity}x ${
-      item.product.name
-    } - $${subtotal.toFixed(2)}`;
+    productsText += `\n• ${item.quantity}x ${item.product.name} - ${formatPrice(
+      subtotal
+    )}`;
   }
 
   // Agregar promociones si existen
@@ -70,7 +71,7 @@ export function generateOrderWhatsAppMessage(
       const promoName = promo.promotion?.name || "Promoción sin nombre";
       productsText += `\n• 🎁 ${
         promo.quantity
-      }x PROMO: ${promoName} - $${subtotal.toFixed(2)}`;
+      }x PROMO: ${promoName} - ${formatPrice(subtotal)}`;
     }
   }
 
@@ -124,11 +125,11 @@ export function generateOrderWhatsAppMessage(
   message += `${deliveryType}\n\n`;
 
   message += `💰 *Resumen:*\n`;
-  message += `Subtotal: $${subtotal.toFixed(2)}\n`;
+  message += `Subtotal: ${formatPrice(subtotal)}\n`;
   if (shippingCost > 0) {
-    message += `Envío: $${shippingCost.toFixed(2)}\n`;
+    message += `Envío: ${formatPrice(shippingCost)}\n`;
   }
-  message += `*Total: $${order.total.toFixed(2)}*`;
+  message += `*Total: ${formatPrice(order.total)}*`;
 
   message += noteText;
 

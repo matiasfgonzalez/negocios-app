@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, MessageCircle, Package, ArrowRight } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
 
 interface OrderSuccessDialogProps {
   isOpen: boolean;
@@ -115,7 +116,7 @@ export default function OrderSuccessDialog({
                     Total:
                   </span>
                   <span className="text-xl font-bold text-primary">
-                    ${total.toFixed(2)}
+                    {formatPrice(total)}
                   </span>
                 </div>
               </div>

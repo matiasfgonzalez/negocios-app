@@ -24,6 +24,7 @@ import Link from "next/link";
 import BusinessHoursDialog from "@/components/BusinessHoursDialog";
 import { BusinessSchedule, isBusinessOpen } from "@/lib/business-hours";
 import { optimizeBusinessCardImage } from "@/lib/cloudinary-utils";
+import { formatPrice } from "@/lib/utils";
 
 export default function BusinessCard({
   business,
@@ -206,7 +207,7 @@ export default function BusinessCard({
                   </span>
                 ) : (
                   <span className="text-xs text-muted-foreground">
-                    Costo fijo: ${business.shippingCost?.toFixed(2) || "0.00"}
+                    Costo fijo: {formatPrice(business.shippingCost || 0)}
                   </span>
                 )}
               </div>

@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { Product, PromotionWithProducts } from "@/app/types/types";
 import { Switch } from "@/components/ui/switch";
+import { formatPrice } from "@/lib/utils";
 
 interface EditarPromocionDialogProps {
   promotion: PromotionWithProducts;
@@ -255,13 +256,13 @@ export default function EditarPromocionDialog({
                 />
                 {selectedProducts.length > 0 && formData.price && (
                   <p className="text-xs text-muted-foreground">
-                    Total individual: ${getTotalIndividualPrice().toFixed(2)}
+                    Total individual: {formatPrice(getTotalIndividualPrice())}
                     <br />
-                    Ahorro: $
-                    {(
+                    Ahorro:{" "}
+                    {formatPrice(
                       getTotalIndividualPrice() -
-                      Number.parseFloat(formData.price)
-                    ).toFixed(2)}
+                        Number.parseFloat(formData.price)
+                    )}
                   </p>
                 )}
               </div>
@@ -349,7 +350,7 @@ export default function EditarPromocionDialog({
                           {item.product?.name}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          ${item.product?.price.toFixed(2)} c/u
+                          {formatPrice(item.product?.price || 0)} c/u
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -389,7 +390,7 @@ export default function EditarPromocionDialog({
                   <SelectContent>
                     {availableProducts.map((product) => (
                       <SelectItem key={product.id} value={product.id}>
-                        {product.name} - ${product.price.toFixed(2)}
+                        {product.name} - {formatPrice(product.price)}
                       </SelectItem>
                     ))}
                   </SelectContent>
