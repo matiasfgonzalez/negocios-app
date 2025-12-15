@@ -76,10 +76,18 @@ export default function BusinessHoursDialog({
                 {businessIsOpen ? "Abierto ahora" : "Cerrado"}
               </p>
             </div>
-            {!businessIsOpen && reason && (
+            {/* Mostrar el reason solo si es diferente de hoursMessage para evitar duplicación */}
+            {!businessIsOpen && reason && reason !== hoursMessage && (
               <p className="text-sm text-muted-foreground mt-1">{reason}</p>
             )}
-            <p className="text-sm text-muted-foreground mt-2">{hoursMessage}</p>
+            {/* Mostrar hoursMessage solo si es informativo (no si es igual a reason) */}
+            {hoursMessage &&
+              hoursMessage !== "Cerrado hoy" &&
+              hoursMessage !== reason && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  {hoursMessage}
+                </p>
+              )}
           </div>
 
           {/* Horario Semanal */}
